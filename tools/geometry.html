@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>図形の性質</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>図形の性質</h1>
+    <p class="lede">三角形の五心、チェバ・メネラウスの定理、円周角・内接四角形・接弦定理、方べきの定理。頂点や点をドラッグして、定理が「どんな形でも成り立つ」ことを数値で確かめます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 三角形の五心 -->
+  <section class="tool-body" data-tab="centers">
+    <div class="layout">
+      <aside class="controls" id="c-centers"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-centers"></canvas><div class="caption">頂点 A, B, C をドラッグできます</div></div>
+        <div class="readout" id="r-centers"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">五心はそれぞれ「3 本の線の交点」</div>
+        重心 G は 3 本の中線、外心 O は 3 辺の垂直二等分線、内心 I は 3 つの内角の二等分線、垂心 H は 3 本の垂線（高さ）の交点。
+        傍心は 1 つの内角と他の 2 つの外角の二等分線の交点で、3 つあります。「3 本が 1 点で交わる」こと自体が定理です。
+      </div>
+      <ul>
+        <li>重心は中線を $2:1$ に内分する（$AG:GM=2:1$）。頂点をどう動かしても比が変わらないことを読み取ろう。</li>
+        <li>「直角三角形」にすると外心が斜辺の中点に、垂心が直角の頂点に来る。「鈍角三角形」では外心と垂心が三角形の外に出る。</li>
+        <li>オイラー線：外心 O、重心 G、垂心 H はつねに一直線上にあり $OG:GH=1:2$。正三角形では 4 点（O, G, H, I）が一致する。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- チェバ・メネラウス -->
+  <section class="tool-body" data-tab="ceva">
+    <div class="layout">
+      <aside class="controls" id="c-ceva"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-ceva"></canvas><div class="caption" id="cap-ceva">点 P と頂点をドラッグできます</div></div>
+        <div class="readout" id="r-ceva"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">チェバの定理・メネラウスの定理</div>
+        三角形 ABC の辺 BC, CA, AB（またはその延長）上の点を D, E, F とするとき、
+        $$\frac{AF}{FB}\cdot\frac{BD}{DC}\cdot\frac{CE}{EA}=1$$
+        が成り立つのは、チェバ：AD, BE, CF が 1 点 P で交わるとき／メネラウス：D, E, F が 1 直線上にあるとき。
+        「A→F→B→D→C→E→A」と頂点と分点を交互にひと回りする順に書くと覚えやすい。
+      </div>
+      <ul>
+        <li>チェバ：P を辺に近づけると、ある比が大きくなる代わりに別の比が小さくなり、積は 1 のまま。</li>
+        <li>メネラウス：直線は必ず 1 辺（または 3 辺）を「外分」する。外分している点は文章で赤く示す。比は長さの比なので正の数で計算する。</li>
+        <li>どちらも「1 になる」ことを使って、未知の比を求めるのが典型問題。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 円の性質 -->
+  <section class="tool-body" data-tab="circle">
+    <div class="layout">
+      <aside class="controls" id="c-circle"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-circle"></canvas><div class="caption" id="cap-circle">円周上の点をドラッグできます</div></div>
+        <div class="readout" id="r-circle"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">円周角の定理</div>
+        1 つの弧に対する円周角は一定で、その弧に対する中心角の半分。$\angle APB=\dfrac12\angle AOB$。
+        P が反対側の弧に移ると、対する弧が入れかわるので $180^\circ-\angle APB$ になる（内接四角形の対角の和が $180^\circ$ になる理由）。
+      </div>
+      <div class="note sage">
+        <div class="title">接弦定理</div>
+        円の接線と接点を通る弦のつくる角は、その角の内部にある弧に対する円周角に等しい。弦 AB と接線のなす角 $=\angle ACB$。
+      </div>
+      <ul>
+        <li>円周角：P を同じ弧の上で動かしても角は変わらない。A, B を動かして弧を大きくすると角も大きくなる。弧が半円のとき $90^\circ$。</li>
+        <li>内接四角形：どの頂点を動かしても、向かい合う角の和は $180^\circ$ のまま。</li>
+        <li>接弦定理：C を動かしても $\angle ACB$ は変わらない（円周角の定理）。B を接点 A に近づけると弦が接線に近づく様子も見よう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 方べきの定理 -->
+  <section class="tool-body" data-tab="power">
+    <div class="layout">
+      <aside class="controls" id="c-power"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-power"></canvas><div class="caption">P と、直線の向きを決める点をドラッグできます</div></div>
+        <div class="readout" id="r-power"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">方べきの定理</div>
+        点 P を通る 2 直線が円と A, B および C, D で交わるとき $PA\cdot PB=PC\cdot PD$。
+        この値は直線の向きによらず、$|OP^2-r^2|$ に等しい（P の「方べき」）。P が円の外にあって PT が接線なら $PA\cdot PB=PT^2$。
+      </div>
+      <ul>
+        <li>P を円の内側に置くと、2 本の弦の「切れ端」の積が等しい。直線の向きを変えても積が変わらないことを確かめよう。</li>
+        <li>P を外に出すと、P から遠い方と近い方の交点までの長さの積。直線を回して円に接する瞬間、A と B が重なって $PT^2$ になる。</li>
+        <li>証明は $\triangle PAC\sim\triangle PDB$（円周角の定理）から。相似比が積の等式になる。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学A', title: '図形の性質' });
+
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1]];
+  const add = (a, b) => [a[0] + b[0], a[1] + b[1]];
+  const mul = (a, k) => [a[0] * k, a[1] * k];
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1];
+  const cross = (a, b) => a[0] * b[1] - a[1] * b[0];
+  const len = (a) => Math.hypot(a[0], a[1]);
+  const dist = (a, b) => len(sub(a, b));
+  const unit = (a) => mul(a, 1 / (len(a) || 1));
+  const mid = (a, b) => mul(add(a, b), 0.5);
+  const perp = (a) => [-a[1], a[0]];
+  const snap = (v) => Math.round(v * 4) / 4;
+  const deg = (r) => r * 180 / Math.PI;
+  /** 角 ∠AVB (0..π) */
+  const angleAt = (V, A, B) => { const u = sub(A, V), w = sub(B, V); return Math.acos(Math.max(-1, Math.min(1, dot(u, w) / (len(u) * len(w))))); };
+  /** 直線 p + t d と q + s e の交点 */
+  function inter(p, d, q, e) { const den = cross(d, e); if (Math.abs(den) < 1e-9) return null; const t = cross(sub(q, p), e) / den; return add(p, mul(d, t)); }
+  const D = (v) => `${fmt(deg(v), 1)}°`;
+
+  /* ======================= 三角形の五心 ======================= */
+  (() => {
+    const ctl = $('#c-centers');
+    const st = { A: [-3, -2], B: [4, -2], C: [1, 3] };
+    const plot = new Plot('#cv-centers', { xmin: -6, xmax: 6, ymin: -6, ymax: 6, aspect: 0.7 });
+    const handle = (k, dx, dy) => plot.addHandle({ x: st[k][0], y: st[k][1], color: C.ochre, label: k, dx, dy, onMove: (x, y) => { st[k] = [snap(x), snap(y)]; draw(); return st[k]; } });
+    const hs = { A: handle('A', -18, 18), B: handle('B', 8, 18), C: handle('C', 8, -8) };
+    UI.heading(ctl, '表示する心');
+    const cb = {
+      G: UI.checkbox(ctl, { label: '重心 G（中線）', checked: true, onChange: draw }),
+      O: UI.checkbox(ctl, { label: '外心 O（垂直二等分線・外接円）', checked: true, onChange: draw }),
+      I: UI.checkbox(ctl, { label: '内心 I（角の二等分線・内接円）', onChange: draw }),
+      H: UI.checkbox(ctl, { label: '垂心 H（垂線）', checked: true, onChange: draw }),
+      E: UI.checkbox(ctl, { label: '傍心 I<sub>A</sub>（A の向かいの傍接円）', onChange: draw }),
+      euler: UI.checkbox(ctl, { label: 'オイラー線（O, G, H）', checked: true, onChange: draw }),
+    };
+    UI.heading(ctl, '形を選ぶ');
+    UI.buttonRow(ctl, [
+      { label: '正三角形', small: true, onClick: () => set([-3, -2], [3, -2], [0, -2 + 3 * Math.sqrt(3)]) },
+      { label: '直角三角形', small: true, onClick: () => set([-3, -2], [4, -2], [-3, 3]) },
+      { label: '鈍角三角形', small: true, onClick: () => set([-4, -2], [4, -2], [0.5, 0]) },
+      { label: '標準', small: true, ghost: true, onClick: () => set([-3, -2], [4, -2], [1, 3]) },
+    ]);
+    function set(A, B, Cc) { st.A = A; st.B = B; st.C = Cc; draw(); }
+    const readout = $('#r-centers');
+
+    function centers() {
+      const { A, B, C: Cc } = st;
+      const a = dist(B, Cc), b = dist(Cc, A), c = dist(A, B);
+      const area2 = Math.abs(cross(sub(B, A), sub(Cc, A)));
+      const G = mul(add(add(A, B), Cc), 1 / 3);
+      const O = inter(mid(A, B), perp(sub(B, A)), mid(B, Cc), perp(sub(Cc, B)));
+      const I = mul(add(add(mul(A, a), mul(B, b)), mul(Cc, c)), 1 / (a + b + c));
+      const H = O ? sub(add(add(A, B), Cc), mul(O, 2)) : null;
+      const Ia = mul(add(add(mul(A, -a), mul(B, b)), mul(Cc, c)), 1 / (-a + b + c));
+      const s = (a + b + c) / 2;
+      return { a, b, c, G, O, I, H, Ia, R: O ? dist(O, A) : NaN, r: area2 / (a + b + c), ra: (area2 / 2) / (s - a), area: area2 / 2 };
+    }
+    function draw() {
+      for (const k of 'ABC') { hs[k].x = st[k][0]; hs[k].y = st[k][1]; }
+      const { A, B, C: Cc } = st;
+      const k = centers();
+      const degenerate = k.area < 0.05;
+      plot.render((P) => {
+        P.polygon([A, B, Cc], { color: C.ink, width: 2.2, fill: Plot.rgba(C.ink, 0.06) });
+        if (degenerate) return;
+        const V = { A, B, C: Cc };
+        const opp = { A: ['B', 'C'], B: ['C', 'A'], C: ['A', 'B'] };
+        if (cb.G.get()) {
+          for (const v of 'ABC') { const [p, q] = opp[v]; const M = mid(V[p], V[q]); P.segment(V[v][0], V[v][1], M[0], M[1], { color: C.sage, width: 1.3 }); P.point(M[0], M[1], { color: C.sage, r: 3 }); }
+          P.point(k.G[0], k.G[1], { color: C.sage, r: 6, label: 'G', dx: 8, dy: 16 });
+        }
+        if (cb.O.get()) {
+          for (const v of 'ABC') { const [p, q] = opp[v]; const M = mid(V[p], V[q]); const d = perp(sub(V[q], V[p])); P.line(M[0], M[1], d[0], d[1], { color: C.ink, width: 1, dash: [5, 4], alpha: 0.7 }); }
+          P.circle(k.O[0], k.O[1], k.R, { color: C.ink, width: 1.3 });
+          P.point(k.O[0], k.O[1], { color: C.ink, r: 6, label: 'O', dx: 8, dy: -8 });
+        }
+        if (cb.I.get()) {
+          for (const v of 'ABC') { const [p, q] = opp[v]; const d = add(unit(sub(V[p], V[v])), unit(sub(V[q], V[v]))); const t = inter(V[v], d, V[p], sub(V[q], V[p])); if (t) P.segment(V[v][0], V[v][1], t[0], t[1], { color: C.ochre, width: 1, dash: [5, 4] }); }
+          P.circle(k.I[0], k.I[1], k.r, { color: C.ochre, width: 1.3, fill: Plot.rgba(C.ochre, 0.08) });
+          P.point(k.I[0], k.I[1], { color: C.ochre, r: 6, label: 'I', dx: -16, dy: 16 });
+        }
+        if (cb.H.get()) {
+          for (const v of 'ABC') { const [p, q] = opp[v]; const d = perp(sub(V[q], V[p])); const F = inter(V[v], d, V[p], sub(V[q], V[p])); if (F) { P.line(V[p][0], V[p][1], V[q][0] - V[p][0], V[q][1] - V[p][1], { color: C.faint, width: 0.8, alpha: 0.5 }); P.segment(V[v][0], V[v][1], F[0], F[1], { color: C.clay, width: 1.2, dash: [5, 4] }); P.angleMark(F[0], F[1], V[v][0], V[v][1], dot(sub(V[q], F), sub(V[v], F)) >= 0 ? V[p][0] : V[q][0], dot(sub(V[q], F), sub(V[v], F)) >= 0 ? V[p][1] : V[q][1], { r: 0.35, right: true, color: C.clay }); } }
+          if (k.H) { P.point(k.H[0], k.H[1], { color: C.clay, r: 6, label: 'H', dx: 8, dy: 16 }); }
+        }
+        if (cb.E.get()) {
+          P.line(A[0], A[1], B[0] - A[0], B[1] - A[1], { color: C.clayLine, width: 1, dash: [3, 4] });
+          P.line(A[0], A[1], Cc[0] - A[0], Cc[1] - A[1], { color: C.clayLine, width: 1, dash: [3, 4] });
+          P.circle(k.Ia[0], k.Ia[1], k.ra, { color: C.clayLine, width: 1.3, fill: Plot.rgba(C.clay, 0.06) });
+          P.point(k.Ia[0], k.Ia[1], { color: C.clayLine, r: 5, label: 'Iₐ', dx: 8, dy: -8 });
+        }
+        if (cb.euler.get() && k.O && k.H && dist(k.O, k.H) > 1e-6) {
+          P.line(k.O[0], k.O[1], k.H[0] - k.O[0], k.H[1] - k.O[1], { color: C.muted, width: 1.4, dash: [8, 5] });
+          P.text(k.H[0], k.H[1], 'オイラー線', { color: C.muted, dx: 12, dy: -14, bg: true });
+        }
+      });
+      if (degenerate) { readout.innerHTML = '<p class="small">3 点が一直線上にあるので三角形になりません。頂点を動かしてください。</p>'; return; }
+      const M = mid(B, Cc);
+      const pt = (p) => `( ${fmt(p[0], 2)} , ${fmt(p[1], 2)} )`;
+      let html = '<div class="readout-grid">';
+      if (cb.G.get()) html += `<div class="stat sage"><div class="k">重心 G</div><div class="v">${pt(k.G)}</div></div><div class="stat sage"><div class="k">AG : GM（M は BC の中点）</div><div class="v">${fmt(dist(A, k.G), 2)} : ${fmt(dist(k.G, M), 2)} = ${fmt(dist(A, k.G) / dist(k.G, M), 2)} : 1</div></div>`;
+      if (cb.O.get()) html += `<div class="stat ink"><div class="k">外心 O・外接円の半径 R</div><div class="v">${pt(k.O)}　R = ${fmt(k.R, 2)}</div></div>`;
+      if (cb.I.get()) html += `<div class="stat ochre"><div class="k">内心 I・内接円の半径 r</div><div class="v">${pt(k.I)}　r = ${fmt(k.r, 2)}</div></div>`;
+      if (cb.H.get()) html += `<div class="stat clay"><div class="k">垂心 H</div><div class="v">${pt(k.H)}</div></div>`;
+      if (cb.E.get()) html += `<div class="stat clay"><div class="k">傍心 Iₐ・傍接円の半径</div><div class="v">${pt(k.Ia)}　rₐ = ${fmt(k.ra, 2)}</div></div>`;
+      if (cb.euler.get()) html += `<div class="stat"><div class="k">オイラー線 OG : GH</div><div class="v">${fmt(dist(k.O, k.G), 2)} : ${fmt(dist(k.G, k.H), 2)}${dist(k.O, k.G) > 1e-6 ? ` = 1 : ${fmt(dist(k.G, k.H) / dist(k.O, k.G), 2)}` : '（O, G, H が一致）'}</div></div>`;
+      html += '</div>';
+      html += `<p class="small">A${pt(A)}, B${pt(B)}, C${pt(Cc)}　辺 a=BC=${fmt(k.a, 2)}, b=CA=${fmt(k.b, 2)}, c=AB=${fmt(k.c, 2)}　面積 ${fmt(k.area, 2)}（内接円：面積 = r × (a+b+c)/2 = ${fmt(k.r * (k.a + k.b + k.c) / 2, 2)}）</p>`;
+      readout.innerHTML = html;
+    }
+    draw();
+  })();
+
+  /* ======================= チェバ・メネラウス ======================= */
+  (() => {
+    const ctl = $('#c-ceva');
+    const st = { mode: 'ceva', A: [-4, -3], B: [4, -3], C: [0, 3.5], P: [0.5, -0.5], L1: [-5.5, 0.5], L2: [5.5, -1.5] };
+    const plot = new Plot('#cv-ceva', { xmin: -6, xmax: 6, ymin: -5, ymax: 5, aspect: 0.7 });
+    const hv = (k, dx, dy) => plot.addHandle({ x: st[k][0], y: st[k][1], color: C.ochre, label: k, dx, dy, onMove: (x, y) => { st[k] = [snap(x), snap(y)]; draw(); return st[k]; } });
+    const hs = { A: hv('A', -18, 18), B: hv('B', 8, 18), C: hv('C', 8, -8) };
+    const hP = plot.addHandle({ x: st.P[0], y: st.P[1], color: C.clay, label: 'P', dx: 10, dy: -8, visible: () => st.mode === 'ceva', onMove: (x, y) => { st.P = clampInside([x, y]); draw(); return st.P; } });
+    const hL1 = plot.addHandle({ x: st.L1[0], y: st.L1[1], color: C.clay, r: 6, visible: () => st.mode === 'menelaus', onMove: (x, y) => { st.L1 = [x, y]; draw(); return st.L1; } });
+    const hL2 = plot.addHandle({ x: st.L2[0], y: st.L2[1], color: C.clay, r: 6, visible: () => st.mode === 'menelaus', onMove: (x, y) => { st.L2 = [x, y]; draw(); return st.L2; } });
+    function clampInside(p) {
+      const { A, B, C: Cc } = st;
+      const den = cross(sub(B, A), sub(Cc, A)); if (Math.abs(den) < 1e-9) return p;
+      let u = cross(sub(B, p), sub(Cc, p)) / den, v = cross(sub(Cc, p), sub(A, p)) / den, w = 1 - u - v;
+      const m = 0.04; u = Math.max(m, u); v = Math.max(m, v); w = Math.max(m, w); const s = u + v + w;
+      return add(add(mul(A, u / s), mul(B, v / s)), mul(Cc, w / s));
+    }
+    UI.segmented(ctl, { options: [{ value: 'ceva', label: 'チェバの定理' }, { value: 'menelaus', label: 'メネラウスの定理' }], value: 'ceva', onChange: (v) => { st.mode = v; $('#cap-ceva').textContent = v === 'ceva' ? '点 P と頂点をドラッグできます' : '直線上の 2 点（赤）と頂点をドラッグできます'; draw(); } });
+    UI.note(ctl, { tone: 'ink', html: '$\\dfrac{AF}{FB}\\cdot\\dfrac{BD}{DC}\\cdot\\dfrac{CE}{EA}=1$<br>D は BC 上、E は CA 上、F は AB 上の点。' });
+    UI.buttonRow(ctl, [
+      { label: 'P を重心に', small: true, onClick: () => { st.P = mul(add(add(st.A, st.B), st.C), 1 / 3); draw(); } },
+      { label: '直線をリセット', small: true, onClick: () => { st.L1 = [-5.5, 0.5]; st.L2 = [5.5, -1.5]; draw(); } },
+    ]);
+    const readout = $('#r-ceva');
+
+    function draw() {
+      for (const k of 'ABC') { hs[k].x = st[k][0]; hs[k].y = st[k][1]; }
+      if (st.mode === 'ceva') st.P = clampInside(st.P);
+      hP.x = st.P[0]; hP.y = st.P[1]; hL1.x = st.L1[0]; hL1.y = st.L1[1]; hL2.x = st.L2[0]; hL2.y = st.L2[1];
+      const { A, B, C: Cc, P: Pp } = st;
+      let Dp, Ep, Fp;
+      if (st.mode === 'ceva') {
+        Dp = inter(A, sub(Pp, A), B, sub(Cc, B)); Ep = inter(B, sub(Pp, B), Cc, sub(A, Cc)); Fp = inter(Cc, sub(Pp, Cc), A, sub(B, A));
+      } else {
+        const d = sub(st.L2, st.L1);
+        Dp = inter(st.L1, d, B, sub(Cc, B)); Ep = inter(st.L1, d, Cc, sub(A, Cc)); Fp = inter(st.L1, d, A, sub(B, A));
+      }
+      const ok = Dp && Ep && Fp && [Dp, Ep, Fp].every((p) => len(p) < 60);
+      // 分点のパラメータ t (0..1 なら内分)
+      const tOf = (p, X, Y) => dot(sub(p, X), sub(Y, X)) / dot(sub(Y, X), sub(Y, X));
+      const tD = ok ? tOf(Dp, B, Cc) : NaN, tE = ok ? tOf(Ep, Cc, A) : NaN, tF = ok ? tOf(Fp, A, B) : NaN;
+      plot.render((P) => {
+        P.polygon([A, B, Cc], { color: C.ink, width: 2.2, fill: Plot.rgba(C.ink, 0.05) });
+        if (!ok) return;
+        if (st.mode === 'ceva') {
+          P.segment(A[0], A[1], Dp[0], Dp[1], { color: C.sage, width: 1.5 });
+          P.segment(B[0], B[1], Ep[0], Ep[1], { color: C.sage, width: 1.5 });
+          P.segment(Cc[0], Cc[1], Fp[0], Fp[1], { color: C.sage, width: 1.5 });
+        } else {
+          for (const [X, Y, t] of [[B, Cc, tD], [Cc, A, tE], [A, B, tF]]) if (t < 0 || t > 1) P.line(X[0], X[1], Y[0] - X[0], Y[1] - X[1], { color: C.ink, width: 1, dash: [4, 4], alpha: 0.5 });
+          const d = sub(st.L2, st.L1);
+          P.line(st.L1[0], st.L1[1], d[0], d[1], { color: C.clay, width: 2 });
+        }
+        for (const [p, name, t] of [[Dp, 'D', tD], [Ep, 'E', tE], [Fp, 'F', tF]]) P.point(p[0], p[1], { color: (t < 0 || t > 1) ? C.clay : C.sage, r: 5.5, label: name, dx: 8, dy: -8 });
+        for (const [X, Y, p] of [[A, B, Fp], [B, Cc, Dp], [Cc, A, Ep]]) {
+          const lab = (u, v, s) => { const m = mid(u, v); P.text(m[0], m[1], s, { color: C.muted, align: 'center', baseline: 'middle', bg: true, font: '12px "Noto Sans JP", system-ui, sans-serif' }); };
+          lab(X, p, fmt(dist(X, p), 2)); lab(p, Y, fmt(dist(p, Y), 2));
+        }
+      });
+      if (!ok) { readout.innerHTML = '<div class="note clay">直線が辺と平行、または交点が遠すぎます。点を動かしてください。</div>'; return; }
+      const AF = dist(A, Fp), FB = dist(Fp, B), BD = dist(B, Dp), DC = dist(Dp, Cc), CE = dist(Cc, Ep), EA = dist(Ep, A);
+      const r1 = AF / FB, r2 = BD / DC, r3 = CE / EA;
+      const outs = [['D', tD, 'BC'], ['E', tE, 'CA'], ['F', tF, 'AB']].filter(([, t]) => t < 0 || t > 1);
+      readout.innerHTML = `
+        <div class="tex-block">$$\\frac{AF}{FB}\\cdot\\frac{BD}{DC}\\cdot\\frac{CE}{EA} = \\frac{${fmt(AF, 2)}}{${fmt(FB, 2)}}\\cdot\\frac{${fmt(BD, 2)}}{${fmt(DC, 2)}}\\cdot\\frac{${fmt(CE, 2)}}{${fmt(EA, 2)}} = ${fmt(r1, 3)}\\times${fmt(r2, 3)}\\times${fmt(r3, 3)} = ${fmt(r1 * r2 * r3, 3)}$$</div>
+        <div class="readout-grid">
+          <div class="stat"><div class="k">AF : FB</div><div class="v">${fmt(AF, 2)} : ${fmt(FB, 2)}</div></div>
+          <div class="stat"><div class="k">BD : DC</div><div class="v">${fmt(BD, 2)} : ${fmt(DC, 2)}</div></div>
+          <div class="stat"><div class="k">CE : EA</div><div class="v">${fmt(CE, 2)} : ${fmt(EA, 2)}</div></div>
+          <div class="stat sage"><div class="k">積</div><div class="v">${fmt(r1 * r2 * r3, 4)}</div></div>
+        </div>
+        ${st.mode === 'menelaus' ? `<p class="small">${outs.length ? `<span style="color:var(--clay-text);font-weight:700">${outs.map(([n, , s]) => `${n} は辺 ${s} を外分`).join('、')}</span>（残りは内分）。外分点は ${outs.length} 個（必ず 1 個か 3 個）。` : ''}</p>` : '<p class="small">3 本の線分 AD, BE, CF が点 P で交わっているので、積は 1。</p>'}`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 円の性質 ======================= */
+  (() => {
+    const ctl = $('#c-circle');
+    const R = 3;
+    const st = { mode: 'inscribed', a: UI.rad(200), b: UI.rad(340), p: UI.rad(100), q: UI.rad(60), showQ: true, quad: [UI.rad(20), UI.rad(110), UI.rad(200), UI.rad(300)], ta: UI.rad(250), tb: UI.rad(10), tc: UI.rad(120) };
+    const plot = new Plot('#cv-circle', { xmin: -5, xmax: 5, ymin: -4.5, ymax: 4.5, aspect: 0.7, grid: false, axes: false });
+    const pt = (t) => [R * Math.cos(t), R * Math.sin(t)];
+    const norm = (t) => { while (t < 0) t += 2 * Math.PI; while (t >= 2 * Math.PI) t -= 2 * Math.PI; return t; };
+    const ang = (x, y) => Math.atan2(y, x);
+    const mk = (get, set, label, color, vis, dx, dy) => { const p0 = pt(get()); return plot.addHandle({ x: p0[0], y: p0[1], color, label, dx, dy, visible: vis, onMove: (x, y) => { set(ang(x, y)); draw(); return pt(get()); } }); };
+    const H = [];
+    H.push(mk(() => st.a, (v) => st.a = v, 'A', C.ink, () => st.mode === 'inscribed'));
+    H.push(mk(() => st.b, (v) => st.b = v, 'B', C.ink, () => st.mode === 'inscribed'));
+    H.push(mk(() => st.p, (v) => st.p = v, 'P', C.clay, () => st.mode === 'inscribed'));
+    H.push(mk(() => st.q, (v) => st.q = v, 'Q', C.sage, () => st.mode === 'inscribed' && st.showQ));
+    'ABCD'.split('').forEach((L, i) => H.push(mk(() => st.quad[i], (v) => {
+      const prev = st.quad[(i + 3) % 4], next = st.quad[(i + 1) % 4];
+      const span = norm(next - prev), off = norm(v - prev);
+      st.quad[i] = norm(prev + Math.max(0.08, Math.min(span - 0.08, off)));
+    }, L, i % 2 ? C.sage : C.clay, () => st.mode === 'quad')));
+    H.push(mk(() => st.ta, (v) => st.ta = v, 'A', C.ochre, () => st.mode === 'tangent'));
+    H.push(mk(() => st.tb, (v) => st.tb = v, 'B', C.ink, () => st.mode === 'tangent'));
+    H.push(mk(() => st.tc, (v) => st.tc = v, 'C', C.sage, () => st.mode === 'tangent'));
+
+    UI.segmented(ctl, { options: [{ value: 'inscribed', label: '円周角' }, { value: 'quad', label: '内接四角形' }, { value: 'tangent', label: '接弦定理' }], value: 'inscribed', onChange: (v) => { st.mode = v; boxI.style.display = v === 'inscribed' ? '' : 'none'; draw(); } });
+    const boxI = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(boxI);
+    UI.checkbox(boxI, { label: 'もう 1 点 Q も表示（同じ弧なら等しい）', checked: true, onChange: (v) => { st.showQ = v; draw(); } });
+    UI.buttonRow(boxI, [{ label: 'AB を直径に', small: true, onClick: () => { st.b = st.a + Math.PI; draw(); } }]);
+    UI.note(ctl, { tone: 'ink', html: '円の半径は 3、中心は O。点はすべて円周上を動きます。' });
+    const readout = $('#r-circle');
+
+    function syncHandles() {
+      const gets = [() => st.a, () => st.b, () => st.p, () => st.q, ...[0, 1, 2, 3].map((i) => () => st.quad[i]), () => st.ta, () => st.tb, () => st.tc];
+      H.forEach((h, i) => { const p = pt(gets[i]()); h.x = p[0]; h.y = p[1]; });
+    }
+    function draw() {
+      syncHandles();
+      plot.render((P) => {
+        P.circle(0, 0, R, { color: C.border, width: 1.5 });
+        P.point(0, 0, { color: C.muted, r: 3, label: 'O', dx: -16, dy: 16 });
+        if (st.mode === 'inscribed') drawInscribed(P);
+        else if (st.mode === 'quad') drawQuad(P);
+        else drawTangent(P);
+      });
+    }
+    function arcInfo(a, b, p) {
+      // P を含まない弧の始点と中心角 (反時計回り)
+      const ab = norm(b - a), ap = norm(p - a);
+      const pOnArcAB = ap < ab;
+      return pOnArcAB ? { start: b, theta: 2 * Math.PI - ab } : { start: a, theta: ab };
+    }
+    function drawInscribed(P) {
+      const A = pt(st.a), B = pt(st.b), Pp = pt(st.p), Q = pt(st.q);
+      const { start, theta } = arcInfo(st.a, st.b, st.p);
+      P.arc(0, 0, R, start, start + theta, { color: C.clay, width: 5, alpha: 0.6 });
+      P.segment(A[0], A[1], B[0], B[1], { color: C.ink, width: 1.2, dash: [4, 4] });
+      P.segment(Pp[0], Pp[1], A[0], A[1], { color: C.ink, width: 2 }); P.segment(Pp[0], Pp[1], B[0], B[1], { color: C.ink, width: 2 });
+      P.segment(0, 0, A[0], A[1], { color: C.clay, width: 1.5 }); P.segment(0, 0, B[0], B[1], { color: C.clay, width: 1.5 });
+      const apb = angleAt(Pp, A, B);
+      P.angleMark(Pp[0], Pp[1], A[0], A[1], B[0], B[1], { r: 0.6, color: C.ink, fill: Plot.rgba(C.ink, 0.15), label: D(apb) });
+      P.arc(0, 0, 0.55, start, start + theta, { color: C.clay, width: 1.3, sector: true, fill: Plot.rgba(C.clay, 0.15) });
+      const m = start + theta / 2; P.text(0.95 * Math.cos(m), 0.95 * Math.sin(m), D(theta), { color: C.clay, align: 'center', baseline: 'middle', bg: true });
+      let qHtml = '';
+      if (st.showQ) {
+        P.segment(Q[0], Q[1], A[0], A[1], { color: C.sage, width: 1.5 }); P.segment(Q[0], Q[1], B[0], B[1], { color: C.sage, width: 1.5 });
+        const aqb = angleAt(Q, A, B);
+        P.angleMark(Q[0], Q[1], A[0], A[1], B[0], B[1], { r: 0.5, color: C.sage, fill: Plot.rgba(C.sage, 0.15), label: D(aqb) });
+        const same = arcInfo(st.a, st.b, st.q).theta === theta;
+        qHtml = `<div class="stat sage"><div class="k">∠AQB</div><div class="v">${D(aqb)}</div></div><div class="stat"><div class="k">Q は P と</div><div class="v">${same ? '同じ弧（等しい）' : '反対の弧（和が 180°）'}</div></div>`;
+      }
+      const aob = Math.min(theta, 2 * Math.PI - theta);
+      readout.innerHTML = `
+        <div class="tex-block">$$\\angle APB = \\tfrac12\\times${D(theta)} = ${D(apb)}\\qquad${theta <= Math.PI + 1e-9 ? `\\angle AOB = ${D(aob)}` : `(\\text{弧の中心角 }${D(theta)} = 360^\\circ - \\angle AOB,\\ \\angle AOB=${D(aob)})`}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">円周角 ∠APB</div><div class="v">${D(apb)}</div></div>
+          <div class="stat clay"><div class="k">弧 AB（P を含まない側）の中心角</div><div class="v">${D(theta)}</div></div>
+          ${qHtml}
+        </div>
+        <p class="small">${theta > Math.PI + 1e-9 ? 'P が短い方の弧にあるので、対する弧は半円より大きく、円周角は 90° より大きい。' : Math.abs(theta - Math.PI) < 1e-6 ? 'AB が直径なので円周角は 90°（タレスの定理）。' : 'P を同じ弧の上で動かしても ∠APB は変わらない。'}</p>`;
+      UI.texAll(readout);
+    }
+    function drawQuad(P) {
+      const V = st.quad.map(pt);
+      P.polygon(V, { color: C.ink, width: 2, fill: Plot.rgba(C.ink, 0.06) });
+      const angs = V.map((v, i) => angleAt(v, V[(i + 3) % 4], V[(i + 1) % 4]));
+      V.forEach((v, i) => P.angleMark(v[0], v[1], V[(i + 3) % 4][0], V[(i + 3) % 4][1], V[(i + 1) % 4][0], V[(i + 1) % 4][1], { r: 0.55, color: i % 2 ? C.sage : C.clay, fill: Plot.rgba(i % 2 ? C.sage : C.clay, 0.18), label: D(angs[i]) }));
+      readout.innerHTML = `
+        <div class="tex-block">$$\\angle A+\\angle C = ${D(angs[0])} + ${D(angs[2])} = ${D(angs[0] + angs[2])}\\qquad \\angle B+\\angle D = ${D(angs[1])} + ${D(angs[3])} = ${D(angs[1] + angs[3])}$$</div>
+        <div class="readout-grid">
+          <div class="stat clay"><div class="k">∠A + ∠C</div><div class="v">${D(angs[0] + angs[2])}</div></div>
+          <div class="stat sage"><div class="k">∠B + ∠D</div><div class="v">${D(angs[1] + angs[3])}</div></div>
+        </div>
+        <p class="small">∠A は弧 BCD に対する円周角、∠C は弧 DAB に対する円周角。2 つの弧を合わせると円全体（中心角 360°）なので、円周角の和は 180°。</p>`;
+      UI.texAll(readout);
+    }
+    function drawTangent(P) {
+      const A = pt(st.ta), B = pt(st.tb), Cc = pt(st.tc);
+      const t = [-Math.sin(st.ta), Math.cos(st.ta)];
+      P.line(A[0], A[1], t[0], t[1], { color: C.ochre, width: 2 });
+      P.polygon([A, B, Cc], { color: C.ink, width: 1.5, fill: Plot.rgba(C.ink, 0.05) });
+      P.segment(A[0], A[1], B[0], B[1], { color: C.ink, width: 2.5 });
+      const u = sub(B, A);
+      const side = Math.sign(cross(u, sub(Cc, A)));
+      const tr = Math.sign(cross(u, t)) === side ? mul(t, -1) : t;
+      const T = add(A, mul(tr, 1.6));
+      const th = angleAt(A, T, B), acb = angleAt(Cc, A, B);
+      P.angleMark(A[0], A[1], T[0], T[1], B[0], B[1], { r: 0.7, color: C.sage, fill: Plot.rgba(C.sage, 0.2), label: D(th) });
+      P.angleMark(Cc[0], Cc[1], A[0], A[1], B[0], B[1], { r: 0.6, color: C.sage, fill: Plot.rgba(C.sage, 0.2), label: D(acb) });
+      P.text(T[0], T[1], '接線', { color: C.ochre, dx: 8, dy: -8, bg: true });
+      readout.innerHTML = `
+        <div class="tex-block">$$(\\text{接線と弦 AB のなす角}) = ${D(th)} \\qquad \\angle ACB = ${D(acb)}$$</div>
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">接線と弦のなす角</div><div class="v">${D(th)}</div></div>
+          <div class="stat sage"><div class="k">円周角 ∠ACB</div><div class="v">${D(acb)}</div></div>
+          <div class="stat"><div class="k">弧 AB（C を含まない側）の中心角</div><div class="v">${D(2 * th)}</div></div>
+        </div>
+        <p class="small">角の内部にある弧 AB に対する円周角が ∠ACB。C をどこに動かしても等しい。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 方べきの定理 ======================= */
+  (() => {
+    const ctl = $('#c-power');
+    const r = 3;
+    const st = { P: [1, 0.5], Q1: [4, 2.5], Q2: [3.5, -2.5], tan: true };
+    const plot = new Plot('#cv-power', { xmin: -6, xmax: 6, ymin: -5, ymax: 5, aspect: 0.7 });
+    const hP = plot.addHandle({ x: st.P[0], y: st.P[1], color: C.clay, label: 'P', dx: 10, dy: -10, onMove: (x, y) => { st.P = [snap(x), snap(y)]; if (Math.abs(len(st.P) - r) < 0.05) st.P = mul(unit(st.P), r + 0.25); draw(); return st.P; } });
+    const hQ1 = plot.addHandle({ x: st.Q1[0], y: st.Q1[1], color: C.ochre, r: 6, onMove: (x, y) => { st.Q1 = [x, y]; draw(); return st.Q1; } });
+    const hQ2 = plot.addHandle({ x: st.Q2[0], y: st.Q2[1], color: C.ochre, r: 6, onMove: (x, y) => { st.Q2 = [x, y]; draw(); return st.Q2; } });
+    UI.heading(ctl, '設定');
+    UI.checkbox(ctl, { label: 'P が外にあるとき接線 PT を表示', checked: true, onChange: (v) => { st.tan = v; draw(); } });
+    UI.buttonRow(ctl, [
+      { label: 'P を内側に', small: true, onClick: () => { st.P = [1, 0.5]; draw(); } },
+      { label: 'P を外側に', small: true, onClick: () => { st.P = [5, 1]; st.Q1 = [-1, 2.2]; st.Q2 = [-0.5, -1.5]; draw(); } },
+    ]);
+    UI.note(ctl, { tone: 'ink', html: '円：中心 O(0,0)、半径 $r=3$。黄色の点で直線の向きを変えられます。' });
+    const readout = $('#r-power');
+
+    function hits(Pp, Q) {
+      const d = unit(sub(Q, Pp));
+      const b = dot(Pp, d), c = dot(Pp, Pp) - r * r;
+      const disc = b * b - c;
+      if (disc < 0) return null;
+      const s = Math.sqrt(disc);
+      const t1 = -b - s, t2 = -b + s;
+      return { d, t1, t2, A: add(Pp, mul(d, t1)), B: add(Pp, mul(d, t2)) };
+    }
+    function draw() {
+      hP.x = st.P[0]; hP.y = st.P[1]; hQ1.x = st.Q1[0]; hQ1.y = st.Q1[1]; hQ2.x = st.Q2[0]; hQ2.y = st.Q2[1];
+      const Pp = st.P, OP = len(Pp), outside = OP > r;
+      const h1 = hits(Pp, st.Q1), h2 = hits(Pp, st.Q2);
+      const pow = Math.abs(OP * OP - r * r);
+      let T = null;
+      if (outside) { const th = Math.atan2(Pp[1], Pp[0]), phi = Math.acos(r / OP); T = [r * Math.cos(th + phi), r * Math.sin(th + phi)]; }
+      plot.render((P) => {
+        P.circle(0, 0, r, { color: C.border, width: 1.5 });
+        P.point(0, 0, { color: C.muted, r: 3, label: 'O', dx: -16, dy: 16 });
+        P.segment(0, 0, Pp[0], Pp[1], { color: C.faint, width: 1, dash: [3, 4] });
+        for (const [h, Q, n1, n2] of [[h1, st.Q1, 'A', 'B'], [h2, st.Q2, 'C', 'D']]) {
+          const d = unit(sub(Q, Pp));
+          P.line(Pp[0], Pp[1], d[0], d[1], { color: C.ink, width: 1, alpha: 0.35 });
+          if (!h) continue;
+          const far = outside ? (Math.abs(h.t1) > Math.abs(h.t2) ? h.A : h.B) : null;
+          const near = outside ? (far === h.A ? h.B : h.A) : null;
+          if (outside) P.segment(Pp[0], Pp[1], far[0], far[1], { color: C.ink, width: 2.5 });
+          else P.segment(h.A[0], h.A[1], h.B[0], h.B[1], { color: C.ink, width: 2.5 });
+          const lab = (X, s) => { const dir = unit(sub(X, Pp)); P.point(X[0], X[1], { color: C.ink, r: 5, label: s, dx: 10 * dir[0] + (X[0] < Pp[0] ? -10 : 2), dy: -10 * dir[1] - 4 }); };
+          lab(h.A, n1); lab(h.B, n2);
+          const m1 = mid(Pp, h.A), m2 = mid(Pp, h.B);
+          P.text(m1[0], m1[1], fmt(Math.abs(h.t1), 2), { color: C.inkText, align: 'center', baseline: 'middle', bg: true, font: '12px "Noto Sans JP", system-ui, sans-serif' });
+          P.text(m2[0], m2[1], fmt(Math.abs(h.t2), 2), { color: C.inkText, align: 'center', baseline: 'middle', bg: true, font: '12px "Noto Sans JP", system-ui, sans-serif' });
+        }
+        if (outside && st.tan && T) {
+          P.segment(Pp[0], Pp[1], T[0], T[1], { color: C.sage, width: 2.5 });
+          P.segment(0, 0, T[0], T[1], { color: C.sage, width: 1, dash: [3, 4] });
+          P.point(T[0], T[1], { color: C.sage, r: 5, label: 'T', dx: 8, dy: -8 });
+          P.angleMark(T[0], T[1], 0, 0, Pp[0], Pp[1], { r: 0.4, right: true, color: C.sage });
+          const m = mid(Pp, T); P.text(m[0], m[1], fmt(dist(Pp, T), 2), { color: C.sageSolid, align: 'center', baseline: 'middle', bg: true, font: '12px "Noto Sans JP", system-ui, sans-serif' });
+        }
+      });
+      const prod = (h) => h ? Math.abs(h.t1 * h.t2) : NaN;
+      const line = (h, a, b) => h ? `P${a}\\cdot P${b} = ${fmt(Math.abs(h.t1), 2)}\\times${fmt(Math.abs(h.t2), 2)} = ${fmt(prod(h), 3)}` : `\\text{直線 }P${a}\\text{ は円と交わらない}`;
+      readout.innerHTML = `
+        <div class="tex-block">$$${line(h1, 'A', 'B')}\\qquad ${line(h2, 'C', 'D')}$$</div>
+        <div class="tex-block">$$|OP^2-r^2| = |${fmt(OP * OP, 2)} - ${r * r}| = ${fmt(pow, 3)}${outside && st.tan ? `\\qquad PT^2 = ${fmt(dist(Pp, T), 2)}^2 = ${fmt(dist(Pp, T) ** 2, 3)}` : ''}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">PA · PB</div><div class="v">${fmt(prod(h1), 3)}</div></div>
+          <div class="stat ink"><div class="k">PC · PD</div><div class="v">${fmt(prod(h2), 3)}</div></div>
+          <div class="stat sage"><div class="k">|OP² − r²|（方べき）</div><div class="v">${fmt(pow, 3)}</div></div>
+          <div class="stat clay"><div class="k">P の位置</div><div class="v">${outside ? '円の外部' : '円の内部'}　OP = ${fmt(OP, 2)}</div></div>
+        </div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'centers', label: '三角形の五心' },
+    { id: 'ceva', label: 'チェバ・メネラウス' },
+    { id: 'circle', label: '円の性質' },
+    { id: 'power', label: '方べきの定理' },
+  ]);
+});
+</script>
+</body>
+</html>

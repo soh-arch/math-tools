@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>三角比</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>三角比</h1>
+    <p class="lede">直角三角形の辺の比から始めて、単位円で $0^\circ$ から $180^\circ$ まで広げ、正弦定理・余弦定理で一般の三角形を測る。角や頂点をドラッグして、値がどう変わるかを確かめられます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 単位円と三角比 -->
+  <section class="tool-body" data-tab="circle">
+    <div class="layout">
+      <aside class="controls" id="c-circle"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-circle"></canvas><div class="caption">円周上の点 P をドラッグできます</div></div>
+        <div class="readout" id="r-circle"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">単位円での定義</div>
+        原点中心・半径 1 の円周上に、$x$ 軸の正の向きから角 $\theta$ だけ回った点 $\mathrm{P}(x,\ y)$ をとると
+        $$\sin\theta = y,\qquad \cos\theta = x,\qquad \tan\theta=\frac{y}{x}$$
+        $\tan\theta$ は直線 $\mathrm{OP}$ を伸ばして直線 $x=1$ と交わる点の $y$ 座標でもあります。
+      </div>
+      <ul>
+        <li>$\theta$ を $0^\circ$ から $180^\circ$ まで動かして、縦の線分（$\sin$）は $0\to1\to0$、横の線分（$\cos$）は $1\to0\to-1$ と変わるのを見よう。$90^\circ$ を超えると $\cos$ が負になる。</li>
+        <li>$\tan\theta$ は $90^\circ$ に近づくと際限なく大きくなり、$90^\circ$ では定義されない。$90^\circ$ を超えると、半径を「後ろへ」伸ばして $x=1$ に届くので $\tan$ は負。</li>
+        <li>「$180^\circ-\theta$ の点を表示」を入れると、$y$ 軸に関して対称な点が現れる。$\sin$ は同じ、$\cos$ と $\tan$ は符号が逆になることが図から読める。</li>
+        <li>どの $\theta$ でも $\sin^2\theta+\cos^2\theta=1$。これは半径 1 の円の方程式 $x^2+y^2=1$ そのもの。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 直角三角形の三角比 -->
+  <section class="tool-body" data-tab="triangle">
+    <div class="layout">
+      <aside class="controls" id="c-triangle"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-triangle"></canvas></div>
+        <div class="readout" id="r-triangle"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">辺の比としての三角比</div>
+        $\angle\mathrm{C}=90^\circ$ の直角三角形で、$\angle\mathrm{A}=\theta$ とすると
+        $$\sin\theta=\frac{\text{対辺}}{\text{斜辺}}=\frac{\mathrm{BC}}{\mathrm{AB}},\qquad
+          \cos\theta=\frac{\text{隣辺}}{\text{斜辺}}=\frac{\mathrm{AC}}{\mathrm{AB}},\qquad
+          \tan\theta=\frac{\text{対辺}}{\text{隣辺}}=\frac{\mathrm{BC}}{\mathrm{AC}}$$
+        「対辺」「隣辺」は角 $\theta$ から見た呼び名です。
+      </div>
+      <ul>
+        <li>斜辺の長さだけを変えても、三つの比は変わらない。三角比は「角の大きさ」だけで決まる量。</li>
+        <li>$\theta$ を大きくすると対辺が伸び、隣辺が縮む。$\sin$ が増えて $\cos$ が減るのはそのため。</li>
+        <li>$\sin$／$\cos$／$\tan$ を切り替えると、使う 2 辺が太く表示される。どの辺の比なのかを声に出して確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 正弦定理 -->
+  <section class="tool-body" data-tab="sine">
+    <div class="layout">
+      <aside class="controls" id="c-sine"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-sine"></canvas><div class="caption">頂点 A, B, C を円周上でドラッグできます</div></div>
+        <div class="readout" id="r-sine"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">正弦定理</div>
+        三角形 ABC の外接円の半径を $R$ とすると
+        $$\frac{a}{\sin A}=\frac{b}{\sin B}=\frac{c}{\sin C}=2R$$
+        「辺 ÷ 向かい合う角の $\sin$」はどの辺で計算しても同じ値になり、それは外接円の直径に等しい。
+      </div>
+      <ul>
+        <li>頂点を円周上で動かして角や辺を変えても、3 つの比はぴったり同じ値のまま。</li>
+        <li>$R$ を大きくすると三角形は相似のまま拡大し、比の値だけが $2R$ に合わせて変わる。</li>
+        <li>頂点 A を動かしても、辺 $a=\mathrm{BC}$ とその対角 $A$ の組は比を保つ（円周角の定理と同じ内容）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 余弦定理と面積 -->
+  <section class="tool-body" data-tab="cosine">
+    <div class="layout">
+      <aside class="controls" id="c-cosine"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-cosine"></canvas><div class="caption">頂点 A, B, C を自由にドラッグできます</div></div>
+        <div class="readout" id="r-cosine"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">余弦定理と面積の公式</div>
+        $$a^2=b^2+c^2-2bc\cos A,\qquad S=\frac12\,bc\sin A$$
+        角 $A$ をはさむ 2 辺 $b,\ c$ と角 $A$ が分かれば、向かいの辺 $a$ も面積 $S$ も決まります。
+      </div>
+      <ul>
+        <li>角 $A$ を $90^\circ$ にすると $\cos A=0$ になり、$a^2=b^2+c^2$（三平方の定理）に戻る。角を鋭角・鈍角にして $-2bc\cos A$ の符号を見よう。</li>
+        <li>面積 $\frac12 bc\sin A$ は、$A$ が $90^\circ$ のとき最大（$\frac12 bc$）。頂点を動かして確かめよう。</li>
+        <li>ヘロンの公式 $S=\sqrt{s(s-a)(s-b)(s-c)}$（$s=\frac{a+b+c}{2}$）は 3 辺だけから面積を出す。どの角で計算しても面積は同じ値になる。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$, rgba = Plot.rgba;
+  UI.header({ unit: '数学I', title: '三角比' });
+  const deg = (r) => r * 180 / Math.PI, rad = (d) => d * Math.PI / 180;
+  const dist = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]);
+  const angleAt = (v, p, q) => {
+    const a = dist(v, p), b = dist(v, q), c = dist(p, q);
+    if (a < 1e-9 || b < 1e-9) return NaN;
+    return Math.acos(Math.max(-1, Math.min(1, (a * a + b * b - c * c) / (2 * a * b))));
+  };
+
+  /* ======================= 単位円と三角比 ======================= */
+  (() => {
+    const ctl = $('#c-circle');
+    const st = { th: 60 };
+    const EXACT = {
+      0: ['0', '1', '0'],
+      30: ['\\dfrac{1}{2}', '\\dfrac{\\sqrt{3}}{2}', '\\dfrac{1}{\\sqrt{3}}'],
+      45: ['\\dfrac{1}{\\sqrt{2}}', '\\dfrac{1}{\\sqrt{2}}', '1'],
+      60: ['\\dfrac{\\sqrt{3}}{2}', '\\dfrac{1}{2}', '\\sqrt{3}'],
+      90: ['1', '0', null],
+      120: ['\\dfrac{\\sqrt{3}}{2}', '-\\dfrac{1}{2}', '-\\sqrt{3}'],
+      135: ['\\dfrac{1}{\\sqrt{2}}', '-\\dfrac{1}{\\sqrt{2}}', '-1'],
+      150: ['\\dfrac{1}{2}', '-\\dfrac{\\sqrt{3}}{2}', '-\\dfrac{1}{\\sqrt{3}}'],
+      180: ['0', '-1', '0'],
+    };
+    const pos = () => [Math.cos(rad(st.th)), Math.sin(rad(st.th))];
+    const plot = new Plot('#cv-circle', { xmin: -1.6, xmax: 1.6, ymin: -1.9, ymax: 2.1, aspect: 0.74, xTick: 1, yTick: 1 });
+    const hP = plot.addHandle({ x: pos()[0], y: pos()[1], color: C.ink, onMove: (x, y) => {
+      let d = Math.round(deg(Math.atan2(y, x)));
+      if (d < 0) d = x >= 0 ? 0 : 180;
+      st.th = d; sTh.set(d); return pos();
+    } });
+
+    UI.heading(ctl, '角 θ');
+    const sTh = UI.slider(ctl, { label: '$\\theta$', min: 0, max: 180, step: 1, value: st.th, unit: '°', digits: 0, onInput: (v) => { st.th = v; draw(); } });
+    UI.buttonRow(ctl, [0, 30, 45, 60, 90].map((d) => ({ label: d + '°', small: true, onClick: () => { st.th = d; sTh.set(d); draw(); } })));
+    UI.buttonRow(ctl, [120, 135, 150, 180].map((d) => ({ label: d + '°', small: true, onClick: () => { st.th = d; sTh.set(d); draw(); } })));
+    UI.divider(ctl);
+    const chkMirror = UI.checkbox(ctl, { label: '$180^\\circ-\\theta$ の点を表示', checked: false, onChange: draw });
+    const chkTan = UI.checkbox(ctl, { label: '直線 $x=1$ と $\\tan\\theta$ を表示', checked: true, onChange: draw });
+
+    const readout = $('#r-circle');
+    function draw() {
+      const t = rad(st.th), c = Math.cos(t), s = Math.sin(t);
+      hP.x = c; hP.y = s;
+      const tanOk = st.th !== 90;
+      const tn = tanOk ? Math.tan(t) : NaN;
+      const mirror = chkMirror.get();
+      plot.render((P) => {
+        P.circle(0, 0, 1, { color: C.inkLine, width: 1.6 });
+        if (chkTan.get()) {
+          P.vline(1, { color: C.ochreLine, width: 1.2, dash: [5, 4] });
+          P.text(1, P.win.ymax, 'x = 1', { color: C.ochre, dx: 6, dy: 18, font: Plot.FONT_MATH, bg: true });
+          if (tanOk) {
+            P.segment(0, 0, 1, tn, { color: C.ochre, width: 1.2, dash: [5, 4] });
+            P.segment(1, 0, 1, tn, { color: C.ochre, width: 4.5 });
+            P.point(1, tn, { color: C.ochre, label: `tan θ = ${fmt(tn, 3)}`, dx: 10, dy: 4 });
+          } else {
+            P.text(1, 1.6, 'tan 90° は定義されない', { color: C.ochre, dx: 10, bg: true });
+          }
+        }
+        if (mirror) {
+          const mx = -c;
+          P.segment(0, 0, mx, s, { color: C.clay, width: 1.5, dash: [5, 4] });
+          P.segment(c, s, mx, s, { color: C.clay, width: 1, dash: [3, 4] });
+          if (st.th !== 90) P.angleMark(0, 0, 1, 0, mx, s, { r: 0.42, color: C.clay, label: `${180 - st.th}°`, font: Plot.FONT });
+          P.point(mx, s, { color: C.clay, hollow: true, r: 6, label: `P′ (${fmt(mx, 2)}, ${fmt(s, 2)})`, dx: mx < 0 ? -8 : 8, dy: -10, align: mx < 0 ? 'right' : 'left' });
+        }
+        if (st.th > 0 && st.th < 180) P.angleMark(0, 0, 1, 0, c, s, { r: 0.28, color: C.clay, label: 'θ', fill: rgba(C.clay, 0.15) });
+        P.segment(0, 0, c, 0, { color: C.clay, width: 4.5 });
+        P.segment(c, 0, c, s, { color: C.sage, width: 4.5 });
+        P.segment(0, 0, c, s, { color: C.ink, width: 2.4 });
+        P.text(c / 2, 0, `cos θ = ${fmt(c, 3)}`, { color: C.clay, align: 'center', dy: 24, bg: true });
+        P.text(c, s / 2, `sin θ = ${fmt(s, 3)}`, { color: C.sage, align: c >= 0 ? 'left' : 'right', dx: c >= 0 ? 8 : -8, baseline: 'middle', bg: true });
+        P.text(c, s, `P (${fmt(c, 2)}, ${fmt(s, 2)})`, { color: C.ink, dx: c >= 0 ? 12 : -12, dy: -14, align: c >= 0 ? 'left' : 'right', font: Plot.FONT_MATH, bg: true });
+      });
+
+      const ex = EXACT[st.th];
+      const line = (name, val, exact) => {
+        const v = fmt(val, 3);
+        if (exact == null) return `\\${name} ${st.th}^\\circ = ${v}`;
+        return exact === v ? `\\${name} ${st.th}^\\circ = ${exact}` : `\\${name} ${st.th}^\\circ = ${exact} \\approx ${v}`;
+      };
+      const tanTex = tanOk ? line('tan', tn, ex && ex[2]) : '\\tan 90^\\circ\\ \\text{は定義されない}';
+      readout.innerHTML = `
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">sin θ（P の y 座標）</div><div class="v">$${line('sin', s, ex && ex[0])}$</div></div>
+          <div class="stat clay"><div class="k">cos θ（P の x 座標）</div><div class="v">$${line('cos', c, ex && ex[1])}$</div></div>
+          <div class="stat ochre"><div class="k">tan θ（x=1 上の高さ）</div><div class="v">$${tanTex}$</div></div>
+        </div>
+        <div class="tex-block">$$\\sin^2\\theta+\\cos^2\\theta=${fmt(s * s, 3)}+${fmt(c * c, 3)}=${fmt(s * s + c * c, 3)}
+          ${tanOk ? `,\\qquad \\tan\\theta=\\frac{\\sin\\theta}{\\cos\\theta}=\\frac{${fmt(s, 3)}}{${fmt(c, 3)}}=${fmt(tn, 3)}` : ''}$$</div>
+        ${mirror ? `<div class="tex-block small">$$\\sin(180^\\circ-\\theta)=\\sin ${180 - st.th}^\\circ=${fmt(s, 3)}=\\sin\\theta,\\qquad
+          \\cos(180^\\circ-\\theta)=\\cos ${180 - st.th}^\\circ=${fmt(-c, 3)}=-\\cos\\theta$$</div>` : ''}
+        ${ex ? '' : '<p class="small">30°, 45°, 60° などの角ではボタンから選ぶと、根号を使った正確な値も表示されます。</p>'}`;
+      UI.texAll(readout);
+    }
+    plot.onChange = () => draw();
+    draw();
+  })();
+
+  /* ======================= 直角三角形の三角比 ======================= */
+  (() => {
+    const ctl = $('#c-triangle');
+    const st = { th: 35, h: 6, mode: 'sin' };
+    const plot = new Plot('#cv-triangle', { xmin: -1.2, xmax: 9.6, ymin: -1.3, ymax: 8.7, aspect: 0.72, grid: false, axes: false });
+
+    UI.heading(ctl, '三角形');
+    const sTh = UI.slider(ctl, { label: '$\\theta=\\angle\\mathrm{A}$', min: 5, max: 85, step: 1, value: st.th, unit: '°', digits: 0, onInput: (v) => { st.th = v; draw(); } });
+    UI.slider(ctl, { label: '斜辺 AB の長さ', min: 2, max: 8, step: 0.5, value: st.h, digits: 1, onInput: (v) => { st.h = v; draw(); } });
+    UI.buttonRow(ctl, [30, 45, 60].map((d) => ({ label: d + '°', small: true, onClick: () => { st.th = d; sTh.set(d); draw(); } })));
+    UI.divider(ctl);
+    const seg = UI.segmented(ctl, { label: '使う辺を強調', options: [{ value: 'sin', label: 'sin θ' }, { value: 'cos', label: 'cos θ' }, { value: 'tan', label: 'tan θ' }], value: st.mode, onChange: (v) => { st.mode = v; draw(); } });
+
+    const readout = $('#r-triangle');
+    const USED = { sin: ['hyp', 'opp'], cos: ['hyp', 'adj'], tan: ['adj', 'opp'] };
+    function draw() {
+      const t = rad(st.th), h = st.h, a = h * Math.sin(t), b = h * Math.cos(t);
+      const A = [0, 0], B = [b, a], Cp = [b, 0];
+      const used = USED[st.mode];
+      const w = (k) => used.includes(k) ? 5 : 1.8;
+      const al = (k) => used.includes(k) ? 1 : 0.45;
+      plot.render((P) => {
+        P.polygon([A, B, Cp], { color: 'none', fill: rgba(C.ink, 0.06) });
+        P.segment(A[0], A[1], B[0], B[1], { color: C.ink, width: w('hyp'), alpha: al('hyp') });
+        P.segment(Cp[0], Cp[1], B[0], B[1], { color: C.sage, width: w('opp'), alpha: al('opp') });
+        P.segment(A[0], A[1], Cp[0], Cp[1], { color: C.clay, width: w('adj'), alpha: al('adj') });
+        P.angleMark(b, 0, 0, 0, b, a, { right: true, r: 0.55 });
+        P.angleMark(0, 0, b, 0, b, a, { r: 0.8, color: C.clay, label: 'θ', fill: rgba(C.clay, 0.15) });
+        P.label(0, 0, 'A', { dx: -18, dy: 18, bold: true });
+        P.label(b, a, 'B', { dx: 8, dy: -8, bold: true });
+        P.label(b, 0, 'C', { dx: 8, dy: 18, bold: true });
+        P.text(b / 2, a / 2, `斜辺  ${fmt(h, 2)}`, { color: C.inkText, align: 'right', dx: -10, dy: -6, bg: true });
+        P.text(b, a / 2, `対辺  ${fmt(a, 2)}`, { color: C.sageSolid, dx: 12, baseline: 'middle', bg: true });
+        P.text(b / 2, 0, `隣辺  ${fmt(b, 2)}`, { color: C.clay, align: 'center', dy: 22, bg: true });
+      });
+      const row = (m, name, num, den, nv, dv) => `<div style="padding:0.15rem 0.6rem;border-radius:6px;${st.mode === m ? 'background:var(--ink-subtle)' : ''}" data-mode="${m}">
+        $${name}\\theta=\\dfrac{\\text{${num}}}{\\text{${den}}}=\\dfrac{${nv}}{${dv}}=${fmt(nv / dv, 3)}$</div>`;
+      readout.innerHTML = `
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">斜辺 AB</div><div class="v">${fmt(h, 3)}</div></div>
+          <div class="stat sage"><div class="k">対辺 BC = AB sin θ</div><div class="v">${fmt(a, 3)}</div></div>
+          <div class="stat clay"><div class="k">隣辺 AC = AB cos θ</div><div class="v">${fmt(b, 3)}</div></div>
+        </div>
+        <div style="display:grid;gap:0.3rem;margin-top:0.6rem">
+          ${row('sin', '\\sin', '対辺', '斜辺', fmt(a, 3), fmt(h, 3))}
+          ${row('cos', '\\cos', '隣辺', '斜辺', fmt(b, 3), fmt(h, 3))}
+          ${row('tan', '\\tan', '対辺', '隣辺', fmt(a, 3), fmt(b, 3))}
+        </div>
+        <p class="small">θ = ${st.th}°。各行にマウスを重ねると、使う 2 辺が図で太くなります。</p>`;
+      UI.texAll(readout);
+      for (const r of readout.querySelectorAll('[data-mode]')) r.addEventListener('mouseenter', () => { if (st.mode !== r.dataset.mode) { st.mode = r.dataset.mode; seg.set(st.mode); draw(); } });
+    }
+    draw();
+  })();
+
+  /* ======================= 正弦定理 ======================= */
+  (() => {
+    const ctl = $('#c-sine');
+    const st = { R: 3, ang: [rad(110), rad(215), rad(335)] };
+    const vert = (i) => [st.R * Math.cos(st.ang[i]), st.R * Math.sin(st.ang[i])];
+    const plot = new Plot('#cv-sine', { xmin: -4, xmax: 4, ymin: -4, ymax: 4, aspect: 0.72, grid: false, axes: false });
+    const names = ['A', 'B', 'C'];
+    const hs = names.map((n, i) => plot.addHandle({ x: vert(i)[0], y: vert(i)[1], color: C.ink, label: n, onMove: (x, y) => {
+      st.ang[i] = Math.atan2(y, x); return vert(i);
+    } }));
+
+    UI.heading(ctl, '外接円');
+    UI.slider(ctl, { label: '半径 $R$', min: 1, max: 4, step: 0.5, value: st.R, digits: 1, onInput: (v) => { st.R = v; draw(); } });
+    UI.buttonRow(ctl, [
+      { label: '正三角形', small: true, onClick: () => { st.ang = [rad(90), rad(210), rad(330)]; draw(); } },
+      { label: '直角三角形', small: true, onClick: () => { st.ang = [rad(140), rad(180), rad(0)]; draw(); } },
+      { label: 'リセット', small: true, onClick: () => { st.ang = [rad(110), rad(215), rad(335)]; draw(); } },
+    ]);
+
+    const readout = $('#r-sine');
+    function draw() {
+      const R = st.R;
+      plot.setView(-R - 1, R + 1, -R - 1, R + 1);
+      const V = [0, 1, 2].map(vert);
+      V.forEach((p, i) => { hs[i].x = p[0]; hs[i].y = p[1]; });
+      const side = [dist(V[1], V[2]), dist(V[2], V[0]), dist(V[0], V[1])];
+      const ang = [angleAt(V[0], V[1], V[2]), angleAt(V[1], V[2], V[0]), angleAt(V[2], V[0], V[1])];
+      const ratio = side.map((s, i) => isFinite(ang[i]) && Math.sin(ang[i]) > 1e-6 ? s / Math.sin(ang[i]) : NaN);
+      const cen = [(V[0][0] + V[1][0] + V[2][0]) / 3, (V[0][1] + V[1][1] + V[2][1]) / 3];
+      plot.render((P) => {
+        P.circle(0, 0, R, { color: C.inkLine, width: 1.6, fill: rgba(C.ink, 0.04) });
+        P.point(0, 0, { color: C.faint, r: 3, label: 'O', dx: 8, dy: 14 });
+        P.segment(0, 0, V[0][0], V[0][1], { color: C.faint, width: 1, dash: [3, 4] });
+        P.text(V[0][0] / 2, V[0][1] / 2, `R = ${fmt(R, 1)}`, { color: C.faint, font: Plot.FONT_MATH, dx: 6, bg: true });
+        P.polygon(V, { color: C.ink, width: 2.4, fill: rgba(C.ink, 0.08) });
+        for (let i = 0; i < 3; i++) {
+          const p = V[(i + 1) % 3], q = V[(i + 2) % 3];
+          const m = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+          const d = Math.hypot(m[0] - cen[0], m[1] - cen[1]) || 1;
+          const o = 0.1 * R + 0.15;
+          P.text(m[0] + (m[0] - cen[0]) / d * o, m[1] + (m[1] - cen[1]) / d * o, `${['a', 'b', 'c'][i]} = ${fmt(side[i], 2)}`, { color: C.sageSolid, align: 'center', baseline: 'middle', font: Plot.FONT_MATH, bg: true });
+          if (isFinite(ang[i]) && side[(i + 1) % 3] > 0.3 && side[(i + 2) % 3] > 0.3) {
+            P.angleMark(V[i][0], V[i][1], p[0], p[1], q[0], q[1], { r: 0.16 * R + 0.15, color: C.clay, label: `${fmt(deg(ang[i]), 0)}°`, font: Plot.FONT, fill: rgba(C.clay, 0.12) });
+          }
+        }
+      });
+      const rows = [0, 1, 2].map((i) => `<tr><td>${['a', 'b', 'c'][i]} = ${fmt(side[i], 3)}</td><td>${names[i]} = ${fmt(deg(ang[i]), 1)}°</td><td>${fmt(Math.sin(ang[i]), 4)}</td><td class="hl-sage">${fmt(ratio[i], 3)}</td></tr>`).join('');
+      readout.innerHTML = `
+        <div class="tex-block">$$\\frac{a}{\\sin A}=\\frac{b}{\\sin B}=\\frac{c}{\\sin C}=2R=${fmt(2 * R, 2)}$$</div>
+        <div class="table-wrap"><table class="data" style="width:100%">
+          <tr><th>辺</th><th>向かい合う角</th><th>sin</th><th>辺 ÷ sin（角）</th></tr>${rows}
+        </table></div>
+        <p class="small">頂点をどう動かしても、右端の列は 3 つとも $2R=${fmt(2 * R, 2)}$ のまま。${ratio.every(isFinite) ? '' : '（頂点が重なると角が 0° になり計算できません）'}</p>`;
+      UI.texAll(readout);
+    }
+    plot.onChange = () => draw();
+    draw();
+  })();
+
+  /* ======================= 余弦定理と面積 ======================= */
+  (() => {
+    const ctl = $('#c-cosine');
+    const st = { V: [[-2.5, -1.5], [3, -1.5], [0.5, 2.5]], sel: 0 };
+    const names = ['A', 'B', 'C'], sides = ['a', 'b', 'c'];
+    const plot = new Plot('#cv-cosine', { xmin: -5, xmax: 5, ymin: -3.6, ymax: 3.8, aspect: 0.7, axes: false, ticks: false });
+    const hs = names.map((n, i) => plot.addHandle({ x: st.V[i][0], y: st.V[i][1], color: C.ink, label: n, onMove: (x, y) => {
+      const p = [Math.round(x * 2) / 2, Math.round(y * 2) / 2];
+      p[0] = Math.max(-4.5, Math.min(4.5, p[0])); p[1] = Math.max(-3.2, Math.min(3.4, p[1]));
+      st.V[i] = p; return p;
+    } }));
+
+    UI.heading(ctl, '公式を書く角');
+    UI.segmented(ctl, { options: [{ value: 0, label: '角 A' }, { value: 1, label: '角 B' }, { value: 2, label: '角 C' }], value: 0, onChange: (v) => { st.sel = v; draw(); } });
+    UI.divider(ctl);
+    UI.buttonRow(ctl, [
+      { label: 'A を直角に', small: true, onClick: () => { st.V = [[-2, -1.5], [2.5, -1.5], [-2, 2.5]]; draw(); } },
+      { label: '鈍角三角形', small: true, onClick: () => { st.V = [[-1, -1.5], [3.5, -1.5], [-3, 1.5]]; draw(); } },
+      { label: 'リセット', small: true, onClick: () => { st.V = [[-2.5, -1.5], [3, -1.5], [0.5, 2.5]]; draw(); } },
+    ]);
+
+    const readout = $('#r-cosine');
+    function draw() {
+      const V = st.V;
+      V.forEach((p, i) => { hs[i].x = p[0]; hs[i].y = p[1]; });
+      const s = [dist(V[1], V[2]), dist(V[2], V[0]), dist(V[0], V[1])];
+      const ang = [angleAt(V[0], V[1], V[2]), angleAt(V[1], V[2], V[0]), angleAt(V[2], V[0], V[1])];
+      const k = st.sel, k1 = (k + 1) % 3, k2 = (k + 2) % 3;
+      const cen = [(V[0][0] + V[1][0] + V[2][0]) / 3, (V[0][1] + V[1][1] + V[2][1]) / 3];
+      plot.render((P) => {
+        P.polygon(V, { color: 'none', fill: rgba(C.ink, 0.06) });
+        for (let i = 0; i < 3; i++) {
+          const p = V[(i + 1) % 3], q = V[(i + 2) % 3];
+          const isAdj = i !== k;
+          P.segment(p[0], p[1], q[0], q[1], { color: isAdj ? C.ink : C.sage, width: isAdj ? 4.5 : 2.6 });
+          const m = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+          const d = Math.hypot(m[0] - cen[0], m[1] - cen[1]) || 1;
+          P.text(m[0] + (m[0] - cen[0]) / d * 0.45, m[1] + (m[1] - cen[1]) / d * 0.45, `${sides[i]} = ${fmt(s[i], 2)}`, { color: isAdj ? C.inkText : C.sageSolid, align: 'center', baseline: 'middle', font: Plot.FONT_MATH, bg: true });
+        }
+        for (let i = 0; i < 3; i++) {
+          if (!isFinite(ang[i]) || s[(i + 1) % 3] < 0.4 || s[(i + 2) % 3] < 0.4) continue;
+          const p = V[(i + 1) % 3], q = V[(i + 2) % 3];
+          if (i === k) P.angleMark(V[i][0], V[i][1], p[0], p[1], q[0], q[1], { r: 0.75, color: C.clay, width: 2, label: `${names[i]} = ${fmt(deg(ang[i]), 0)}°`, font: Plot.FONT, fill: rgba(C.clay, 0.25) });
+          else P.angleMark(V[i][0], V[i][1], p[0], p[1], q[0], q[1], { r: 0.45, color: C.faint, label: `${fmt(deg(ang[i]), 0)}°`, font: Plot.FONT });
+        }
+      });
+      const X = names[k], x = sides[k], y = sides[k1], z = sides[k2];
+      const lhs = s[k] * s[k];
+      const rhs = s[k1] * s[k1] + s[k2] * s[k2] - 2 * s[k1] * s[k2] * Math.cos(ang[k]);
+      const S1 = 0.5 * s[k1] * s[k2] * Math.sin(ang[k]);
+      const sp = (s[0] + s[1] + s[2]) / 2;
+      const heron = Math.sqrt(Math.max(0, sp * (sp - s[0]) * (sp - s[1]) * (sp - s[2])));
+      const degenerate = !ang.every(isFinite);
+      readout.innerHTML = degenerate ? '<p class="small">頂点が重なっています。離してください。</p>' : `
+        <div class="tex-block">$$${x}^2=${y}^2+${z}^2-2\\,${y}${z}\\cos ${X}$$
+          $$${fmt(s[k], 2)}^2=${fmt(s[k1], 2)}^2+${fmt(s[k2], 2)}^2-2\\cdot${fmt(s[k1], 2)}\\cdot${fmt(s[k2], 2)}\\cdot\\cos ${fmt(deg(ang[k]), 1)}^\\circ$$</div>
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">左辺 ${x}²</div><div class="v">${fmt(lhs, 3)}</div></div>
+          <div class="stat sage"><div class="k">右辺 ${y}²+${z}²−2${y}${z} cos ${X}</div><div class="v">${fmt(rhs, 3)}</div></div>
+          <div class="stat clay"><div class="k">cos ${X}（${ang[k] < Math.PI / 2 - 1e-9 ? '鋭角' : Math.abs(ang[k] - Math.PI / 2) < 1e-9 ? '直角' : '鈍角'}）</div><div class="v">${fmt(Math.cos(ang[k]), 3)}</div></div>
+        </div>
+        <div class="kv" style="margin-top:0.6rem">
+          <span class="k">角</span><span class="v">A = ${fmt(deg(ang[0]), 1)}°, B = ${fmt(deg(ang[1]), 1)}°, C = ${fmt(deg(ang[2]), 1)}°　（和 ${fmt(deg(ang[0] + ang[1] + ang[2]), 0)}°）</span>
+          <span class="k">辺</span><span class="v">a = ${fmt(s[0], 3)}, b = ${fmt(s[1], 3)}, c = ${fmt(s[2], 3)}</span>
+        </div>
+        <div class="tex-block">$$S=\\frac12\\,${y}${z}\\sin ${X}=\\frac12\\cdot${fmt(s[k1], 2)}\\cdot${fmt(s[k2], 2)}\\cdot\\sin ${fmt(deg(ang[k]), 1)}^\\circ=${fmt(S1, 3)}$$
+          $$\\text{ヘロン：}\\ s=\\frac{a+b+c}{2}=${fmt(sp, 3)},\\quad S=\\sqrt{s(s-a)(s-b)(s-c)}=${fmt(heron, 3)}$$</div>`;
+      UI.texAll(readout);
+    }
+    plot.onChange = () => draw();
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'circle', label: '単位円と三角比' },
+    { id: 'triangle', label: '直角三角形の三角比' },
+    { id: 'sine', label: '正弦定理' },
+    { id: 'cosine', label: '余弦定理と面積' },
+  ]);
+});
+</script>
+</body>
+</html>

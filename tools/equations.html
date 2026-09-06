@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>式と証明・複素数と方程式</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+<style>
+  .terms { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.15rem; justify-content: center; padding: 0.2rem 0; }
+  .terms .term { padding: 0.1em 0.3em; border-radius: 4px; cursor: pointer; border: 1px solid transparent; }
+  .terms .term:hover, .terms .term.hl { background: var(--clay-subtle); border-color: var(--clay-line); }
+  .terms .op { color: var(--text-faint); }
+  table.synth td { min-width: 3.2em; text-align: center; font-family: var(--font-mono); }
+  table.synth tr.sum td { border-top: 2px solid var(--border-strong); }
+  table.synth td.k { background: var(--ochre-subtle); color: var(--ochre-text); font-weight: 700; border-left: 2px solid var(--border-strong); }
+</style>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>式と証明・複素数と方程式</h1>
+    <p class="lede">二項定理の係数をパスカルの三角形で追い、相加平均・相乗平均の不等式を図で確かめ、解と係数の関係・因数定理を放物線や三次曲線の上で動かしながら理解します。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 二項定理 -->
+  <section class="tool-body" data-tab="binomial">
+    <div class="layout">
+      <aside class="controls" id="c-binomial"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-binomial"></canvas><div class="caption">パスカルの三角形（一番下の行にマウスを乗せると項と対応します）</div></div>
+        <div class="readout" id="r-binomial"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">二項定理</div>
+        $$(a+b)^n=\sum_{k=0}^{n}{}_n\mathrm{C}_k\,a^{n-k}b^k={}_n\mathrm{C}_0a^n+{}_n\mathrm{C}_1a^{n-1}b+\cdots+{}_n\mathrm{C}_nb^n$$
+        $(a+b)^n$ は $(a+b)$ を $n$ 個掛けたもの。各因数から $a$ か $b$ を選ぶとき、$b$ を $k$ 個選ぶ選び方が ${}_n\mathrm{C}_k$ 通りあるので、$a^{n-k}b^k$ の係数が ${}_n\mathrm{C}_k$ になります。
+      </div>
+      <ul>
+        <li>$n$ を 1 ずつ増やして、係数の行がパスカルの三角形のとおり「上の 2 つの和」で作られること（${}_{n-1}\mathrm{C}_{k-1}+{}_{n-1}\mathrm{C}_k={}_n\mathrm{C}_k$）を確かめよう。項に触れると、その係数と上の 2 つが光る。</li>
+        <li>$k$ を動かすと一般項（第 $k+1$ 項）が変わる。$a$ の指数と $b$ の指数の和はつねに $n$。</li>
+        <li>「$a=1,\ b=\pm1$ を代入」を入れると、係数の和が $2^n$、交互に符号を変えた和が $0$ になる。これは $(1+1)^n$、$(1-1)^n$ を二項定理で書いただけ。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 相加平均・相乗平均 -->
+  <section class="tool-body" data-tab="amgm">
+    <div class="layout">
+      <aside class="controls" id="c-amgm"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-amgm"></canvas><div class="caption">直径上の点 D をドラッグすると a+b を保ったまま a, b が変わります</div></div>
+        <div class="readout" id="r-amgm"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage">
+        <div class="title">相加平均 ≧ 相乗平均</div>
+        $a>0,\ b>0$ のとき $\dfrac{a+b}{2}\ge\sqrt{ab}$。等号が成り立つのは $a=b$ のときだけ。
+        図では、直径 $a+b$ の半円の半径が $\dfrac{a+b}{2}$、$a$ と $b$ の境目 D から立てた垂線 DH の長さが $\sqrt{ab}$ です。
+      </div>
+      <div class="note ink">
+        <div class="title">なぜ DH の長さが √(ab) になるのか（相似）</div>
+        直径に対する円周角は直角なので $\angle\mathrm{AHB}=90^\circ$。すると $\triangle\mathrm{ADH}\sim\triangle\mathrm{HDB}$ となり、
+        $\mathrm{AD}:\mathrm{DH}=\mathrm{DH}:\mathrm{DB}$、つまり $\mathrm{DH}^2=\mathrm{AD}\cdot\mathrm{DB}=ab$。
+      </div>
+      <ul>
+        <li>D を左右に動かして、垂線（緑）は半径（青）を決して超えないことを見る。D が中心に来る（$a=b$）とき、ちょうど一致する。</li>
+        <li>$a+b$ を固定して $a$ と $b$ の差を大きくすると $\sqrt{ab}$ が小さくなる。「和が一定なら積は $a=b$ で最大」という使い方につながる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 解と係数の関係 -->
+  <section class="tool-body" data-tab="vieta">
+    <div class="layout">
+      <aside class="controls" id="c-vieta"></aside>
+      <div class="stage">
+        <div class="canvas-row">
+          <div class="canvas-wrap"><canvas id="cv-vieta"></canvas><div class="caption">グラフ（x 軸上の解をドラッグ）</div></div>
+          <div class="canvas-wrap"><canvas id="cv-vieta2"></canvas><div class="caption">複素数平面での解の位置</div></div>
+        </div>
+        <div class="readout" id="r-vieta"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">解と係数の関係</div>
+        2 次方程式 $ax^2+bx+c=0$ の 2 つの解を $\alpha,\beta$ とすると
+        $$\alpha+\beta=-\frac{b}{a},\qquad \alpha\beta=\frac{c}{a}$$
+        これは $a(x-\alpha)(x-\beta)=ax^2-a(\alpha+\beta)x+a\alpha\beta$ を展開して係数を比べたもの。3 次方程式なら $\alpha+\beta+\gamma=-\dfrac{b}{a},\ \alpha\beta+\beta\gamma+\gamma\alpha=\dfrac{c}{a},\ \alpha\beta\gamma=-\dfrac{d}{a}$。
+      </div>
+      <ul>
+        <li>解 $\alpha,\beta$ をドラッグすると、$x$ の係数が $-(\alpha+\beta)$、定数項が $\alpha\beta$ になっていることが読み取れる。</li>
+        <li>$\alpha^2+\beta^2=(\alpha+\beta)^2-2\alpha\beta$、$(\alpha-\beta)^2=(\alpha+\beta)^2-4\alpha\beta$ のように、対称式は和と積だけで計算できる。</li>
+        <li>「虚数解」に切り替えると、解 $p\pm qi$ は複素数平面で実軸に関して対称な位置にあり、グラフは $x$ 軸と交わらない（頂点の高さは $q^2>0$）。それでも和 $2p$ と積 $p^2+q^2$ は実数になる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 因数定理と高次方程式 -->
+  <section class="tool-body" data-tab="factor">
+    <div class="layout">
+      <aside class="controls" id="c-factor"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-factor"></canvas><div class="caption">x 軸上の点 k をドラッグして代入する値を選べます</div></div>
+        <div class="readout" id="r-factor"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">剰余の定理と因数定理</div>
+        多項式 $f(x)$ を $x-k$ で割った余りは $f(k)$（剰余の定理）。とくに $f(k)=0$ なら $f(x)$ は $x-k$ で割り切れ、$f(x)=(x-k)\,Q(x)$ と因数分解できる（因数定理）。
+        商 $Q(x)$ は組立除法で手早く求められます。
+      </div>
+      <div class="note ochre">
+        <div class="title">k の候補の探し方</div>
+        整数係数で最高次の係数が 1 なら、$f(k)=0$ となる整数 $k$ は定数項の約数の中にある。$\pm1,\pm2,\dots$ と順に代入して、グラフが $x$ 軸を横切る整数点を探そう。
+      </div>
+      <ul>
+        <li>$k$ を動かすと、点 $(k,\ f(k))$ の高さがそのまま「$x-k$ で割った余り」になる。$f(k)\ne0$ のときは赤い点で余りが示される。</li>
+        <li>$f(k)=0$ のとき、組立除法の表と商 $Q(x)$ が現れる。残りの 2 次方程式 $Q(x)=0$ を解けば、3 次方程式のすべての解が求まる。</li>
+        <li>プリセットで $x^3-6x^2+11x-6$ を選び、$k=1,2,3$ でどれも割り切れることを確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学II', title: '式と証明・複素数と方程式' });
+
+  const choose = (n, k) => { if (k < 0 || k > n) return 0; let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return Math.round(r); };
+  const texC = (n, k) => `{}_{${n}}\\mathrm{C}_{${k}}`;
+  const texPow = (sym, e) => e === 0 ? '' : e === 1 ? sym : `${sym}^{${e}}`;
+  const sgn = (x, d = 2) => (x < 0 ? '-' : '+') + fmt(Math.abs(x), d);
+
+  /* ======================= 二項定理 ======================= */
+  (() => {
+    const ctl = $('#c-binomial');
+    const st = { n: 4, k: 2, hl: null, subst: false };
+    const plot = new Plot('#cv-binomial', { grid: false, axes: false, equal: false, height: 220, xmin: -6, xmax: 6, ymin: -5, ymax: 1 });
+
+    UI.heading(ctl, '指数');
+    const sN = UI.slider(ctl, { label: '$n$', min: 1, max: 8, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; if (st.k > v) st.k = v; sK.setRange(0, v); sK.set(st.k); st.hl = null; draw(); } });
+    UI.heading(ctl, '一般項');
+    const sK = UI.slider(ctl, { label: '$k$（第 $k+1$ 項）', min: 0, max: st.n, step: 1, value: st.k, digits: 0, onInput: (v) => { st.k = v; st.hl = v; draw(); } });
+    UI.divider(ctl);
+    UI.checkbox(ctl, { label: '$a=1,\\ b=\\pm1$ を代入して確かめる', checked: false, onChange: (v) => { st.subst = v; draw(); } });
+
+    const cellX = (r, j) => j - r / 2;
+    const cellY = (r) => -r;
+    plot.onHover = (x, y) => {
+      let hl = null;
+      if (x != null && Math.abs(y - cellY(st.n)) < 0.5) {
+        const j = Math.round(x + st.n / 2);
+        if (j >= 0 && j <= st.n && Math.abs(cellX(st.n, j) - x) < 0.5) hl = j;
+      }
+      if (hl == null) hl = st.k;
+      if (hl !== st.hl) { st.hl = hl; draw(); }
+    };
+
+    const readout = $('#r-binomial');
+    function draw() {
+      const n = st.n, k = st.k, hl = st.hl;
+      plot.opts.height = 34 * (n + 1) + 56;
+      plot.setView(-6, 6, -(n + 0.55), 1.3);
+      plot.resize();
+      plot.render((P) => {
+        for (let r = 0; r <= n; r++) {
+          P.text(-5.6, cellY(r), `n=${r}`, { color: C.faint, align: 'left', baseline: 'middle', font: '12px "Noto Sans JP", system-ui, sans-serif' });
+          for (let j = 0; j <= r; j++) {
+            const x = cellX(r, j), y = cellY(r);
+            const isTarget = hl != null && r === n && j === hl;
+            const isParent = hl != null && r === n - 1 && (j === hl || j === hl - 1);
+            if (isTarget || isParent) {
+              P.ctx.beginPath(); P.ctx.arc(P.X(x), P.Y(y), 15, 0, Math.PI * 2);
+              P.ctx.fillStyle = isTarget ? C.claySubtle : C.inkSubtle; P.ctx.fill();
+              P.ctx.lineWidth = 1.5; P.ctx.strokeStyle = isTarget ? C.clay : C.ink; P.ctx.stroke();
+            }
+            P.text(x, y, String(choose(r, j)), { color: isTarget ? C.clay : isParent ? C.inkText : r === n ? C.text : C.muted, align: 'center', baseline: 'middle', font: (r === n ? 'bold ' : '') + '14px "Noto Sans JP", system-ui, sans-serif' });
+          }
+        }
+        if (hl != null && n >= 1) {
+          const tx = cellX(n, hl), ty = cellY(n);
+          for (const pj of [hl - 1, hl]) if (pj >= 0 && pj <= n - 1) P.segment(cellX(n - 1, pj), cellY(n - 1) - 0.32, tx, ty + 0.32, { color: C.ink, width: 1.5 });
+        }
+      });
+
+      const termsA = [], termsB = [];
+      for (let j = 0; j <= n; j++) {
+        const cls = 'term' + (j === hl ? ' hl' : '');
+        termsA.push(`<span class="${cls}" data-k="${j}">$${texC(n, j)}${texPow('a', n - j)}${texPow('b', j)}$</span>`);
+        const c = choose(n, j);
+        const mono = texPow('a', n - j) + texPow('b', j);
+        termsB.push(`<span class="${cls}" data-k="${j}">$${c === 1 && mono ? '' : c}${mono}$</span>`);
+      }
+      const join = (arr) => arr.map((t, i) => (i ? '<span class="op">+</span>' : '') + t).join('');
+      let subst = '';
+      if (st.subst) {
+        const coefs = []; for (let j = 0; j <= n; j++) coefs.push(choose(n, j));
+        const alt = coefs.map((c, j) => (j % 2 ? '-' : (j ? '+' : '')) + c).join('');
+        subst = `<hr>
+          <div class="tex-block">$$a=1,\\ b=1:\\quad (1+1)^n=${coefs.join('+')}=${Math.pow(2, n)}=2^{${n}}$$</div>
+          <div class="tex-block">$$a=1,\\ b=-1:\\quad (1-1)^n=${alt}=0$$</div>
+          <p class="small">係数の和は $2^n$、偶数番目の係数の和と奇数番目の係数の和は等しい（どちらも $2^{n-1}=${Math.pow(2, n - 1)}$）。</p>`;
+      }
+      readout.innerHTML = `
+        <div class="terms"><span class="op">$(a+b)^{${n}}=$</span>${join(termsA)}</div>
+        <div class="terms"><span class="op">$=$</span>${join(termsB)}</div>
+        <hr>
+        <div class="tex-block">$$\\text{一般項（第 ${k + 1} 項）}\\quad ${texC(n, k)}\\,${texPow('a', n - k)}${texPow('b', k)}=\\frac{${n}!}{${k}!\\,${n - k}!}\\,${texPow('a', n - k)}${texPow('b', k)}=${choose(n, k)}${texPow('a', n - k)}${texPow('b', k)}$$</div>
+        ${subst}`;
+      UI.texAll(readout);
+      for (const t of readout.querySelectorAll('.term')) {
+        t.addEventListener('pointerenter', () => { const j = +t.dataset.k; if (st.hl !== j) { st.hl = j; draw(); } });
+        t.addEventListener('click', () => { st.k = +t.dataset.k; sK.set(st.k); st.hl = st.k; draw(); });
+      }
+      readout.querySelectorAll('.terms').forEach((row) => row.addEventListener('pointerleave', () => { if (st.hl !== st.k) { st.hl = st.k; draw(); } }));
+    }
+    st.hl = st.k;
+    draw();
+  })();
+
+  /* ======================= 相加平均・相乗平均 ======================= */
+  (() => {
+    const ctl = $('#c-amgm');
+    const st = { a: 2, b: 6 };
+    const plot = new Plot('#cv-amgm', { grid: false, xmin: -1, xmax: 17, ymin: -1.5, ymax: 9, xLabel: '', yLabel: '', arrows: false, aspect: 0.65 });
+    const hD = plot.addHandle({ x: st.a, y: 0, color: C.ochre, label: 'D', dy: -12, dx: -14, onMove: (x) => {
+      const S = st.a + st.b;
+      st.a = Math.min(Math.max(Math.round(x * 10) / 10, 0.5), S - 0.5); st.b = Math.round((S - st.a) * 10) / 10;
+      sA.set(st.a); sB.set(st.b); return [st.a, 0];
+    } });
+
+    UI.heading(ctl, '2 つの正の数');
+    const sA = UI.slider(ctl, { label: '$a$', min: 0.5, max: 8, step: 0.1, value: st.a, digits: 1, onInput: (v) => { st.a = v; draw(); } });
+    const sB = UI.slider(ctl, { label: '$b$', min: 0.5, max: 8, step: 0.1, value: st.b, digits: 1, onInput: (v) => { st.b = v; draw(); } });
+    UI.buttonRow(ctl, [
+      { label: 'a = b にする', small: true, onClick: () => { const m = Math.round((st.a + st.b) / 2 * 10) / 10; st.a = st.b = m; sA.set(m); sB.set(m); draw(); } },
+      { label: 'a=2, b=6', small: true, onClick: () => { st.a = 2; st.b = 6; sA.set(2); sB.set(6); draw(); } },
+    ]);
+
+    const readout = $('#r-amgm');
+    function draw() {
+      const a = st.a, b = st.b, S = a + b, M = S / 2, h = Math.sqrt(a * b);
+      hD.x = a; hD.y = 0;
+      const ymin = -0.15 * S - 0.5;
+      plot.setView(-1, S + 1, ymin, ymin + (S + 2) * plot.opts.aspect);
+      plot.render((P) => {
+        P.arc(M, 0, M, 0, Math.PI, { color: C.ink, width: 2, fill: Plot.rgba(C.ink, 0.05) });
+        P.segment(0, 0, S, 0, { color: C.borderStrong, width: 2 });
+        P.segment(0, 0, a, h, { color: C.faint, width: 1.2, dash: [4, 4] });
+        P.segment(S, 0, a, h, { color: C.faint, width: 1.2, dash: [4, 4] });
+        P.angleMark(a, h, 0, 0, S, 0, { r: 0.09 * S, right: true, color: C.faint });
+        P.hline(M, { color: C.ink, width: 1, dash: [3, 5], alpha: 0.6 });
+        P.hline(h, { color: C.sage, width: 1, dash: [3, 5], alpha: 0.6 });
+        P.segment(M, 0, M, M, { color: C.ink, width: 3.5 });
+        P.segment(a, 0, a, h, { color: C.sage, width: 3.5 });
+        P.point(M, M, { color: C.ink, r: 4 });
+        P.point(a, h, { color: C.sage, r: 5, label: 'H', dx: 8, dy: -6 });
+        P.point(M, 0, { color: C.ink, r: 4, label: 'M', dx: 6, dy: -10 });
+        P.point(0, 0, { color: C.text, r: 4, label: 'A', dx: -16, dy: -10 });
+        P.point(S, 0, { color: C.text, r: 4, label: 'B', dx: 8, dy: -10 });
+        P.text(a / 2, 0, `a = ${fmt(a, 1)}`, { color: C.ochre, align: 'center', baseline: 'top', dy: 28, bg: true });
+        P.text(a + b / 2, 0, `b = ${fmt(b, 1)}`, { color: C.ochre, align: 'center', baseline: 'top', dy: 28, bg: true });
+        P.text(M, M / 2, `(a+b)/2 = ${fmt(M, 2)}`, { color: C.inkText, align: a < M ? 'left' : 'right', baseline: 'middle', dx: a < M ? 8 : -8, bg: true });
+        P.text(a, h / 2, `√(ab) = ${fmt(h, 2)}`, { color: C.sageSolid, align: a < M ? 'right' : 'left', baseline: 'middle', dx: a < M ? -8 : 8, bg: true });
+      });
+      const eq = Math.abs(a - b) < 1e-9;
+      readout.innerHTML = `
+        <div class="tex-block">$$\\sqrt{ab}=\\sqrt{${fmt(a, 1)}\\times${fmt(b, 1)}}=${fmt(h, 3)}\\ ${eq ? '=' : '<'}\\ ${fmt(M, 3)}=\\frac{${fmt(a, 1)}+${fmt(b, 1)}}{2}=\\frac{a+b}{2}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">相加平均 (a+b)/2 ＝ 半径 CM</div><div class="v">${fmt(M, 3)}</div></div>
+          <div class="stat sage"><div class="k">相乗平均 √(ab) ＝ 垂線 DH</div><div class="v">${fmt(h, 3)}</div></div>
+          <div class="stat ${eq ? 'sage' : 'clay'}"><div class="k">差 (a+b)/2 − √(ab)</div><div class="v">${fmt(M - h, 3)}${eq ? '（等号成立）' : ''}</div></div>
+        </div>
+        <p class="small">$\\mathrm{AD}=a,\\ \\mathrm{DB}=b$、$\\triangle\\mathrm{ADH}\\sim\\triangle\\mathrm{HDB}$ より $\\mathrm{DH}^2=ab$。垂線 DH は半径以下なので $\\sqrt{ab}\\le\\dfrac{a+b}{2}$。</p>`;
+      UI.texAll(readout);
+    }
+    plot.onChange = draw;
+    draw();
+  })();
+
+  /* ======================= 解と係数の関係 ======================= */
+  (() => {
+    const ctl = $('#c-vieta');
+    const st = { mode: 'real', al: -1, be: 3, ga: 1, p: 1, q: 2 };
+    const snap = (x) => Math.round(x * 2) / 2;
+    const plot = new Plot('#cv-vieta', { equal: false, xmin: -6, xmax: 6, ymin: -8, ymax: 8, aspect: 0.8 });
+    const cplot = new Plot('#cv-vieta2', { xmin: -5, xmax: 5, ymin: -5, ymax: 5, aspect: 0.8, xLabel: 'Re', yLabel: 'Im' });
+    const hA = plot.addHandle({ x: st.al, y: 0, color: C.sage, label: 'α', visible: () => st.mode !== 'imag', onMove: (x) => { st.al = snap(x); return [st.al, 0]; } });
+    const hB = plot.addHandle({ x: st.be, y: 0, color: C.sage, label: 'β', visible: () => st.mode !== 'imag', onMove: (x) => { st.be = snap(x); return [st.be, 0]; } });
+    const hG = plot.addHandle({ x: st.ga, y: 0, color: C.sage, label: 'γ', visible: () => st.mode === 'cubic', onMove: (x) => { st.ga = snap(x); return [st.ga, 0]; } });
+    const hZ = cplot.addHandle({ x: st.p, y: st.q, color: C.ochre, label: 'p+qi', visible: () => st.mode === 'imag', onMove: (x, y) => {
+      st.p = Math.min(4, Math.max(-4, snap(x))); st.q = Math.min(4, Math.max(0.5, snap(y))); sP.set(st.p); sQ.set(st.q); return [st.p, st.q];
+    } });
+
+    UI.heading(ctl, '解の種類');
+    UI.segmented(ctl, { options: [{ value: 'real', label: '実数解 (2次)' }, { value: 'imag', label: '虚数解 (2次)' }, { value: 'cubic', label: '3次' }], value: 'real', onChange: (v) => { st.mode = v; rebuild(); } });
+    const box = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    let sP, sQ;
+    function rebuild() {
+      box.innerHTML = '';
+      if (st.mode === 'imag') {
+        UI.heading(box, '解 p ± qi');
+        sP = UI.slider(box, { label: '$p$（実部）', min: -4, max: 4, step: 0.5, value: st.p, digits: 1, onInput: (v) => { st.p = v; draw(); } });
+        sQ = UI.slider(box, { label: '$q$（虚部）', min: 0.5, max: 4, step: 0.5, value: st.q, digits: 1, onInput: (v) => { st.q = v; draw(); } });
+        UI.note(box, { tone: 'ochre', html: '右の複素数平面の点 $p+qi$ もドラッグできます。' });
+      } else {
+        UI.note(box, { tone: 'ochre', html: st.mode === 'cubic' ? 'グラフ上の 3 つの解 $\\alpha,\\beta,\\gamma$ をドラッグしてください（0.5 刻み）。' : 'グラフ上の 2 つの解 $\\alpha,\\beta$ をドラッグしてください（0.5 刻み）。' });
+        UI.buttonRow(box, [
+          { label: 'α=−1, β=3', small: true, onClick: () => { st.al = -1; st.be = 3; draw(); } },
+          { label: '重解 α=β=2', small: true, onClick: () => { st.al = 2; st.be = 2; draw(); } },
+          { label: 'α=−2, β=2', small: true, onClick: () => { st.al = -2; st.be = 2; draw(); } },
+        ]);
+      }
+      draw();
+    }
+
+    const readout = $('#r-vieta');
+    function draw() {
+      hA.x = st.al; hB.x = st.be; hG.x = st.ga; hZ.x = st.p; hZ.y = st.q;
+      const { al, be, ga, p, q, mode } = st;
+      if (mode === 'cubic') plot.setView(-6, 6, -15, 15); else plot.setView(-6, 6, -8, 8);
+      let f, texEq;
+      if (mode === 'real') {
+        f = (x) => (x - al) * (x - be);
+        texEq = `y=(x${sgn(-al, 1)})(x${sgn(-be, 1)})=${UI.texPoly([1, -(al + be), al * be], 'x', 2)}`;
+      } else if (mode === 'imag') {
+        f = (x) => x * x - 2 * p * x + p * p + q * q;
+        texEq = `y=${UI.texPoly([1, -2 * p, p * p + q * q], 'x', 2)}`;
+      } else {
+        f = (x) => (x - al) * (x - be) * (x - ga);
+        texEq = `y=(x${sgn(-al, 1)})(x${sgn(-be, 1)})(x${sgn(-ga, 1)})=${UI.texPoly([1, -(al + be + ga), al * be + be * ga + ga * al, -al * be * ga], 'x', 2)}`;
+      }
+      plot.render((P) => {
+        P.fn(f, { color: C.ink, width: 2.6 });
+        if (mode === 'imag') {
+          P.segment(p, 0, p, q * q, { color: C.clay, width: 1.2, dash: [4, 4] });
+          P.point(p, q * q, { color: C.clay, label: `頂点 (${fmt(p, 1)}, ${fmt(q * q, 2)})`, dx: 8, dy: -8 });
+          P.legend([{ label: 'x 軸と交わらない', color: C.ink }], { left: 10, top: 34 });
+        }
+      });
+      cplot.render((P) => {
+        if (mode === 'imag') {
+          P.dropLines(p, q, { color: C.ochre });
+          P.dropLines(p, -q, { color: C.ochre });
+          P.segment(p, q, p, -q, { color: C.sage, width: 1, dash: [4, 4] });
+          P.point(p, -q, { color: C.sage, r: 6, label: 'p−qi', dx: 8, dy: 16 });
+          P.label(p, q, `${fmt(p, 1)}+${fmt(q, 1)}i`, { color: C.ochre, dx: 12, dy: -12 });
+        } else {
+          const roots = mode === 'cubic' ? [[al, 'α'], [be, 'β'], [ga, 'γ']] : [[al, 'α'], [be, 'β']];
+          roots.forEach(([r, name], i) => P.point(r, 0, { color: C.sage, r: 6, label: name, dx: -4, dy: 22 + (i % 2) * 0 }));
+        }
+      });
+
+      let html = `<div class="tex-block">$$${texEq}$$</div>`;
+      if (mode === 'real') {
+        const s = al + be, pr = al * be;
+        html += `
+          <div class="readout-grid">
+            <div class="stat sage"><div class="k">α + β</div><div class="v">${fmt(s, 2)}</div></div>
+            <div class="stat sage"><div class="k">αβ</div><div class="v">${fmt(pr, 2)}</div></div>
+            <div class="stat"><div class="k">α² + β² = (α+β)² − 2αβ</div><div class="v">${fmt(s * s - 2 * pr, 2)}</div></div>
+            <div class="stat"><div class="k">(α − β)² = (α+β)² − 4αβ</div><div class="v">${fmt(s * s - 4 * pr, 2)}</div></div>
+          </div>
+          <div class="tex-block">$$x^2-(\\alpha+\\beta)x+\\alpha\\beta=x^2-(${fmt(s, 2)})x+(${fmt(pr, 2)})$$</div>`;
+      } else if (mode === 'imag') {
+        const s = 2 * p, pr = p * p + q * q;
+        html += `
+          <div class="tex-block">$$\\alpha=${fmt(p, 1)}+${fmt(q, 1)}i,\\quad \\beta=${fmt(p, 1)}-${fmt(q, 1)}i$$</div>
+          <div class="readout-grid">
+            <div class="stat sage"><div class="k">α + β = 2p</div><div class="v">${fmt(s, 2)}</div></div>
+            <div class="stat sage"><div class="k">αβ = p² + q²</div><div class="v">${fmt(pr, 2)}</div></div>
+            <div class="stat clay"><div class="k">判別式 D/4 = p² − (p²+q²) = −q²</div><div class="v">${fmt(-q * q, 2)}</div></div>
+            <div class="stat"><div class="k">α² + β² = (α+β)² − 2αβ</div><div class="v">${fmt(s * s - 2 * pr, 2)}</div></div>
+          </div>
+          <p class="small">共役な虚数解の和と積は実数になるので、係数も実数。$(x-\\alpha)(x-\\beta)=x^2-2px+(p^2+q^2)$。</p>`;
+      } else {
+        const s1 = al + be + ga, s2 = al * be + be * ga + ga * al, s3 = al * be * ga;
+        html += `
+          <div class="readout-grid">
+            <div class="stat sage"><div class="k">α + β + γ</div><div class="v">${fmt(s1, 2)}</div></div>
+            <div class="stat sage"><div class="k">αβ + βγ + γα</div><div class="v">${fmt(s2, 2)}</div></div>
+            <div class="stat sage"><div class="k">αβγ</div><div class="v">${fmt(s3, 2)}</div></div>
+            <div class="stat"><div class="k">α²+β²+γ² = (α+β+γ)² − 2(αβ+βγ+γα)</div><div class="v">${fmt(s1 * s1 - 2 * s2, 2)}</div></div>
+          </div>
+          <div class="tex-block">$$x^3-(\\alpha+\\beta+\\gamma)x^2+(\\alpha\\beta+\\beta\\gamma+\\gamma\\alpha)x-\\alpha\\beta\\gamma=x^3-(${fmt(s1, 2)})x^2+(${fmt(s2, 2)})x-(${fmt(s3, 2)})$$</div>`;
+      }
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    plot.onChange = draw; cplot.onChange = draw;
+    rebuild();
+  })();
+
+  /* ======================= 因数定理と高次方程式 ======================= */
+  (() => {
+    const ctl = $('#c-factor');
+    const st = { a: 1, b: -6, c: 11, d: -6, k: 1 };
+    const f = (x) => ((st.a * x + st.b) * x + st.c) * x + st.d;
+    const plot = new Plot('#cv-factor', { equal: false, xmin: -6, xmax: 6, ymin: -15, ymax: 15 });
+    const hK = plot.addHandle({ x: st.k, y: 0, color: C.ochre, label: 'k', onMove: (x) => { st.k = Math.min(4, Math.max(-4, Math.round(x))); sK.set(st.k); return [st.k, 0]; } });
+
+    UI.heading(ctl, '三次式の係数');
+    const sA = UI.slider(ctl, { label: '$a$', min: 1, max: 3, step: 1, value: st.a, digits: 0, onInput: (v) => { st.a = v; draw(); } });
+    const sB = UI.slider(ctl, { label: '$b$', min: -6, max: 6, step: 1, value: st.b, digits: 0, onInput: (v) => { st.b = v; draw(); } });
+    const sC = UI.slider(ctl, { label: '$c$', min: -6, max: 6, step: 1, value: st.c, digits: 0, onInput: (v) => { st.c = v; draw(); } });
+    const sD = UI.slider(ctl, { label: '$d$', min: -6, max: 6, step: 1, value: st.d, digits: 0, onInput: (v) => { st.d = v; draw(); } });
+    UI.heading(ctl, '代入する整数 k');
+    const sK = UI.slider(ctl, { label: '$k$', min: -4, max: 4, step: 1, value: st.k, digits: 0, onInput: (v) => { st.k = v; draw(); } });
+    UI.heading(ctl, 'プリセット');
+    const preset = (a, b, c, d) => () => { st.a = a; st.b = b; st.c = c; st.d = d; sA.set(a); sB.set(b); sC.set(c); sD.set(d); draw(); };
+    UI.buttonRow(ctl, [
+      { label: 'x³−6x²+11x−6', small: true, onClick: preset(1, -6, 11, -6) },
+      { label: 'x³−2x²−5x+6', small: true, onClick: preset(1, -2, -5, 6) },
+      { label: 'x³−3x+2', small: true, onClick: preset(1, 0, -3, 2) },
+      { label: '2x³−3x²−3x+2', small: true, onClick: preset(2, -3, -3, 2) },
+      { label: 'x³+x²−4x−4', small: true, onClick: preset(1, 1, -4, -4) },
+      { label: 'x³−x²+x−1', small: true, onClick: preset(1, -1, 1, -1) },
+    ]);
+
+    const readout = $('#r-factor');
+    function draw() {
+      hK.x = st.k;
+      const { a, b, c, d, k } = st;
+      const fk = f(k);
+      const zero = fk === 0;
+      const s0 = a, m1 = k * s0, s1 = b + m1, m2 = k * s1, s2 = c + m2, m3 = k * s2, s3 = d + m3;
+      const intRoots = [];
+      for (let i = -6; i <= 6; i++) if (f(i) === 0) intRoots.push(i);
+      plot.render((P) => {
+        P.fn(f, { color: C.ink, width: 2.6 });
+        intRoots.forEach((r) => P.point(r, 0, { color: C.sage, r: 5, hollow: true }));
+        P.segment(k, 0, k, fk, { color: zero ? C.sage : C.clay, width: 1.5, dash: [4, 4] });
+        P.point(k, fk, { color: zero ? C.sage : C.clay, r: 6, label: zero ? `f(${k}) = 0` : `余り f(${k}) = ${fk}`, dx: 10, dy: fk >= 0 ? -8 : 16 });
+      });
+
+      const texF = 'f(x)=' + UI.texPoly([a, b, c, d]);
+      const subst = `f(${k})=${a}\\cdot(${k})^3${sgn(b, 0)}\\cdot(${k})^2${sgn(c, 0)}\\cdot(${k})${sgn(d, 0)}=${fk}`;
+      let html = `<div class="tex-block">$$${texF}\\qquad ${subst}$$</div>`;
+      const table = `
+        <div class="table-wrap"><table class="data synth">
+          <tr><td>${a}</td><td>${b}</td><td>${c}</td><td>${d}</td><td class="k">${k}</td></tr>
+          <tr><td></td><td>${m1}</td><td>${m2}</td><td>${m3}</td><td></td></tr>
+          <tr class="sum"><td class="${zero ? 'hl-sage' : ''}">${s0}</td><td class="${zero ? 'hl-sage' : ''}">${s1}</td><td class="${zero ? 'hl-sage' : ''}">${s2}</td><td class="${zero ? 'hl-sage' : 'hl-clay'}">${s3}</td><td></td></tr>
+        </table></div>`;
+      if (zero) {
+        const Q = [s0, s1, s2];
+        const D = s1 * s1 - 4 * s0 * s2;
+        let rest;
+        if (D > 0) {
+          const sq = Math.sqrt(D);
+          const r1 = (-s1 - sq) / (2 * s0), r2 = (-s1 + sq) / (2 * s0);
+          const fr = (x) => { const p = UI.toFrac(x, 12); return p ? UI.texFrac(p[0], p[1]).replace('dfrac', 'frac') : fmt(x, 3); };
+          rest = `x=${fr(r1)},\\ ${fr(r2)}`;
+        } else if (D === 0) rest = `x=${fmt(-s1 / (2 * s0), 3)}\\ (\\text{重解})`;
+        else rest = `x=\\frac{${-s1}\\pm\\sqrt{${-D}}\\,i}{${2 * s0}}\\ (\\text{虚数解})`;
+        html += `
+          <div class="readout-grid">
+            <div class="stat sage"><div class="k">f(${k}) = 0 なので x − (${k}) は因数</div><div class="v">割り切れる</div></div>
+            <div class="stat"><div class="k">商 Q(x)</div><div class="v">$Q(x)=${UI.texPoly(Q)}$</div></div>
+          </div>
+          <p class="small">組立除法（右端の ${k} を掛けて左上に足していく。下段の左 3 つが商の係数、右端が余り）</p>
+          ${table}
+          <div class="tex-block">$$${texF}=(x${sgn(-k, 0)})(${UI.texPoly(Q)})$$</div>
+          <div class="tex-block">$$f(x)=0\\ \\Longleftrightarrow\\ x=${k}\\ \\text{または}\\ ${UI.texPoly(Q)}=0\\quad\\Longrightarrow\\quad x=${k},\\ ${rest.replace(/^x=/, '')}$$</div>`;
+      } else {
+        html += `
+          <div class="readout-grid">
+            <div class="stat clay"><div class="k">x − (${k}) で割った余り（剰余の定理）</div><div class="v">${fk}</div></div>
+            <div class="stat"><div class="k">f(k)=0 となる整数 k（−6〜6）</div><div class="v">${intRoots.length ? intRoots.join(', ') : 'なし'}</div></div>
+          </div>
+          <p class="small">組立除法（右端が余り ${fk}。$f(x)=(x${sgn(-k, 0)})(${UI.texPoly([s0, s1, s2])})${sgn(s3, 0)}$）</p>
+          ${table}`;
+      }
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    plot.onChange = draw;
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'binomial', label: '二項定理' },
+    { id: 'amgm', label: '相加平均・相乗平均' },
+    { id: 'vieta', label: '解と係数の関係' },
+    { id: 'factor', label: '因数定理と高次方程式' },
+  ]);
+});
+</script>
+</body>
+</html>

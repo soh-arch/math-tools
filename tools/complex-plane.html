@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>複素数平面</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<style>.controls .segmented { flex-wrap: wrap; } .controls .segmented button { white-space: nowrap; }</style>
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>複素数平面</h1>
+    <p class="lede">複素数を点として動かし、絶対値と偏角、積・商が「回転と拡大」になること、ド・モアブルの定理と $n$ 乗根、そして円・垂直二等分線・回転・三角形の形への応用を目で確かめます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 複素数と極形式 -->
+  <section class="tool-body" data-tab="polar">
+    <div class="layout">
+      <aside class="controls" id="c-polar"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-polar"></canvas><div class="caption">点 z をドラッグできます</div></div>
+        <div class="readout" id="r-polar"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">$z=x+yi$ は点 $(x,y)$、極形式は「長さと向き」</div>
+        絶対値 $|z|=\sqrt{x^2+y^2}$ は原点からの距離、偏角 $\arg z=\theta$ は実軸の正の向きから測った角。
+        $z=r(\cos\theta+i\sin\theta)$（$r=|z|$）と書くのが極形式で、$\theta$ は $2\pi$ の整数倍を除いて定まります（ここでは $-\pi<\theta\le\pi$ で表示）。
+        共役 $\bar z=x-yi$ は実軸に関する対称点、$-z$ は原点に関する対称点です。
+      </div>
+      <ul>
+        <li>$z$ を単位円上（$|z|=1$）で動かすと $z=\cos\theta+i\sin\theta$。偏角だけが変わることを読み取り欄で確かめよう。</li>
+        <li>$z=\sqrt3+i$ のボタンを押すと $r=2,\ \theta=\dfrac{\pi}{6}$。$\cos\theta=\dfrac{\sqrt3}{2},\ \sin\theta=\dfrac12$ と成分の関係を見よう。</li>
+        <li>$\bar z$ の偏角は $-\theta$、$-z$ の偏角は $\theta+\pi$。第 2 象限から第 3 象限へ $z$ を動かすと、偏角の表示が $\pi$ の前後で切り替わる（主値の範囲）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 積と商 -->
+  <section class="tool-body" data-tab="mul">
+    <div class="layout">
+      <aside class="controls" id="c-mul"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-mul"></canvas><div class="caption">z₁, z₂ をドラッグできます</div></div>
+        <div class="readout" id="r-mul"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">かけ算は「偏角を足して、絶対値をかける」</div>
+        $z_1=r_1(\cos\theta_1+i\sin\theta_1),\ z_2=r_2(\cos\theta_2+i\sin\theta_2)$ のとき
+        $$z_1z_2=r_1r_2\{\cos(\theta_1+\theta_2)+i\sin(\theta_1+\theta_2)\},\qquad \frac{z_1}{z_2}=\frac{r_1}{r_2}\{\cos(\theta_1-\theta_2)+i\sin(\theta_1-\theta_2)\}$$
+        つまり $z_1$ に $z_2$ をかけると、点 $z_1$ は原点のまわりに $\theta_2$ だけ回転し、原点からの距離が $r_2$ 倍になります。
+      </div>
+      <ul>
+        <li>「$z_2$ を単位円上に固定」にすると $r_2=1$ なので、積は純粋な回転になる。$z_2$ を回すと $z_1z_2$ が同じ角だけ回るのを見よう。</li>
+        <li>「$i$ 倍」は $i=\cos90^\circ+i\sin90^\circ$ なので $90^\circ$ の回転。$z_1$ をどこに置いても $iz_1$ が直角の位置に来る。</li>
+        <li>商に切り替えると偏角は引き算、絶対値は割り算。$z_2$ を実軸上に置くと商は拡大・縮小だけになる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ド・モアブル -->
+  <section class="tool-body" data-tab="demoivre">
+    <div class="layout">
+      <aside class="controls" id="c-demoivre"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-demoivre"></canvas><div class="caption">点をドラッグできます</div></div>
+        <div class="readout" id="r-demoivre"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">ド・モアブルの定理と $n$ 乗根</div>
+        $(\cos\theta+i\sin\theta)^n=\cos n\theta+i\sin n\theta$。よって $z=r(\cos\theta+i\sin\theta)$ なら $z^n=r^n(\cos n\theta+i\sin n\theta)$。
+        逆に $z^n=w=r(\cos\theta+i\sin\theta)$ を満たす $z$ は
+        $$z_k=\sqrt[n]{r}\left(\cos\frac{\theta+2k\pi}{n}+i\sin\frac{\theta+2k\pi}{n}\right)\quad(k=0,1,\dots,n-1)$$
+        の $n$ 個で、半径 $\sqrt[n]{r}$ の円周を $n$ 等分する正 $n$ 角形の頂点に並びます。
+      </div>
+      <ul>
+        <li>累乗：$|z|>1$ なら外へ広がる渦巻き、$|z|<1$ なら内へ縮む渦巻き、$|z|=1$ なら円周上を回るだけ。偏角が毎回 $\theta$ ずつ増えるのを見よう。</li>
+        <li>$n$ 乗根：$w$ を回すと $n$ 個の根は全部いっしょに $\dfrac{1}{n}$ の角だけ回る。$w=1$ のとき $z_0=1$ を含む正 $n$ 角形（$1$ の $n$ 乗根）。</li>
+        <li>$1$ の $3$ 乗根 $\omega$ は $z_1$。$\omega^2$ が $z_2$ になること、$1+\omega+\omega^2=0$ を数値で確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 図形への応用 -->
+  <section class="tool-body" data-tab="figures">
+    <div class="layout">
+      <aside class="controls" id="c-figures"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-figures"></canvas><div class="caption">点をドラッグできます</div></div>
+        <div class="readout" id="r-figures"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">$|z-\alpha|$ は距離、$\dfrac{\gamma-\alpha}{\beta-\alpha}$ は「$\alpha$ から見た $\beta,\gamma$ の関係」</div>
+        $|z-\alpha|=r$ は中心 $\alpha$、半径 $r$ の円。$|z-\alpha|=|z-\beta|$ は線分 $\alpha\beta$ の垂直二等分線。
+        点 $\beta$ を $\alpha$ のまわりに $\theta$ 回転した点は $\gamma=\alpha+(\beta-\alpha)(\cos\theta+i\sin\theta)$。
+        $w=\dfrac{\gamma-\alpha}{\beta-\alpha}$ とおくと $|w|=\dfrac{AC}{AB}$、$\arg w=\angle BAC$（符号付き）なので、$w$ が純虚数 $\iff$ AB $\perp$ AC、$w$ が実数 $\iff$ A, B, C は一直線上。
+      </div>
+      <ul>
+        <li>円と垂直二等分線：$\alpha,\beta$ を動かして、垂直二等分線がいつも線分 $\alpha\beta$ の中点を通り直交することを確かめよう。</li>
+        <li>回転：$\theta=90^\circ$ にすると $\gamma-\alpha=i(\beta-\alpha)$。$\theta=180^\circ$ で $\gamma$ は $\alpha$ に関して $\beta$ と対称になる。</li>
+        <li>三角形の形：$\gamma$ を動かして $\arg w=\pm90^\circ$ にすると直角、$|w|=1$ かつ $\arg w=\pm60^\circ$ で正三角形。判定の表示が変わる瞬間を見よう。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学C', title: '複素数平面' });
+  const PI = Math.PI;
+  const snap2 = (v) => Math.round(v * 2) / 2;
+  const PURPLE = C.series[4];
+
+  /* ---------- 複素数の整形 ---------- */
+  const cabs = (z) => Math.hypot(z.x, z.y);
+  const carg = (z) => Math.atan2(z.y, z.x);
+  const cmul = (a, b) => ({ x: a.x * b.x - a.y * b.y, y: a.x * b.y + a.y * b.x });
+  const cdiv = (a, b) => { const d = b.x * b.x + b.y * b.y; return { x: (a.x * b.x + a.y * b.y) / d, y: (a.y * b.x - a.x * b.y) / d }; };
+  const csub = (a, b) => ({ x: a.x - b.x, y: a.y - b.y });
+  const cadd = (a, b) => ({ x: a.x + b.x, y: a.y + b.y });
+  const cpolar = (r, t) => ({ x: r * Math.cos(t), y: r * Math.sin(t) });
+  const wrapArg = (t) => { while (t <= -PI) t += 2 * PI; while (t > PI) t -= 2 * PI; return t; };
+  const eq0 = (v) => Math.abs(v) < 1e-9;
+
+  /** x+yi を TeX に */
+  function texZ(z, d = 2) {
+    const xs = fmt(z.x, d), ys = fmt(Math.abs(z.y), d);
+    if (ys === '0') return xs;
+    const im = (ys === '1' ? '' : ys) + 'i';
+    if (xs === '0') return (z.y < 0 ? '-' : '') + im;
+    return `${xs}${z.y < 0 ? '-' : '+'}${im}`;
+  }
+  /** 括弧つき (負や複素数なら括弧) */
+  const texZp = (z, d = 2) => (eq0(z.y) && z.x >= 0) ? texZ(z, d) : `(${texZ(z, d)})`;
+  /** 角度を π の有理数倍で表す。できなければ小数 */
+  function texAngle(t, d = 3) {
+    if (eq0(t)) return '0';
+    const f = UI.toFrac(t / PI, 24, 1e-6);
+    if (!f) return fmt(t, d);
+    const [p, q] = f;
+    const sign = p < 0 ? '-' : '', ap = Math.abs(p);
+    if (q === 1) return `${sign}${ap === 1 ? '' : ap}\\pi`;
+    return `${sign}\\dfrac{${ap === 1 ? '' : ap}\\pi}{${q}}`;
+  }
+  const texDeg = (t) => fmt(UI.deg(t), 1) + '^\\circ';
+  const texPolar = (r, t, d = 2, deg = false) => { const a = deg ? texDeg(t) : texAngle(t); return `${fmt(r, d)}\\left(\\cos ${a}+i\\sin ${a}\\right)`; };
+  /** 数値の平方根表記 √k (k が整数なら) */
+  function texSqrt(v2, d = 3) {
+    const r = Math.sqrt(v2);
+    const k = Math.round(v2);
+    if (Math.abs(k - v2) < 1e-9) { const s = Math.round(r); if (s * s === k) return String(s); return `\\sqrt{${k}}=${fmt(r, d)}`; }
+    return `\\sqrt{${fmt(v2, 2)}}=${fmt(r, d)}`;
+  }
+
+  /* ======================= 複素数と極形式 ======================= */
+  (() => {
+    const ctl = $('#c-polar');
+    const st = { z: { x: 2, y: 1.5 } };
+    const plot = new Plot('#cv-polar', { xmin: -4.5, xmax: 4.5, ymin: -3.6, ymax: 3.6, xLabel: '実軸', yLabel: '虚軸' });
+    const hZ = plot.addHandle({ x: st.z.x, y: st.z.y, color: C.ink, label: 'z', onMove: (x, y) => { st.z = cSnap.get() ? { x: snap2(x), y: snap2(y) } : { x, y }; return [st.z.x, st.z.y]; } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, '表示');
+    const cConj = UI.checkbox(ctl, { label: '共役 $\\bar z$', checked: true, onChange: draw });
+    const cNeg = UI.checkbox(ctl, { label: '$-z$', checked: false, onChange: draw });
+    const cUnit = UI.checkbox(ctl, { label: '単位円', checked: true, onChange: draw });
+    const cSnap = UI.checkbox(ctl, { label: '0.5 刻みに吸着', checked: true, onChange: draw });
+    UI.heading(ctl, '代表的な値');
+    UI.buttonRow(ctl, [
+      { label: '1+i', small: true, onClick: () => { st.z = { x: 1, y: 1 }; draw(); } },
+      { label: '√3+i', small: true, onClick: () => { st.z = { x: Math.sqrt(3), y: 1 }; draw(); } },
+      { label: 'i', small: true, onClick: () => { st.z = { x: 0, y: 1 }; draw(); } },
+      { label: '−1', small: true, onClick: () => { st.z = { x: -1, y: 0 }; draw(); } },
+      { label: '−1−√3i', small: true, onClick: () => { st.z = { x: -1, y: -Math.sqrt(3) }; draw(); } },
+    ]);
+
+    const readout = $('#r-polar');
+    function draw() {
+      hZ.x = st.z.x; hZ.y = st.z.y;
+      const z = st.z, r = cabs(z), t = carg(z);
+      plot.render((P) => {
+        if (cUnit.get()) P.circle(0, 0, 1, { color: C.faint, width: 1, dash: [4, 4], alpha: 0.7 });
+        P.dropLines(z.x, z.y, { color: C.ink });
+        if (r > 0.05) P.angleMark(0, 0, 1, 0, z.x, z.y, { r: 0.6, label: 'θ', color: C.clay, fill: Plot.rgba(C.clay, 0.12) });
+        P.segment(0, 0, z.x, z.y, { color: C.ink, width: 2.6 });
+        P.text(z.x / 2, z.y / 2, `r = ${fmt(r, 2)}`, { color: C.ink, font: Plot.FONT_MATH, dx: z.y >= 0 ? -10 : 10, dy: z.y >= 0 ? -8 : 16, align: z.y >= 0 ? 'right' : 'left', bg: true });
+        if (cConj.get()) {
+          P.segment(z.x, z.y, z.x, -z.y, { color: C.sage, width: 1, dash: [4, 4] });
+          P.segment(0, 0, z.x, -z.y, { color: C.sage, width: 1.6, dash: [6, 4] });
+          P.point(z.x, -z.y, { color: C.sage, r: 5, label: 'z̄', dx: 10, dy: eq0(z.y) ? 22 : 6 });
+        }
+        if (cNeg.get()) {
+          P.segment(0, 0, -z.x, -z.y, { color: PURPLE, width: 1.6, dash: [6, 4] });
+          P.point(-z.x, -z.y, { color: PURPLE, r: 5, label: '−z', dx: -26, dy: 18 });
+        }
+        if (!eq0(z.x) && !eq0(z.y)) P.text(z.x, 0, fmt(z.x), { color: C.ink, align: 'center', baseline: z.y >= 0 ? 'top' : 'bottom', dy: z.y >= 0 ? 6 : -6, bg: true });
+        if (!eq0(z.y) && !eq0(z.x)) P.text(0, z.y, fmt(z.y) + 'i', { color: C.ink, align: z.x >= 0 ? 'right' : 'left', baseline: 'middle', dx: z.x >= 0 ? -6 : 6, bg: true });
+      });
+      const conj = { x: z.x, y: -z.y }, neg = { x: -z.x, y: -z.y };
+      readout.innerHTML = `
+        <div class="tex-block">$$z=${texZ(z)},\\qquad |z|=\\sqrt{(${fmt(z.x)})^2+(${fmt(z.y)})^2}=${texSqrt(z.x * z.x + z.y * z.y)},\\qquad \\arg z=${texDeg(t)}=${texAngle(t)}$$</div>
+        <div class="tex-block">$$z=r(\\cos\\theta+i\\sin\\theta)=${texPolar(r, t, 2, true)}${UI.toFrac(t / PI, 24, 1e-6) ? '=' + texPolar(r, t) : ''}$$</div>`;
+      UI.stats(readout, [
+        { k: '$|z|$', v: fmt(r, 3), tone: 'ink' },
+        { k: '$\\arg z$（度）', v: `${fmt(UI.deg(t), 1)}°`, tone: 'clay' },
+        { k: '$\\arg z$（ラジアン, $-\\pi<\\theta\\le\\pi$）', v: `${fmt(t, 3)}`, tone: 'clay' },
+      ]);
+      readout.insertAdjacentHTML('beforeend', `<div class="kv" style="margin-top:0.6rem"><span class="k">共役 $\\bar z=x-yi$</span><span class="v" style="color:var(--sage-text)">${texZ(conj).replace(/\\/g, '')}　（偏角 ${fmt(UI.deg(carg(conj)), 1)}°）</span><span class="k">$-z$</span><span class="v">${texZ(neg).replace(/\\/g, '')}　（偏角 ${fmt(UI.deg(carg(neg)), 1)}°）</span></div>`);
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 積と商 ======================= */
+  (() => {
+    const ctl = $('#c-mul');
+    const st = { z1: { x: 2, y: 1 }, z2: { x: 1, y: 1 }, op: 'mul' };
+    const plot = new Plot('#cv-mul', { xmin: -5, xmax: 5, ymin: -4, ymax: 4, xLabel: '実軸', yLabel: '虚軸' });
+    const h1 = plot.addHandle({ x: st.z1.x, y: st.z1.y, color: C.ink, label: 'z₁', onMove: (x, y) => { st.z1 = { x: snap2(x), y: snap2(y) }; if (cabs(st.z1) < 0.5) st.z1 = { x: 0.5, y: 0 }; return [st.z1.x, st.z1.y]; } });
+    const h2 = plot.addHandle({ x: st.z2.x, y: st.z2.y, color: C.clay, label: 'z₂', onMove: (x, y) => {
+      if (cUnit.get()) { const t = Math.atan2(y, x); const ts = Math.round(t / (PI / 12)) * (PI / 12); st.z2 = cpolar(1, ts); }
+      else { st.z2 = { x: snap2(x), y: snap2(y) }; if (cabs(st.z2) < 0.5) st.z2 = { x: 0.5, y: 0 }; }
+      return [st.z2.x, st.z2.y];
+    } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, '演算');
+    UI.segmented(ctl, { options: [{ value: 'mul', label: '積 z₁z₂' }, { value: 'div', label: '商 z₁/z₂' }], value: 'mul', onChange: (v) => { st.op = v; draw(); } });
+    const cUnit = UI.checkbox(ctl, { label: '$z_2$ を単位円上に固定（$|z_2|=1$）', checked: false, onChange: (v) => { if (v) st.z2 = cpolar(1, Math.round(carg(st.z2) / (PI / 12)) * (PI / 12)); draw(); } });
+    const cI = UI.checkbox(ctl, { label: '$i$ 倍（$iz_1$）を表示', checked: false, onChange: draw });
+    UI.buttonRow(ctl, [
+      { label: 'z₂ = i', small: true, onClick: () => { st.z2 = { x: 0, y: 1 }; draw(); } },
+      { label: 'z₂ = 2', small: true, onClick: () => { st.z2 = { x: 2, y: 0 }; draw(); } },
+      { label: 'リセット', small: true, onClick: () => { st.z1 = { x: 2, y: 1 }; st.z2 = { x: 1, y: 1 }; draw(); } },
+    ]);
+
+    const readout = $('#r-mul');
+    function draw() {
+      h1.x = st.z1.x; h1.y = st.z1.y; h2.x = st.z2.x; h2.y = st.z2.y;
+      const z1 = st.z1, z2 = st.z2, mul = st.op === 'mul';
+      const w = mul ? cmul(z1, z2) : cdiv(z1, z2);
+      const r1 = cabs(z1), r2 = cabs(z2), t1 = carg(z1), t2 = carg(z2);
+      const rw = mul ? r1 * r2 : r1 / r2, tw = mul ? t1 + t2 : t1 - t2;
+      const R = Math.min(40, Math.max(4, rw * 1.2, r1 * 1.2, r2 * 1.2));
+      plot.setView(-R * 1.25, R * 1.25, -R, R);
+      plot.render((P) => {
+        const s = R / 4;
+        P.circle(0, 0, 1, { color: C.faint, width: 1, dash: [4, 4], alpha: cUnit.get() ? 1 : 0.5 });
+        P.circle(0, 0, rw, { color: C.sage, width: 1, dash: [3, 5], alpha: 0.5 });
+        P.angleMark(0, 0, 1, 0, z1.x, z1.y, { r: 0.55 * s, label: 'θ₁', color: C.ink, fill: Plot.rgba(C.ink, 0.12) });
+        P.angleMark(0, 0, 1, 0, z2.x, z2.y, { r: 0.35 * s, color: C.clay, fill: Plot.rgba(C.clay, 0.12) });
+        P.arc(0, 0, 0.8 * s, t1, tw, { color: C.clay, width: 2 });
+        const m = (t1 + tw) / 2;
+        P.text(Math.cos(m) * 1.05 * s, Math.sin(m) * 1.05 * s, (mul ? '+' : '−') + 'θ₂', { color: C.clay, font: Plot.FONT_MATH, align: 'center', baseline: 'middle', bg: true });
+        P.segment(0, 0, z1.x, z1.y, { color: C.ink, width: 2.4 });
+        P.segment(0, 0, z2.x, z2.y, { color: C.clay, width: 2.4 });
+        P.segment(0, 0, w.x, w.y, { color: C.sage, width: 2.6 });
+        P.point(w.x, w.y, { color: C.sage, r: 6, label: mul ? 'z₁z₂' : 'z₁/z₂', dx: 10, dy: -8 });
+        if (cI.get()) {
+          const iz = { x: -z1.y, y: z1.x };
+          P.segment(0, 0, iz.x, iz.y, { color: C.ochre, width: 2, dash: [6, 4] });
+          P.angleMark(0, 0, z1.x, z1.y, iz.x, iz.y, { r: 0.4 * s, right: true, color: C.ochre });
+          P.point(iz.x, iz.y, { color: C.ochre, r: 5, label: 'iz₁', dx: -28, dy: -8 });
+        }
+      });
+      const opTex = mul ? 'z_1z_2' : '\\frac{z_1}{z_2}';
+      const rTex = mul ? `${fmt(r1, 2)}\\times${fmt(r2, 2)}` : `\\frac{${fmt(r1, 2)}}{${fmt(r2, 2)}}`;
+      const tTex = mul ? `${texDeg(t1)}+${texDeg(t2)}` : `${texDeg(t1)}-${texDeg(t2)}`;
+      const rect = mul
+        ? `${texZp(z1)}${texZp(z2)}=(${fmt(z1.x)}\\cdot${fmt(z2.x)}-${fmt(z1.y)}\\cdot${fmt(z2.y)})+(${fmt(z1.x)}\\cdot${fmt(z2.y)}+${fmt(z1.y)}\\cdot${fmt(z2.x)})i=${texZ(w)}`
+        : `\\frac{${texZ(z1)}}{${texZ(z2)}}=\\frac{(${texZ(z1)})(${texZ({ x: z2.x, y: -z2.y })})}{${fmt(z2.x * z2.x + z2.y * z2.y)}}=${texZ(w)}`;
+      readout.innerHTML = `
+        <div class="tex-block">$$z_1=${texZ(z1)}=${texPolar(r1, t1, 2, true)},\\qquad z_2=${texZ(z2)}=${texPolar(r2, t2, 2, true)}$$</div>
+        <div class="tex-block">$$${opTex}=${rTex}\\{\\cos(${tTex})+i\\sin(${tTex})\\}=${fmt(rw, 2)}\\{\\cos ${texDeg(wrapArg(tw))}+i\\sin ${texDeg(wrapArg(tw))}\\}$$</div>
+        <div class="tex-block">$$${rect}$$</div>`;
+      UI.stats(readout, [
+        { k: mul ? '$|z_1z_2|=|z_1||z_2|$' : '$|z_1/z_2|=|z_1|/|z_2|$', v: fmt(rw, 3), tone: 'sage' },
+        { k: mul ? '$\\arg(z_1z_2)=\\theta_1+\\theta_2$' : '$\\arg(z_1/z_2)=\\theta_1-\\theta_2$', v: `${fmt(UI.deg(tw), 1)}°`, tone: 'clay' },
+        { k: '直交形式で確認', v: texZ(w, 3).replace(/\\/g, ''), tone: 'sage' },
+      ]);
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= ド・モアブル ======================= */
+  (() => {
+    const ctl = $('#c-demoivre');
+    const st = { mode: 'pow', z: { x: 1.1, y: 0.5 }, n: 5, w: { x: 1.5, y: 1.5 }, m: 3 };
+    const plot = new Plot('#cv-demoivre', { xmin: -4, xmax: 4, ymin: -3.2, ymax: 3.2, xLabel: '実軸', yLabel: '虚軸' });
+    const hZ = plot.addHandle({ x: st.z.x, y: st.z.y, color: C.ink, label: 'z', visible: () => st.mode === 'pow', onMove: (x, y) => {
+      let z = { x, y }; const r = cabs(z); if (r > 1.5) z = cpolar(1.5, carg(z)); if (r < 0.2) z = cpolar(0.2, carg(z)); st.z = z; return [z.x, z.y];
+    } });
+    const hW = plot.addHandle({ x: st.w.x, y: st.w.y, color: C.clay, label: 'w', visible: () => st.mode === 'root', onMove: (x, y) => { st.w = { x, y }; if (cabs(st.w) < 0.2) st.w = { x: 0.2, y: 0 }; return [st.w.x, st.w.y]; } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, 'モード');
+    UI.segmented(ctl, { options: [{ value: 'pow', label: '累乗 zⁿ' }, { value: 'root', label: 'n 乗根' }], value: 'pow', onChange: (v) => { st.mode = v; rebuild(); } });
+    const box = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    function rebuild() {
+      box.innerHTML = '';
+      if (st.mode === 'pow') {
+        UI.slider(box, { label: '$n$', min: 1, max: 8, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+        UI.buttonRow(box, [
+          { label: '|z| = 1 にする', small: true, onClick: () => { st.z = cpolar(1, carg(st.z)); draw(); } },
+          { label: 'z = 1+i', small: true, onClick: () => { st.z = { x: 1, y: 1 }; draw(); } },
+          { label: 'z = cos36°+i sin36°', small: true, onClick: () => { st.z = cpolar(1, UI.rad(36)); draw(); } },
+        ]);
+      } else {
+        UI.slider(box, { label: '$n$', min: 2, max: 8, step: 1, value: st.m, digits: 0, onInput: (v) => { st.m = v; draw(); } });
+        UI.buttonRow(box, [
+          { label: '1 の n 乗根 (w = 1)', small: true, onClick: () => { st.w = { x: 1, y: 0 }; draw(); } },
+          { label: 'w = i', small: true, onClick: () => { st.w = { x: 0, y: 1 }; draw(); } },
+          { label: 'w = −8', small: true, onClick: () => { st.w = { x: -8, y: 0 }; draw(); } },
+        ]);
+      }
+      UI.texAll(box);
+      draw();
+    }
+
+    const readout = $('#r-demoivre');
+    const sup = (k) => String(k).replace(/\d/g, (d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[+d]);
+    const sub = (k) => String(k).replace(/\d/g, (d) => '₀₁₂₃₄₅₆₇₈₉'[+d]);
+    function draw() {
+      hZ.x = st.z.x; hZ.y = st.z.y; hW.x = st.w.x; hW.y = st.w.y;
+      if (st.mode === 'pow') {
+        const z = st.z, n = st.n, r = cabs(z), t = carg(z);
+        const pows = []; let cur = { x: 1, y: 0 };
+        for (let k = 1; k <= n; k++) { cur = cmul(cur, z); pows.push(cur); }
+        const R = Math.max(2.2, ...pows.map(cabs)) * 1.15;
+        plot.setView(-R * 1.25, R * 1.25, -R, R);
+        plot.render((P) => {
+          P.circle(0, 0, 1, { color: C.faint, width: 1, dash: [4, 4], alpha: 0.6 });
+          P.param((u) => Math.pow(r, u) * Math.cos(u * t), (u) => Math.pow(r, u) * Math.sin(u * t), 0, n, { color: C.ink, width: 1.2, dash: [3, 4], alpha: 0.6, samples: 400 });
+          P.angleMark(0, 0, 1, 0, z.x, z.y, { r: 0.5 * R / 3, label: 'θ', color: C.clay, fill: Plot.rgba(C.clay, 0.12) });
+          pows.forEach((p, i) => {
+            const k = i + 1, last = k === n;
+            P.segment(0, 0, p.x, p.y, { color: last ? C.sage : C.ink, width: last ? 2.4 : 1, alpha: last ? 1 : 0.5 });
+            P.point(p.x, p.y, { color: last ? C.sage : k === 1 ? C.ink : C.inkText, r: last ? 6 : 4, label: k === 1 ? 'z' : 'z' + sup(k), dx: 8, dy: -6 });
+          });
+        });
+        const zn = pows[n - 1];
+        readout.innerHTML = `
+          <div class="tex-block">$$z=${texZ(z)}=${texPolar(r, t, 2, true)}\\qquad (r=${fmt(r, 3)},\\ \\theta=${texDeg(t)}=${texAngle(t)})$$</div>
+          <div class="tex-block">$$z^{${n}}=r^{${n}}(\\cos ${n}\\theta+i\\sin ${n}\\theta)=${fmt(Math.pow(r, n), 3)}\\{\\cos(${texDeg(n * t)})+i\\sin(${texDeg(n * t)})\\}=${texZ(zn, 3)}$$</div>`;
+        UI.stats(readout, [
+          { k: `$|z^{${n}}|=r^{${n}}$`, v: fmt(Math.pow(r, n), 3), tone: 'sage' },
+          { k: `$\\arg z^{${n}}=${n}\\theta$`, v: `${fmt(UI.deg(n * t), 1)}° ≡ ${fmt(UI.deg(wrapArg(n * t)), 1)}°`, tone: 'clay' },
+          { k: '絶対値の変化', v: r > 1 + 1e-6 ? '外へ広がる（r > 1）' : r < 1 - 1e-6 ? '内へ縮む（r < 1）' : '単位円上を回る（r = 1）', tone: 'ink' },
+        ]);
+      } else {
+        const w = st.w, n = st.m, r = cabs(w), t = carg(w);
+        const rr = Math.pow(r, 1 / n);
+        const roots = []; for (let k = 0; k < n; k++) roots.push(cpolar(rr, (t + 2 * k * PI) / n));
+        const R = Math.max(2.2, r * 1.1, rr * 1.4);
+        plot.setView(-R * 1.25, R * 1.25, -R, R);
+        plot.render((P) => {
+          P.circle(0, 0, rr, { color: C.sage, width: 1, dash: [4, 4], alpha: 0.7 });
+          P.polygon(roots.map((z) => [z.x, z.y]), { color: C.sage, width: 1.8, fill: Plot.rgba(C.sage, 0.1) });
+          P.segment(0, 0, w.x, w.y, { color: C.clay, width: 2.2 });
+          P.angleMark(0, 0, 1, 0, w.x, w.y, { r: 0.45 * R / 3, label: 'θ', color: C.clay, fill: Plot.rgba(C.clay, 0.12) });
+          P.segment(0, 0, roots[0].x, roots[0].y, { color: C.sage, width: 1.4 });
+          P.angleMark(0, 0, 1, 0, roots[0].x, roots[0].y, { r: 0.7 * R / 3, label: 'θ/n', color: C.sage });
+          roots.forEach((z, k) => P.point(z.x, z.y, { color: C.sage, r: 5.5, label: 'z' + sub(k), dx: 8, dy: -6 }));
+        });
+        const list = roots.map((z, k) => `<span class="k">$z_{${k}}$</span><span class="v">${texZ(z, 3).replace(/\\/g, '')}　（偏角 ${fmt(UI.deg((t + 2 * k * PI) / n), 1)}°）</span>`).join('');
+        readout.innerHTML = `
+          <div class="tex-block">$$w=${texZ(w)}=${texPolar(r, t, 2, true)},\\qquad z^{${n}}=w\\ \\text{の解}$$</div>
+          <div class="tex-block">$$z_k=\\sqrt[${n}]{${fmt(r, 2)}}\\left(\\cos\\frac{${texDeg(t)}+360^\\circ k}{${n}}+i\\sin\\frac{${texDeg(t)}+360^\\circ k}{${n}}\\right)\\quad(k=0,1,\\dots,${n - 1}),\\qquad \\sqrt[${n}]{${fmt(r, 2)}}=${fmt(rr, 3)}$$</div>
+          <div class="kv">${list}</div>`;
+        UI.stats(readout, [
+          { k: '根の個数', v: `${n} 個（正 ${n} 角形の頂点）`, tone: 'sage' },
+          { k: '隣り合う根の偏角の差', v: `${fmt(360 / n, 2)}°`, tone: 'clay' },
+          { k: '根の和', v: n >= 2 ? texZ(roots.reduce(cadd, { x: 0, y: 0 }), 3).replace(/\\/g, '') : '—', tone: 'ink' },
+        ]);
+      }
+      UI.texAll(readout);
+    }
+    rebuild();
+  })();
+
+  /* ======================= 図形への応用 ======================= */
+  (() => {
+    const ctl = $('#c-figures');
+    const st = { mode: 'circle', a: { x: 1, y: 1 }, b: { x: -1.5, y: 2 }, g: { x: 2.5, y: -0.5 }, r: 2, th: 60 };
+    const plot = new Plot('#cv-figures', { xmin: -5, xmax: 5, ymin: -4, ymax: 4, xLabel: '実軸', yLabel: '虚軸' });
+    const mk = (key, color, label, vis) => plot.addHandle({ x: st[key].x, y: st[key].y, color, label, visible: vis, onMove: (x, y) => { st[key] = { x: snap2(x), y: snap2(y) }; return [st[key].x, st[key].y]; } });
+    const hA = mk('a', C.ochre, 'α', () => true);
+    const hB = mk('b', C.ochre, 'β', () => true);
+    const hG = mk('g', C.ochre, 'γ', () => st.mode === 'tri');
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, 'テーマ');
+    UI.segmented(ctl, { options: [{ value: 'circle', label: '円と垂直二等分線' }, { value: 'rot', label: '回転' }, { value: 'tri', label: '三角形の形' }], value: 'circle', onChange: (v) => { st.mode = v; rebuild(); } });
+    const box = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    function rebuild() {
+      box.innerHTML = '';
+      if (st.mode === 'circle') {
+        UI.slider(box, { label: '半径 $r$', min: 0.5, max: 4, step: 0.25, value: st.r, onInput: (v) => { st.r = v; draw(); } });
+        UI.note(box, { tone: 'ink', html: '青の円 $|z-\\alpha|=r$、緑の直線 $|z-\\alpha|=|z-\\beta|$。$\\alpha,\\beta$ を動かしてみよう。' });
+      } else if (st.mode === 'rot') {
+        UI.slider(box, { label: '回転角 $\\theta$', min: -180, max: 180, step: 5, value: st.th, unit: '°', digits: 0, onInput: (v) => { st.th = v; draw(); } });
+        UI.buttonRow(box, [
+          { label: '90°', small: true, onClick: () => { st.th = 90; rebuild(); } },
+          { label: '60°', small: true, onClick: () => { st.th = 60; rebuild(); } },
+          { label: '180°', small: true, onClick: () => { st.th = 180; rebuild(); } },
+        ]);
+        UI.note(box, { tone: 'ink', html: '点 $\\beta$ を点 $\\alpha$ のまわりに $\\theta$ だけ回転した点 $\\gamma$。' });
+      } else {
+        UI.note(box, { tone: 'ink', html: '$\\alpha=$A, $\\beta=$B, $\\gamma=$C として $w=\\dfrac{\\gamma-\\alpha}{\\beta-\\alpha}$ を計算する。' });
+        UI.buttonRow(box, [
+          { label: '直角二等辺にする', small: true, onClick: () => { const d = csub(st.b, st.a); st.g = cadd(st.a, { x: -d.y, y: d.x }); draw(); } },
+          { label: '正三角形にする', small: true, onClick: () => { const d = csub(st.b, st.a); st.g = cadd(st.a, cmul(d, cpolar(1, PI / 3))); draw(); } },
+        ]);
+      }
+      UI.texAll(box);
+      draw();
+    }
+
+    const readout = $('#r-figures');
+    function draw() {
+      hA.x = st.a.x; hA.y = st.a.y; hB.x = st.b.x; hB.y = st.b.y; hG.x = st.g.x; hG.y = st.g.y;
+      const a = st.a, b = st.b;
+      if (st.mode === 'circle') {
+        const M = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, d = csub(b, a);
+        plot.render((P) => {
+          P.circle(a.x, a.y, st.r, { color: C.ink, width: 2.4, fill: Plot.rgba(C.ink, 0.06) });
+          const q = cpolar(st.r, UI.rad(35));
+          P.segment(a.x, a.y, a.x + q.x, a.y + q.y, { color: C.ink, width: 1.2, dash: [4, 4] });
+          P.text(a.x + q.x / 2, a.y + q.y / 2, `r = ${fmt(st.r)}`, { color: C.ink, font: Plot.FONT_MATH, dx: 4, dy: -6, bg: true });
+          P.segment(a.x, a.y, b.x, b.y, { color: C.ochre, width: 1.2, dash: [5, 4] });
+          if (cabs(d) > 1e-6) {
+            P.line(M.x, M.y, -d.y, d.x, { color: C.sage, width: 2.2 });
+            P.angleMark(M.x, M.y, b.x, b.y, M.x - d.y, M.y + d.x, { r: 0.35, right: true, color: C.sage });
+            const T = cadd(M, cmul({ x: -d.y, y: d.x }, { x: 1.4 / cabs(d), y: 0 }));
+            P.segment(T.x, T.y, a.x, a.y, { color: C.sage, width: 1, dash: [3, 4], alpha: 0.7 });
+            P.segment(T.x, T.y, b.x, b.y, { color: C.sage, width: 1, dash: [3, 4], alpha: 0.7 });
+            P.point(T.x, T.y, { color: C.sage, r: 4, label: 'z', dx: 8, dy: -6 });
+          }
+          P.point(M.x, M.y, { color: C.sage, r: 4, label: 'M', dx: 8, dy: 16 });
+        });
+        readout.innerHTML = `
+          <div class="tex-block">$$\\alpha=${texZ(a)},\\qquad \\beta=${texZ(b)}$$</div>
+          <div class="tex-block">$$\\text{円：}\\ |z-${texZp(a)}|=${fmt(st.r)}\\qquad \\text{垂直二等分線：}\\ |z-${texZp(a)}|=|z-${texZp(b)}|$$</div>`;
+        UI.stats(readout, [
+          { k: '円の中心・半径', v: `中心 ${texZ(a).replace(/\\/g, '')}, 半径 ${fmt(st.r)}`, tone: 'ink' },
+          { k: '中点 $\\dfrac{\\alpha+\\beta}{2}$', v: texZ(M).replace(/\\/g, ''), tone: 'sage' },
+          { k: '$|\\alpha-\\beta|$', v: fmt(cabs(d), 3), tone: 'ochre' },
+        ]);
+      } else if (st.mode === 'rot') {
+        const th = UI.rad(st.th), rot = cpolar(1, th);
+        const d = csub(b, a), g = cadd(a, cmul(d, rot));
+        plot.render((P) => {
+          P.circle(a.x, a.y, cabs(d), { color: C.faint, width: 1, dash: [3, 5], alpha: 0.6 });
+          if (cabs(d) > 1e-6) {
+            P.arc(a.x, a.y, cabs(d), carg(d), carg(d) + th, { color: C.sage, width: 1.6, dash: [5, 4] });
+            P.angleMark(a.x, a.y, b.x, b.y, g.x, g.y, { r: 0.6, label: 'θ', color: C.clay, fill: Plot.rgba(C.clay, 0.12), right: true });
+          }
+          P.segment(a.x, a.y, b.x, b.y, { color: C.ink, width: 2.2 });
+          P.segment(a.x, a.y, g.x, g.y, { color: C.sage, width: 2.4 });
+          P.point(g.x, g.y, { color: C.sage, r: 6, label: 'γ', dx: 8, dy: -6 });
+        });
+        readout.innerHTML = `
+          <div class="tex-block">$$\\gamma=\\alpha+(\\beta-\\alpha)(\\cos\\theta+i\\sin\\theta),\\qquad \\theta=${st.th}^\\circ$$</div>
+          <div class="tex-block">$$\\gamma=${texZp(a)}+${texZp(d)}${texZp(rot)}=${texZp(a)}+${texZp(cmul(d, rot))}=${texZ(g)}$$</div>`;
+        UI.stats(readout, [
+          { k: '$\\beta-\\alpha$', v: texZ(d).replace(/\\/g, ''), tone: 'ink' },
+          { k: '$\\cos\\theta+i\\sin\\theta$', v: texZ(rot, 3).replace(/\\/g, ''), tone: 'clay' },
+          { k: '$\\gamma$', v: texZ(g, 3).replace(/\\/g, ''), tone: 'sage' },
+        ]);
+      } else {
+        const g = st.g, ab = csub(b, a), ac = csub(g, a);
+        const w = cabs(ab) > 1e-9 ? cdiv(ac, ab) : { x: NaN, y: NaN };
+        const rw = cabs(w), tw = carg(w), degw = UI.deg(tw);
+        const near = (u, v, tol) => Math.abs(u - v) < tol;
+        const isRight = near(Math.abs(degw), 90, 2.5), isLine = near(Math.abs(degw), 0, 2.5) || near(Math.abs(degw), 180, 2.5);
+        const isIso = near(rw, 1, 0.04);
+        const isEqui = isIso && near(Math.abs(degw), 60, 2.5);
+        const shape = isLine ? '一直線上（$w$ は実数）' : isEqui ? '正三角形' : isRight && isIso ? '直角二等辺三角形（∠A = 90°）' : isRight ? '∠A = 90° の直角三角形（$w$ は純虚数）' : isIso ? 'AB = AC の二等辺三角形' : '一般の三角形';
+        plot.render((P) => {
+          P.polygon([[a.x, a.y], [b.x, b.y], [g.x, g.y]], { color: C.ink, width: 2, fill: Plot.rgba(C.ink, 0.06) });
+          P.segment(a.x, a.y, b.x, b.y, { color: C.ink, width: 2.4 });
+          P.segment(a.x, a.y, g.x, g.y, { color: C.sage, width: 2.4 });
+          if (isFinite(tw) && cabs(ac) > 1e-6) P.angleMark(a.x, a.y, b.x, b.y, g.x, g.y, { r: 0.55, label: 'θ', color: isRight || isEqui || isLine ? C.sage : C.clay, right: true, fill: Plot.rgba(C.clay, 0.12) });
+          P.text((a.x + b.x) / 2, (a.y + b.y) / 2, 'AB = ' + fmt(cabs(ab), 2), { color: C.ink, dx: 6, dy: -6, bg: true });
+          P.text((a.x + g.x) / 2, (a.y + g.y) / 2, 'AC = ' + fmt(cabs(ac), 2), { color: C.sage, dx: 6, dy: 16, bg: true });
+        });
+        readout.innerHTML = `
+          <div class="tex-block">$$\\alpha=${texZ(a)},\\quad \\beta=${texZ(b)},\\quad \\gamma=${texZ(g)}$$</div>
+          <div class="tex-block">$$w=\\frac{\\gamma-\\alpha}{\\beta-\\alpha}=\\frac{${texZ(ac)}}{${texZ(ab)}}=${isFinite(w.x) ? texZ(w, 3) : '\\text{（定義できない：}\\alpha=\\beta\\text{）}'}=${isFinite(rw) ? texPolar(rw, tw, 3, true) : ''}$$</div>`;
+        UI.stats(readout, [
+          { k: '$|w|=\\dfrac{AC}{AB}$', v: `${fmt(rw, 3)}${isIso ? '（= 1：AB = AC）' : ''}`, tone: isIso ? 'sage' : 'ink' },
+          { k: '$\\arg w=\\angle BAC$', v: `${fmt(degw, 1)}°`, tone: isRight || isLine || isEqui ? 'sage' : 'clay' },
+          { k: '判定', v: shape.replace(/\$/g, ''), tone: isLine || isRight || isEqui || isIso ? 'sage' : '' },
+        ]);
+      }
+      UI.texAll(readout);
+    }
+    rebuild();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'polar', label: '複素数と極形式' },
+    { id: 'mul', label: '積と商は回転・拡大' },
+    { id: 'demoivre', label: 'ド・モアブルと n 乗根' },
+    { id: 'figures', label: '図形への応用' },
+  ]);
+});
+</script>
+</body>
+</html>

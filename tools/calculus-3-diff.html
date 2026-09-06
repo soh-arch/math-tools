@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>微分法（数学III）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>微分法（数学III）</h1>
+    <p class="lede">三角関数・指数関数・対数関数などの導関数、合成関数・積・商・媒介変数の微分、平均値の定理、グラフの概形（増減・凹凸）、速度と加速度を、点を動かしながら確かめます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- いろいろな関数の導関数 -->
+  <section class="tool-body" data-tab="functions">
+    <div class="layout">
+      <aside class="controls" id="c-functions"></aside>
+      <div class="stage">
+        <div class="canvas-row" id="row-functions">
+          <div class="canvas-wrap"><canvas id="cv-functions-a"></canvas><div class="caption">y = f(x)：点をドラッグ</div></div>
+          <div class="canvas-wrap" id="wrap-functions-b"><canvas id="cv-functions-b"></canvas><div class="caption">y = f′(x)</div></div>
+        </div>
+        <div class="readout" id="r-functions"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">導関数は「接線の傾きの関数」</div>
+        左の図の接線の傾きが、右の図の点の高さになっています。
+        $(\sin x)'=\cos x,\ (\cos x)'=-\sin x,\ (\tan x)'=\dfrac{1}{\cos^2x},\ (e^x)'=e^x,\ (\log x)'=\dfrac1x,\ (x^\alpha)'=\alpha x^{\alpha-1}$ を、この対応で確かめましょう。
+      </div>
+      <ul>
+        <li>点を動かして、接線が水平になる場所（赤い点）で $f'$ のグラフが $x$ 軸を横切ることを確認しよう。</li>
+        <li>$e^x$ では左右の図が同じ形になる。$\log x$ の導関数 $1/x$ は $x\to+0$ で無限大、接線が急になる。</li>
+        <li>$\sqrt x$ や $x^{1/3}$ は $x=0$ で接線が垂直になり、微分できない（導関数の値が定まらない）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 合成・積・商・媒介変数 -->
+  <section class="tool-body" data-tab="rules">
+    <div class="layout">
+      <aside class="controls" id="c-rules"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-rules"></canvas><div class="caption">曲線上の点をドラッグ</div></div>
+        <div class="readout" id="r-rules"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">微分の計算規則</div>
+        合成関数：$y=f(u),\ u=g(x)$ のとき $\dfrac{dy}{dx}=\dfrac{dy}{du}\cdot\dfrac{du}{dx}$。
+        積：$(uv)'=u'v+uv'$、商：$\left(\dfrac uv\right)'=\dfrac{u'v-uv'}{v^2}$。
+        媒介変数：$\dfrac{dy}{dx}=\dfrac{dy/dt}{dx/dt}$。
+      </div>
+      <ul>
+        <li>合成関数では、外側の微分 $f'(u)$ に $u=g(x)$ を代入した値と、内側の微分 $g'(x)$ の積が接線の傾きになる。2 つの数値の積が図の接線の傾きに一致することを確かめよう。</li>
+        <li>積・商では、各部品の値 $u,v,u',v'$ を入れた式がそのまま傾きになる。</li>
+        <li>媒介変数では $dx/dt=0$ の瞬間（円の左右端、サイクロイドの尖点）に接線が垂直になったり定まらなくなったりする。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 平均値の定理 -->
+  <section class="tool-body" data-tab="mvt">
+    <div class="layout">
+      <aside class="controls" id="c-mvt"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-mvt"></canvas><div class="caption">x 軸上の a, b をドラッグ</div></div>
+        <div class="readout" id="r-mvt"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage">
+        <div class="title">平均値の定理</div>
+        $f(x)$ が $[a,b]$ で連続、$(a,b)$ で微分可能なら
+        $$\frac{f(b)-f(a)}{b-a}=f'(c),\qquad a\lt c\lt b$$
+        を満たす $c$ が少なくとも 1 つ存在する。特に $f(a)=f(b)$ なら $f'(c)=0$（ロルの定理）。
+      </div>
+      <ul>
+        <li>両端 $a,b$ を動かすと割線（黄土色）の傾きが変わり、それと平行な接線（緑）が引ける点 $c$ が区間内に必ず見つかる。$c$ は 1 つとは限らない。</li>
+        <li>「ロルの定理」ボタンで $f(b)=f(a)$ にすると、割線が水平になり、$c$ は極値の場所になる。</li>
+        <li>$c$ の存在は「区間の平均の変化率と等しい瞬間の変化率がある」こと。速度でいえば、平均速度と同じ速度の瞬間が必ずある。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- グラフの概形 -->
+  <section class="tool-body" data-tab="shape">
+    <div class="layout">
+      <aside class="controls" id="c-shape"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-shape"></canvas></div>
+        <div class="readout" id="r-shape"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">増減と凹凸</div>
+        $f'>0$ で増加、$f'<0$ で減少。$f''>0$ で下に凸、$f''<0$ で上に凸。
+        $f'$ の符号が変わる点が極値、$f''$ の符号が変わる点が変曲点。
+        遠くでの振る舞い（漸近線）を合わせると、グラフの概形が決まります。
+      </div>
+      <ul>
+        <li>$f'$（赤）と $f''$（黄土）を表示して、それぞれが $x$ 軸を横切る場所と、$f$ の極値・変曲点の位置を照らし合わせよう。</li>
+        <li>$x+\dfrac1x$ は $x\to\pm\infty$ で直線 $y=x$ に近づく（斜めの漸近線）。$\dfrac{x^2}{x-1}$ も同様に $y=x+1$ が漸近線。</li>
+        <li>表は数値計算で作っている。$f'=0$ でも符号が変わらなければ極値ではないことに注意。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 速度と加速度 -->
+  <section class="tool-body" data-tab="motion">
+    <div class="layout">
+      <aside class="controls" id="c-motion"></aside>
+      <div class="stage">
+        <div id="row-motion">
+          <div class="canvas-wrap"><canvas id="cv-motion-a"></canvas><div class="caption">軌道と速度 (緑)・加速度 (黄土)</div></div>
+          <div class="canvas-wrap" id="wrap-motion-b"><canvas id="cv-motion-b"></canvas><div class="caption">x(t), v(t), a(t)</div></div>
+        </div>
+        <div class="readout" id="r-motion"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">速度・加速度はベクトル</div>
+        位置 $(x(t),y(t))$ に対し、速度は $\vec v=\left(\dfrac{dx}{dt},\dfrac{dy}{dt}\right)$、速さは $|\vec v|=\sqrt{\left(\dfrac{dx}{dt}\right)^2+\left(\dfrac{dy}{dt}\right)^2}$、
+        加速度は $\vec a=\left(\dfrac{d^2x}{dt^2},\dfrac{d^2y}{dt^2}\right)$。速度ベクトルは軌道の接線方向を向きます。
+      </div>
+      <ul>
+        <li>等速円運動では速さが一定でも速度の向きが変わるので加速度は $0$ ではなく、常に中心を向く（$\vec a=-\vec r$）。</li>
+        <li>放物運動では加速度が一定（下向き）で、速度の $x$ 成分は変わらず $y$ 成分だけが一定の割合で減る。</li>
+        <li>直線上の運動では、$x(t)$ の傾きが $v(t)$、$v(t)$ の傾きが $a(t)$。$v=0$ の瞬間に点が折り返す。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学III', title: '微分法' });
+
+  /* 符号変化と二分法で g(x)=0 の解を求める (a,b) */
+  function findZeros(g, a, b, n = 800) {
+    const out = [];
+    let px = a, pv = g(a);
+    for (let i = 1; i <= n; i++) {
+      const x = a + (b - a) * i / n, v = g(x);
+      if (isFinite(pv) && isFinite(v)) {
+        if (pv === 0) out.push(px);
+        else if (pv * v < 0) {
+          let lo = px, hi = x, flo = pv;
+          for (let k = 0; k < 60; k++) { const m = (lo + hi) / 2, fm = g(m); if (fm === 0) { lo = hi = m; break; } if (flo * fm < 0) hi = m; else { lo = m; flo = fm; } }
+          const c = (lo + hi) / 2;
+          if (Math.abs(g(c)) < 1e-4) out.push(c);
+        }
+      }
+      px = x; pv = v;
+    }
+    return out.filter((z, i) => i === 0 || z - out[i - 1] > 1e-6);
+  }
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  /* ======================= いろいろな関数の導関数 ======================= */
+  (() => {
+    const ctl = $('#c-functions');
+    const st = { preset: 'sin', x: 1, same: false };
+    const PRESETS = {
+      sin: { label: 'sin x', tex: '\\sin x', dtex: '\\cos x', f: Math.sin, df: Math.cos, view: [-7, 7, -2, 2], dview: [-7, 7, -2, 2] },
+      cos: { label: 'cos x', tex: '\\cos x', dtex: '-\\sin x', f: Math.cos, df: (x) => -Math.sin(x), view: [-7, 7, -2, 2], dview: [-7, 7, -2, 2] },
+      tan: { label: 'tan x', tex: '\\tan x', dtex: '\\dfrac{1}{\\cos^2 x}', f: Math.tan, df: (x) => 1 / (Math.cos(x) ** 2), view: [-4.5, 4.5, -4, 4], dview: [-4.5, 4.5, -1, 6] },
+      exp: { label: 'e^x', tex: 'e^x', dtex: 'e^x', f: Math.exp, df: Math.exp, view: [-3, 3, -1, 6], dview: [-3, 3, -1, 6] },
+      log: { label: 'log x', tex: '\\log x', dtex: '\\dfrac{1}{x}', f: Math.log, df: (x) => 1 / x, dom: [1e-9, Infinity], view: [-1, 7, -3, 3], dview: [-1, 7, -1, 4] },
+      sqrt: { label: '√x', tex: '\\sqrt{x}', dtex: '\\dfrac{1}{2\\sqrt{x}}', f: Math.sqrt, df: (x) => 1 / (2 * Math.sqrt(x)), dom: [0, Infinity], view: [-1, 7, -1, 3], dview: [-1, 7, -0.5, 3] },
+      inv: { label: '1/x', tex: '\\dfrac1x', dtex: '-\\dfrac{1}{x^2}', f: (x) => 1 / x, df: (x) => -1 / (x * x), view: [-4, 4, -4, 4], dview: [-4, 4, -5, 1] },
+      cbrt: { label: 'x^{1/3}', tex: 'x^{\\frac13}=\\sqrt[3]{x}', dtex: '\\dfrac{1}{3\\sqrt[3]{x^2}}', f: Math.cbrt, df: (x) => 1 / (3 * Math.cbrt(x * x)), view: [-4, 4, -2, 2], dview: [-4, 4, -0.5, 3] },
+      xex: { label: 'x e^{−x}', tex: 'xe^{-x}', dtex: '(1-x)e^{-x}', f: (x) => x * Math.exp(-x), df: (x) => (1 - x) * Math.exp(-x), view: [-1.5, 6, -1.5, 1.5], dview: [-1.5, 6, -1.5, 1.5] },
+      sinc: { label: 'sin x / x', tex: '\\dfrac{\\sin x}{x}', dtex: '\\dfrac{x\\cos x-\\sin x}{x^2}', f: (x) => (x === 0 ? 1 : Math.sin(x) / x), df: (x) => (x === 0 ? 0 : (x * Math.cos(x) - Math.sin(x)) / (x * x)), view: [-11, 11, -1, 1.5], dview: [-11, 11, -1, 1] },
+    };
+    const cur = () => PRESETS[st.preset];
+    const pA = new Plot('#cv-functions-a', { xmin: -7, xmax: 7, ymin: -2, ymax: 2, equal: false, aspect: 0.72 });
+    const pB = new Plot('#cv-functions-b', { xmin: -7, xmax: 7, ymin: -2, ymax: 2, equal: false, aspect: 0.72 });
+    const row = $('#row-functions'), wrapB = $('#wrap-functions-b');
+    const hA = pA.addHandle({ x: 1, y: Math.sin(1), color: C.ink, r: 7, onMove: (x) => { setX(x); draw(); } });
+
+    function setX(x) {
+      const p = cur();
+      let v = clamp(x, p.view[0], p.view[1]);
+      if (p.dom) v = clamp(v, p.dom[0], p.dom[1]);
+      st.x = Math.round(v * 100) / 100;
+      sX.set(st.x);
+    }
+    UI.heading(ctl, '関数');
+    UI.select(ctl, { label: '$f(x)$', options: Object.entries(PRESETS).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; const p = cur(); sX.setRange(p.view[0], p.view[1], 0.01); setX(clamp(st.x, p.view[0] + 0.3, p.view[1] - 0.3)); draw(); } });
+    const sX = UI.slider(ctl, { label: '$x$（接点）', min: -7, max: 7, step: 0.01, value: st.x, onInput: (v) => { setX(v); draw(); } });
+    UI.checkbox(ctl, { label: '$f\'$ を同じ座標平面に描く', checked: false, onChange: (v) => { st.same = v; row.classList.toggle('canvas-row', !v); wrapB.style.display = v ? 'none' : ''; draw(); } });
+    UI.checkbox(ctl, { label: '$f\'=0$ の点を表示', checked: true, onChange: (v) => { st.zeros = v; draw(); } });
+    st.zeros = true;
+    UI.texAll(ctl);
+
+    const readout = $('#r-functions');
+    function draw() {
+      const p = cur(), f = p.f, df = p.df, a = st.x;
+      const fa = f(a), m = df(a);
+      hA.x = a; hA.y = isFinite(fa) ? fa : 0;
+      const view = st.same ? [p.view[0], p.view[1], Math.min(p.view[2], p.dview[2]), Math.max(p.view[3], p.dview[3])] : p.view;
+      pA.setView(...view);
+      const zeros = findZeros(df, p.dom ? Math.max(p.dom[0] + 0.01, view[0]) : view[0], view[1]).filter((z) => isFinite(f(z)));
+      pA.render((P) => {
+        if (st.same) {
+          P.fn(df, { color: C.clay, width: 1.6, dash: [5, 4] });
+          P.point(a, m, { color: C.clay, r: 5, label: `f′(${fmt(a)})=${fmt(m, 3)}`, dx: 10, dy: 16 });
+        }
+        P.fn(f, { color: C.ink, width: 2.6 });
+        if (st.zeros) for (const z of zeros) P.point(z, f(z), { color: C.clay, r: 5 });
+        if (isFinite(m) && isFinite(fa)) P.line(a, fa, 1, m, { color: C.sage, width: 2 });
+        else if (isFinite(fa)) P.vline(a, { color: C.sage, width: 2 });
+        if (isFinite(fa)) P.text(a, fa, `傾き ${isFinite(m) ? fmt(m, 3) : '∞'}`, { color: C.sage, dx: 12, dy: -12, bg: true });
+        P.legend([{ label: 'y = f(x)', color: C.ink }, { label: '接線', color: C.sage }, ...(st.same ? [{ label: 'y = f′(x)', color: C.clay, dash: [5, 4] }] : [])], { left: 12, top: 34 });
+      });
+      pB.setView(...p.dview);
+      pB.render((P) => {
+        P.fn(df, { color: C.clay, width: 2.4 });
+        if (st.zeros) for (const z of zeros) P.point(z, 0, { color: C.clay, r: 5, hollow: true });
+        if (isFinite(m)) { P.dropLines(a, m, { color: C.sage }); P.point(a, m, { color: C.sage, r: 6, label: `f′(${fmt(a)})=${fmt(m, 3)}`, dx: 10, dy: -10 }); }
+        else P.vline(a, { color: C.sage, width: 1.2, dash: [4, 4] });
+        P.legend([{ label: 'y = f′(x)', color: C.clay }], { left: 12, top: 34 });
+      });
+      const tangent = isFinite(m) && isFinite(fa) ? `y=${fmt(m, 3)}(x${a < 0 ? '+' : '-'}${fmt(Math.abs(a))})${fa < 0 ? '-' : '+'}${fmt(Math.abs(fa), 3)}` : `x=${fmt(a)}`;
+      readout.innerHTML = `
+        <div class="tex-block">$$f(x)=${p.tex},\\qquad f'(x)=${p.dtex}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">接点 (x, f(x))</div><div class="v">(${fmt(a)}, ${isFinite(fa) ? fmt(fa, 4) : '—'})</div></div>
+          <div class="stat sage"><div class="k">接線の傾き f′(x)</div><div class="v">${isFinite(m) ? fmt(m, 4) : '定まらない'}</div></div>
+          <div class="stat sage"><div class="k">接線</div><div class="v" style="font-size:1rem">${tangent}</div></div>
+          <div class="stat clay"><div class="k">f′(x)=0 となる x（表示範囲内）</div><div class="v" style="font-size:1rem">${zeros.length ? zeros.map((z) => fmt(z, 3)).join(', ') : 'なし'}</div></div>
+        </div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 合成・積・商・媒介変数 ======================= */
+  (() => {
+    const ctl = $('#c-rules');
+    const st = { mode: 'chain', x: 1, t: 1, preset: null };
+    const CHAIN = {
+      sinx2: { label: 'sin(x²)', ytex: '\\sin(x^2)', utex: 'x^2', ftex: '\\sin u', dfu: '\\cos u', dgx: '2x', f: Math.sin, g: (x) => x * x, fp: Math.cos, gp: (x) => 2 * x, view: [-3, 3, -2, 2] },
+      gauss: { label: 'e^{−x²}', ytex: 'e^{-x^2}', utex: '-x^2', ftex: 'e^u', dfu: 'e^u', dgx: '-2x', f: Math.exp, g: (x) => -x * x, fp: Math.exp, gp: (x) => -2 * x, view: [-3, 3, -0.5, 1.5] },
+      sqrt: { label: '√(x²+1)', ytex: '\\sqrt{x^2+1}', utex: 'x^2+1', ftex: '\\sqrt u', dfu: '\\dfrac{1}{2\\sqrt u}', dgx: '2x', f: Math.sqrt, g: (x) => x * x + 1, fp: (u) => 1 / (2 * Math.sqrt(u)), gp: (x) => 2 * x, view: [-4, 4, -1, 5] },
+      cube: { label: '(2x+1)³', ytex: '(2x+1)^3', utex: '2x+1', ftex: 'u^3', dfu: '3u^2', dgx: '2', f: (u) => u ** 3, g: (x) => 2 * x + 1, fp: (u) => 3 * u * u, gp: () => 2, view: [-2, 1.5, -6, 8] },
+      logcos: { label: 'log(cos x)', ytex: '\\log(\\cos x)', utex: '\\cos x', ftex: '\\log u', dfu: '\\dfrac1u', dgx: '-\\sin x', f: Math.log, g: Math.cos, fp: (u) => 1 / u, gp: (x) => -Math.sin(x), view: [-1.6, 1.6, -3, 1], dom: [-1.5, 1.5] },
+    };
+    const PROD = {
+      x2sin: { label: 'x² sin x（積）', kind: 'prod', ytex: 'x^2\\sin x', u: (x) => x * x, v: Math.sin, up: (x) => 2 * x, vp: Math.cos, utex: 'x^2', vtex: '\\sin x', uptex: '2x', vptex: '\\cos x', view: [-6, 6, -20, 20] },
+      xex: { label: 'x e^x（積）', kind: 'prod', ytex: 'xe^x', u: (x) => x, v: Math.exp, up: () => 1, vp: Math.exp, utex: 'x', vtex: 'e^x', uptex: '1', vptex: 'e^x', view: [-4, 2, -1, 6] },
+      sinc: { label: 'sin x / x（商）', kind: 'quot', ytex: '\\dfrac{\\sin x}{x}', u: Math.sin, v: (x) => x, up: Math.cos, vp: () => 1, utex: '\\sin x', vtex: 'x', uptex: '\\cos x', vptex: '1', view: [-10, 10, -1, 1.5] },
+      rat: { label: 'x / (x²+1)（商）', kind: 'quot', ytex: '\\dfrac{x}{x^2+1}', u: (x) => x, v: (x) => x * x + 1, up: () => 1, vp: (x) => 2 * x, utex: 'x', vtex: 'x^2+1', uptex: '1', vptex: '2x', view: [-5, 5, -1, 1] },
+    };
+    const PARAM = {
+      circle: { label: '円 (cos t, sin t)', xtex: '\\cos t', ytex: '\\sin t', dxtex: '-\\sin t', dytex: '\\cos t', x: Math.cos, y: Math.sin, dx: (t) => -Math.sin(t), dy: Math.cos, t0: 0, t1: 2 * Math.PI, view: [-2, 2, -1.6, 1.6] },
+      cycloid: { label: 'サイクロイド (t−sin t, 1−cos t)', xtex: 't-\\sin t', ytex: '1-\\cos t', dxtex: '1-\\cos t', dytex: '\\sin t', x: (t) => t - Math.sin(t), y: (t) => 1 - Math.cos(t), dx: (t) => 1 - Math.cos(t), dy: Math.sin, t0: 0, t1: 4 * Math.PI, view: [-1, 13.5, -1, 3] },
+      lissajous: { label: 'リサージュ (sin 2t, sin 3t)', xtex: '\\sin 2t', ytex: '\\sin 3t', dxtex: '2\\cos 2t', dytex: '3\\cos 3t', x: (t) => Math.sin(2 * t), y: (t) => Math.sin(3 * t), dx: (t) => 2 * Math.cos(2 * t), dy: (t) => 3 * Math.cos(3 * t), t0: 0, t1: 2 * Math.PI, view: [-1.8, 1.8, -1.4, 1.4] },
+    };
+    const plot = new Plot('#cv-rules', { xmin: -3, xmax: 3, ymin: -2, ymax: 2, equal: false, aspect: 0.62 });
+    const handle = plot.addHandle({ x: 1, y: 0, color: C.ink, r: 7, onMove: (x, y) => {
+      if (st.mode === 'param') {
+        const p = PARAM[st.preset];
+        let best = st.t, bd = 1e9;
+        for (let i = 0; i <= 720; i++) { const t = p.t0 + (p.t1 - p.t0) * i / 720; const d = Math.hypot(p.x(t) - x, p.y(t) - y); if (d < bd) { bd = d; best = t; } }
+        st.t = Math.round(best * 100) / 100; sT.set(st.t);
+      } else {
+        const p = curPreset();
+        st.x = Math.round(clamp(x, p.dom ? p.dom[0] : p.view[0], p.dom ? p.dom[1] : p.view[1]) * 100) / 100; sX.set(st.x);
+      }
+      draw();
+    } });
+    const curPreset = () => (st.mode === 'chain' ? CHAIN : st.mode === 'prod' ? PROD : PARAM)[st.preset];
+
+    UI.heading(ctl, '規則');
+    UI.segmented(ctl, { options: [{ value: 'chain', label: '合成関数' }, { value: 'prod', label: '積・商' }, { value: 'param', label: '媒介変数' }], value: 'chain', onChange: (v) => { st.mode = v; rebuild(); } });
+    const box = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    let sX, sT;
+    function rebuild() {
+      box.innerHTML = '';
+      const src = st.mode === 'chain' ? CHAIN : st.mode === 'prod' ? PROD : PARAM;
+      st.preset = Object.keys(src)[0];
+      const sel = UI.select(box, { label: st.mode === 'param' ? '曲線' : '関数', options: Object.entries(src).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; setup(); draw(); } });
+      if (st.mode === 'param') sT = UI.slider(box, { label: '$t$', min: 0, max: 6.28, step: 0.01, value: st.t, onInput: (v) => { st.t = v; draw(); } });
+      else sX = UI.slider(box, { label: '$x$', min: -3, max: 3, step: 0.01, value: st.x, onInput: (v) => { st.x = v; draw(); } });
+      UI.texAll(box);
+      setup(); draw();
+    }
+    function setup() {
+      const p = curPreset();
+      if (st.mode === 'param') { sT.setRange(p.t0, p.t1, 0.01); st.t = clamp(st.t, p.t0, p.t1); sT.set(st.t); plot.opts.equal = true; }
+      else { const lo = p.dom ? p.dom[0] : p.view[0], hi = p.dom ? p.dom[1] : p.view[1]; sX.setRange(lo, hi, 0.01); st.x = clamp(st.x, lo + 0.2, hi - 0.2); sX.set(st.x); plot.opts.equal = false; }
+      plot.setView(...p.view);
+    }
+
+    const readout = $('#r-rules');
+    function draw() {
+      const p = curPreset();
+      let html = '';
+      if (st.mode === 'chain') {
+        const x = st.x, u = p.g(x), y = p.f(u), dfu = p.fp(u), dgx = p.gp(x), m = dfu * dgx;
+        handle.x = x; handle.y = y;
+        plot.render((P) => {
+          P.fn((t) => p.f(p.g(t)), { color: C.ink, width: 2.6, domain: p.dom });
+          if (isFinite(m)) P.line(x, y, 1, m, { color: C.sage, width: 2 });
+          P.dropLines(x, y);
+          P.text(x, y, `傾き ${fmt(m, 3)}`, { color: C.sage, dx: 12, dy: -12, bg: true });
+        });
+        html = `
+          <div class="tex-block">$$y=${p.ytex}:\\quad y=${p.ftex},\\ u=${p.utex}\\qquad \\frac{dy}{dx}=\\frac{dy}{du}\\cdot\\frac{du}{dx}=${p.dfu}\\cdot(${p.dgx})$$</div>
+          <div class="readout-grid">
+            <div class="stat ochre"><div class="k">x</div><div class="v">${fmt(x)}</div></div>
+            <div class="stat ink"><div class="k">u = g(x)</div><div class="v">${fmt(u, 4)}</div></div>
+            <div class="stat ink"><div class="k">dy/du = f′(u)</div><div class="v">${fmt(dfu, 4)}</div></div>
+            <div class="stat ink"><div class="k">du/dx = g′(x)</div><div class="v">${fmt(dgx, 4)}</div></div>
+            <div class="stat sage"><div class="k">dy/dx = 積</div><div class="v">${fmt(dfu, 3)} × ${fmt(dgx, 3)} = ${fmt(m, 4)}</div></div>
+          </div>`;
+      } else if (st.mode === 'prod') {
+        const x = st.x, u = p.u(x), v = p.v(x), up = p.up(x), vp = p.vp(x);
+        const y = p.kind === 'prod' ? u * v : u / v;
+        const m = p.kind === 'prod' ? up * v + u * vp : (up * v - u * vp) / (v * v);
+        handle.x = x; handle.y = y;
+        plot.render((P) => {
+          P.fn((t) => (p.kind === 'prod' ? p.u(t) * p.v(t) : p.u(t) / p.v(t)), { color: C.ink, width: 2.6 });
+          if (isFinite(m)) P.line(x, y, 1, m, { color: C.sage, width: 2 });
+          P.dropLines(x, y);
+          P.text(x, y, `傾き ${fmt(m, 3)}`, { color: C.sage, dx: 12, dy: -12, bg: true });
+        });
+        const rule = p.kind === 'prod'
+          ? `(uv)'=u'v+uv'=(${p.uptex})(${p.vtex})+(${p.utex})(${p.vptex})`
+          : `\\left(\\frac uv\\right)'=\\frac{u'v-uv'}{v^2}=\\frac{(${p.uptex})(${p.vtex})-(${p.utex})(${p.vptex})}{(${p.vtex})^2}`;
+        const nums = p.kind === 'prod'
+          ? `${fmt(up, 3)}\\times${fmt(v, 3)}+${fmt(u, 3)}\\times${fmt(vp, 3)}=${fmt(m, 4)}`
+          : `\\frac{${fmt(up, 3)}\\times${fmt(v, 3)}-${fmt(u, 3)}\\times${fmt(vp, 3)}}{${fmt(v, 3)}^2}=${fmt(m, 4)}`;
+        html = `
+          <div class="tex-block">$$y=${p.ytex}:\\quad u=${p.utex},\\ v=${p.vtex}\\qquad ${rule}$$</div>
+          <div class="tex-block">$$x=${fmt(x)}:\\quad ${nums}$$</div>
+          <div class="readout-grid">
+            <div class="stat ink"><div class="k">u, u′</div><div class="v">${fmt(u, 4)}, ${fmt(up, 4)}</div></div>
+            <div class="stat ink"><div class="k">v, v′</div><div class="v">${fmt(v, 4)}, ${fmt(vp, 4)}</div></div>
+            <div class="stat sage"><div class="k">dy/dx（接線の傾き）</div><div class="v">${fmt(m, 4)}</div></div>
+          </div>`;
+      } else {
+        const t = st.t, x = p.x(t), y = p.y(t), dx = p.dx(t), dy = p.dy(t);
+        const m = dy / dx;
+        handle.x = x; handle.y = y;
+        plot.render((P) => {
+          P.param(p.x, p.y, p.t0, p.t1, { color: C.ink, width: 2.4 });
+          if (Math.abs(dx) > 1e-9) P.line(x, y, dx, dy, { color: C.sage, width: 2 });
+          else if (Math.abs(dy) > 1e-9) P.vline(x, { color: C.sage, width: 2 });
+          const s = 0.6;
+          if (Math.hypot(dx, dy) > 1e-9) P.arrow(x, y, x + dx * s, y + dy * s, { color: C.ochre, width: 2 });
+          P.text(x + dx * s, y + dy * s, '(dx/dt, dy/dt)', { color: C.ochre, dx: 8, dy: -6, bg: true });
+          P.text(x, y, `t=${fmt(t)}`, { color: C.ink, dx: -10, dy: 20, align: 'right', bg: true, font: Plot.FONT_MATH });
+        });
+        const mTxt = Math.abs(dx) < 1e-9 ? (Math.abs(dy) < 1e-9 ? '定まらない（dx/dt=dy/dt=0）' : '∞（接線は垂直）') : fmt(m, 4);
+        html = `
+          <div class="tex-block">$$x=${p.xtex},\\ y=${p.ytex}\\qquad \\frac{dx}{dt}=${p.dxtex},\\ \\frac{dy}{dt}=${p.dytex}\\qquad \\frac{dy}{dx}=\\frac{dy/dt}{dx/dt}$$</div>
+          <div class="readout-grid">
+            <div class="stat ochre"><div class="k">t</div><div class="v">${fmt(t)}</div></div>
+            <div class="stat ink"><div class="k">点 (x, y)</div><div class="v">(${fmt(x, 3)}, ${fmt(y, 3)})</div></div>
+            <div class="stat ink"><div class="k">dx/dt, dy/dt</div><div class="v">${fmt(dx, 4)}, ${fmt(dy, 4)}</div></div>
+            <div class="stat sage"><div class="k">dy/dx</div><div class="v">${mTxt}</div></div>
+          </div>`;
+      }
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    rebuild();
+  })();
+
+  /* ======================= 平均値の定理 ======================= */
+  (() => {
+    const ctl = $('#c-mvt');
+    const st = { preset: 'cubic', a: -1.5, b: 2 };
+    const PRESETS = {
+      cubic: { label: 'x³ − 3x', tex: 'x^3-3x', dtex: '3x^2-3', f: (x) => x ** 3 - 3 * x, df: (x) => 3 * x * x - 3, view: [-3.2, 3.2, -6, 6], lo: -3, hi: 3 },
+      sin: { label: 'sin x', tex: '\\sin x', dtex: '\\cos x', f: Math.sin, df: Math.cos, view: [-1, 7.5, -2, 2], lo: -0.8, hi: 7.3 },
+      exp: { label: 'e^{x/2}', tex: 'e^{x/2}', dtex: '\\dfrac12e^{x/2}', f: (x) => Math.exp(x / 2), df: (x) => Math.exp(x / 2) / 2, view: [-4, 4.5, -1, 8], lo: -3.8, hi: 4 },
+      log: { label: 'log x', tex: '\\log x', dtex: '\\dfrac1x', f: Math.log, df: (x) => 1 / x, view: [-0.5, 8, -3, 3], lo: 0.1, hi: 7.8 },
+      sq: { label: 'x²', tex: 'x^2', dtex: '2x', f: (x) => x * x, df: (x) => 2 * x, view: [-3.2, 3.2, -2, 8], lo: -3, hi: 3 },
+    };
+    const cur = () => PRESETS[st.preset];
+    const plot = new Plot('#cv-mvt', { xmin: -3.2, xmax: 3.2, ymin: -6, ymax: 6, equal: false, aspect: 0.62 });
+    const hA = plot.addHandle({ x: st.a, y: 0, color: C.ochre, label: 'a', onMove: (x) => { const p = cur(); st.a = Math.round(clamp(x, p.lo, st.b - 0.2) * 20) / 20; sA.set(st.a); draw(); return [st.a, 0]; } });
+    const hB = plot.addHandle({ x: st.b, y: 0, color: C.ochre, label: 'b', onMove: (x) => { const p = cur(); st.b = Math.round(clamp(x, st.a + 0.2, p.hi) * 20) / 20; sB.set(st.b); draw(); return [st.b, 0]; } });
+
+    UI.heading(ctl, '関数と区間');
+    UI.select(ctl, { label: '$f(x)$', options: Object.entries(PRESETS).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => {
+      st.preset = v; const p = cur();
+      sA.setRange(p.lo, p.hi, 0.05); sB.setRange(p.lo, p.hi, 0.05);
+      st.a = clamp(st.a, p.lo, p.hi - 0.5); st.b = clamp(st.b, st.a + 0.5, p.hi); sA.set(st.a); sB.set(st.b); draw();
+    } });
+    const sA = UI.slider(ctl, { label: '$a$', min: -3, max: 3, step: 0.05, value: st.a, onInput: (v) => { st.a = Math.min(v, st.b - 0.2); sA.set(st.a); draw(); } });
+    const sB = UI.slider(ctl, { label: '$b$', min: -3, max: 3, step: 0.05, value: st.b, onInput: (v) => { st.b = Math.max(v, st.a + 0.2); sB.set(st.b); draw(); } });
+    let rolleMsg = '';
+    UI.buttonRow(ctl, [{ label: 'ロルの定理：f(b)=f(a) にする', small: true, onClick: () => {
+      const p = cur();
+      const zs = findZeros((x) => p.f(x) - p.f(st.a), st.a + 0.05, p.hi);
+      if (zs.length) { st.b = Math.round(zs[0] * 1000) / 1000; sB.set(st.b); rolleMsg = ''; }
+      else rolleMsg = `この a では f(b)=f(a) となる b（a &lt; b ≤ ${fmt(p.hi)}）が見つからない。`;
+      draw();
+    } }]);
+    UI.texAll(ctl);
+
+    const readout = $('#r-mvt');
+    function draw() {
+      const p = cur(), f = p.f, df = p.df, a = st.a, b = st.b;
+      hA.x = a; hB.x = b;
+      plot.setView(...p.view);
+      const m = (f(b) - f(a)) / (b - a);
+      const cs = findZeros((x) => df(x) - m, a + 1e-6, b - 1e-6, 600);
+      plot.render((P) => {
+        P.rect(a, P.win.ymin, b - a, P.win.ymax - P.win.ymin, { color: 'none', fill: Plot.rgba(C.ochre, 0.08) });
+        P.fn(f, { color: C.ink, width: 1.5, alpha: 0.35 });
+        P.fn(f, { color: C.ink, width: 3, domain: [a, b] });
+        P.line(a, f(a), 1, m, { color: C.ochre, width: 1.2, dash: [6, 4], alpha: 0.7 });
+        P.segment(a, f(a), b, f(b), { color: C.ochre, width: 2.4 });
+        P.segment(a, 0, a, f(a), { color: C.ochre, width: 1, dash: [3, 4] });
+        P.segment(b, 0, b, f(b), { color: C.ochre, width: 1, dash: [3, 4] });
+        P.point(a, f(a), { color: C.ochre, r: 5, label: `(a, f(a))`, dx: -10, dy: -10, align: 'right' });
+        P.point(b, f(b), { color: C.ochre, r: 5, label: `(b, f(b))`, dx: 10, dy: -10 });
+        cs.forEach((c, i) => {
+          P.line(c, f(c), 1, m, { color: C.sage, width: 2 });
+          P.segment(c, 0, c, f(c), { color: C.sage, width: 1, dash: [3, 4] });
+          P.point(c, 0, { color: C.sage, r: 4, label: cs.length > 1 ? `c${i + 1}` : 'c', dx: -4, dy: 20 });
+          P.point(c, f(c), { color: C.sage, r: 6 });
+        });
+        P.legend([{ label: `割線（傾き ${fmt(m, 3)}）`, color: C.ochre }, { label: '平行な接線', color: C.sage }], { left: 12, top: 34 });
+      });
+      const rolle = Math.abs(f(b) - f(a)) < 1e-6;
+      readout.innerHTML = `
+        <div class="tex-block">$$f(x)=${p.tex},\\quad f'(x)=${p.dtex}\\qquad \\frac{f(b)-f(a)}{b-a}=\\frac{${fmt(f(b), 3)}-(${fmt(f(a), 3)})}{${fmt(b)}-(${fmt(a)})}=${fmt(m, 4)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ochre"><div class="k">区間 [a, b]</div><div class="v">[${fmt(a)}, ${fmt(b)}]</div></div>
+          <div class="stat ochre"><div class="k">割線の傾き（平均変化率）</div><div class="v">${fmt(m, 4)}</div></div>
+          <div class="stat sage"><div class="k">f′(c) = 割線の傾き となる c</div><div class="v">${cs.length ? cs.map((c) => fmt(c, 4)).join(', ') : '見つからない'}</div></div>
+          <div class="stat sage"><div class="k">f′(c)</div><div class="v">${cs.length ? cs.map((c) => fmt(df(c), 4)).join(', ') : '—'}</div></div>
+        </div>
+        <p class="small">${rolle ? '<b>f(a)=f(b)</b> なので割線は水平、f′(c)=0（ロルの定理）。' : '割線（黄土）と平行な接線（緑）が区間内に必ず引ける。'} ${rolleMsg}</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= グラフの概形 ======================= */
+  (() => {
+    const ctl = $('#c-shape');
+    const st = { preset: 'cubic', d1: true, d2: true };
+    const E = Math.exp;
+    const PRESETS = {
+      cubic: { label: 'x³ − 3x', tex: 'x^3-3x', d1tex: '3x^2-3', d2tex: '6x', f: (x) => x ** 3 - 3 * x, d1: (x) => 3 * x * x - 3, d2: (x) => 6 * x, view: [-3.5, 3.5, -5, 5] },
+      xex: { label: 'x e^{−x}', tex: 'xe^{-x}', d1tex: '(1-x)e^{-x}', d2tex: '(x-2)e^{-x}', f: (x) => x * E(-x), d1: (x) => (1 - x) * E(-x), d2: (x) => (x - 2) * E(-x), view: [-1.5, 8, -1.5, 1.5], hasym: [0] },
+      rat: { label: 'x / (x²+1)', tex: '\\dfrac{x}{x^2+1}', d1tex: '\\dfrac{1-x^2}{(x^2+1)^2}', d2tex: '\\dfrac{2x(x^2-3)}{(x^2+1)^3}', f: (x) => x / (x * x + 1), d1: (x) => (1 - x * x) / (x * x + 1) ** 2, d2: (x) => 2 * x * (x * x - 3) / (x * x + 1) ** 3, view: [-6, 6, -1, 1], hasym: [0] },
+      xinv: { label: 'x + 1/x', tex: 'x+\\dfrac1x', d1tex: '1-\\dfrac{1}{x^2}', d2tex: '\\dfrac{2}{x^3}', f: (x) => x + 1 / x, d1: (x) => 1 - 1 / (x * x), d2: (x) => 2 / x ** 3, view: [-5, 5, -6, 6], vasym: [0], oasym: [[1, 0]] },
+      sinx: { label: 'sin x + x/2', tex: '\\sin x+\\dfrac x2', d1tex: '\\cos x+\\dfrac12', d2tex: '-\\sin x', f: (x) => Math.sin(x) + x / 2, d1: (x) => Math.cos(x) + 0.5, d2: (x) => -Math.sin(x), view: [-7.5, 7.5, -5, 5] },
+      x2ex: { label: 'x² e^{−x}', tex: 'x^2e^{-x}', d1tex: 'x(2-x)e^{-x}', d2tex: '(x^2-4x+2)e^{-x}', f: (x) => x * x * E(-x), d1: (x) => x * (2 - x) * E(-x), d2: (x) => (x * x - 4 * x + 2) * E(-x), view: [-1.5, 9, -0.6, 1.6], hasym: [0] },
+      logx: { label: 'log x / x', tex: '\\dfrac{\\log x}{x}', d1tex: '\\dfrac{1-\\log x}{x^2}', d2tex: '\\dfrac{2\\log x-3}{x^3}', f: (x) => Math.log(x) / x, d1: (x) => (1 - Math.log(x)) / (x * x), d2: (x) => (2 * Math.log(x) - 3) / x ** 3, view: [-0.5, 12, -2, 1], dom: [0, Infinity], vasym: [0], hasym: [0] },
+      rat2: { label: 'x² / (x−1)', tex: '\\dfrac{x^2}{x-1}', d1tex: '\\dfrac{x(x-2)}{(x-1)^2}', d2tex: '\\dfrac{2}{(x-1)^3}', f: (x) => x * x / (x - 1), d1: (x) => x * (x - 2) / (x - 1) ** 2, d2: (x) => 2 / (x - 1) ** 3, view: [-5, 7, -8, 10], vasym: [1], oasym: [[1, 1]] },
+    };
+    const cur = () => PRESETS[st.preset];
+    const plot = new Plot('#cv-shape', { xmin: -3.5, xmax: 3.5, ymin: -5, ymax: 5, equal: false, aspect: 0.6 });
+
+    UI.heading(ctl, '関数');
+    UI.select(ctl, { label: '$f(x)$', options: Object.entries(PRESETS).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; draw(); } });
+    UI.checkbox(ctl, { label: '$f\'(x)$ を表示（赤）', checked: true, onChange: (v) => { st.d1 = v; draw(); } });
+    UI.checkbox(ctl, { label: '$f\'\'(x)$ を表示（黄土）', checked: true, onChange: (v) => { st.d2 = v; draw(); } });
+    UI.texAll(ctl);
+
+    const readout = $('#r-shape');
+    const sgn = (v) => (!isFinite(v) ? '×' : v > 1e-9 ? '+' : v < -1e-9 ? '−' : '0');
+    function draw() {
+      const p = cur(), f = p.f;
+      plot.setView(...p.view);
+      const xlo = p.dom ? Math.max(p.dom[0], p.view[0]) : p.view[0], xhi = p.view[1];
+      const vas = (p.vasym || []).filter((v) => v > xlo && v < xhi);
+      const pieces = [];
+      let start = xlo;
+      for (const v of vas) { pieces.push([start, v]); start = v; }
+      pieces.push([start, xhi]);
+      const z1 = [], z2 = [];
+      for (const [a, b] of pieces) { const e = (b - a) * 1e-4; z1.push(...findZeros(p.d1, a + e, b - e)); z2.push(...findZeros(p.d2, a + e, b - e)); }
+      const ext = z1.map((c) => { const l = p.d1(c - 1e-4), r = p.d1(c + 1e-4); return { x: c, kind: l > 0 && r < 0 ? '極大' : l < 0 && r > 0 ? '極小' : null }; }).filter((e) => e.kind);
+      const inf = z2.map((c) => { const l = p.d2(c - 1e-4), r = p.d2(c + 1e-4); return { x: c, ok: l * r < 0 }; }).filter((e) => e.ok);
+
+      plot.render((P) => {
+        for (const v of (p.vasym || [])) { P.vline(v, { color: C.faint, width: 1.2, dash: [6, 4] }); P.text(v, P.win.ymax, `x=${fmt(v)}`, { color: C.faint, dx: 6, dy: 36, font: Plot.FONT_MATH, bg: true }); }
+        for (const h of (p.hasym || [])) { P.hline(h, { color: C.faint, width: 1.2, dash: [6, 4] }); P.text(P.win.xmax, h, `y=${fmt(h)}`, { color: C.faint, align: 'right', dx: -6, dy: -6, font: Plot.FONT_MATH, bg: true }); }
+        for (const [m, k] of (p.oasym || [])) { P.line(0, k, 1, m, { color: C.faint, width: 1.2, dash: [6, 4] }); const xx = P.win.xmax - 0.8; P.text(xx, m * xx + k, `y=${m === 1 ? '' : fmt(m)}x${k ? (k > 0 ? '+' : '−') + fmt(Math.abs(k)) : ''}`, { color: C.faint, align: 'right', dx: -6, dy: 16, font: Plot.FONT_MATH, bg: true }); }
+        if (st.d2) P.fn(p.d2, { color: C.ochre, width: 1.3, dash: [4, 4], domain: p.dom });
+        if (st.d1) P.fn(p.d1, { color: C.clay, width: 1.5, domain: p.dom });
+        P.fn(f, { color: C.ink, width: 2.8, domain: p.dom });
+        for (const e of ext) P.point(e.x, f(e.x), { color: C.sage, r: 6, label: `${e.kind} (${fmt(e.x, 2)}, ${fmt(f(e.x), 2)})`, dx: 10, dy: e.kind === '極大' ? -10 : 18 });
+        for (const q of inf) P.point(q.x, f(q.x), { color: C.clay, r: 5.5, hollow: true, label: `変曲点 (${fmt(q.x, 2)}, ${fmt(f(q.x), 2)})`, dx: 10, dy: 18 });
+        const items = [{ label: 'y = f(x)', color: C.ink }];
+        if (st.d1) items.push({ label: 'y = f′(x)', color: C.clay, width: 2 });
+        if (st.d2) items.push({ label: 'y = f″(x)', color: C.ochre, dash: [4, 4], width: 2 });
+        P.legend(items, { left: 12, top: 10 });
+      });
+
+      // 増減・凹凸表
+      const marks = [];
+      for (const v of vas) marks.push({ x: v, type: 'asym' });
+      for (const e of ext) marks.push({ x: e.x, type: 'ext', kind: e.kind });
+      for (const q of inf) marks.push({ x: q.x, type: 'inf' });
+      if (p.dom && isFinite(p.dom[0]) && !vas.includes(p.dom[0])) marks.push({ x: p.dom[0], type: 'bound' });
+      marks.sort((u, v) => u.x - v.x);
+      const cols = [];
+      const interval = (lo, hi) => {
+        const mid = isFinite(lo) && isFinite(hi) ? (lo + hi) / 2 : isFinite(lo) ? lo + 1 : hi - 1;
+        const s1 = sgn(p.d1(mid)), s2 = sgn(p.d2(mid));
+        const arrow = s1 === '+' ? '↗' : '↘';
+        const conv = s2 === '+' ? '下に凸' : '上に凸';
+        return { x: '…', s1, s2, f: `<span style="font-size:1.25em">${arrow}</span><br><small>${conv}</small>` };
+      };
+      let prev = p.dom && isFinite(p.dom[0]) ? p.dom[0] : -Infinity;
+      const firstBound = marks.length && (marks[0].type === 'bound' || marks[0].x === prev);
+      if (!firstBound) cols.push(interval(prev, marks.length ? marks[0].x : Infinity));
+      marks.forEach((mk, i) => {
+        if (mk.type === 'asym' || mk.type === 'bound') cols.push({ x: fmt(mk.x, 2), s1: '×', s2: '×', f: '×' });
+        else cols.push({ x: fmt(mk.x, 3), s1: mk.type === 'ext' ? '0' : sgn(p.d1(mk.x)), s2: mk.type === 'inf' ? '0' : sgn(p.d2(mk.x)), f: `${fmt(f(mk.x), 3)}<br><small>${mk.type === 'ext' ? mk.kind : '変曲点'}</small>` });
+        const next = i + 1 < marks.length ? marks[i + 1].x : Infinity;
+        cols.push(interval(mk.x, next));
+      });
+      const row = (label, key) => `<tr><th>${label}</th>${cols.map((c) => `<td style="text-align:center">${c[key]}</td>`).join('')}</tr>`;
+      readout.innerHTML = `
+        <div class="tex-block">$$f(x)=${p.tex},\\quad f'(x)=${p.d1tex},\\quad f''(x)=${p.d2tex}$$</div>
+        <div class="readout-grid" style="margin-bottom:0.6rem">
+          <div class="stat sage"><div class="k">極値</div><div class="v" style="font-size:0.98rem">${ext.length ? ext.map((e) => `${e.kind} f(${fmt(e.x, 3)})=${fmt(f(e.x), 3)}`).join('<br>') : 'なし'}</div></div>
+          <div class="stat clay"><div class="k">変曲点</div><div class="v" style="font-size:0.98rem">${inf.length ? inf.map((q) => `(${fmt(q.x, 3)}, ${fmt(f(q.x), 3)})`).join('<br>') : 'なし'}</div></div>
+          <div class="stat"><div class="k">漸近線</div><div class="v" style="font-size:0.98rem">${[...(p.vasym || []).map((v) => `x=${fmt(v)}`), ...(p.hasym || []).map((h) => `y=${fmt(h)}`), ...(p.oasym || []).map(([m, k]) => `y=${m === 1 ? '' : fmt(m)}x${k ? (k > 0 ? '+' : '−') + fmt(Math.abs(k)) : ''}`)].join(', ') || 'なし'}</div></div>
+        </div>
+        <div class="table-wrap"><table class="data">
+          ${row('x', 'x')}${row("f′(x)", 's1')}${row('f″(x)', 's2')}${row('f(x)', 'f')}
+        </table></div>
+        <p class="small">↗ 増加、↘ 減少。× は定義されない点。表は表示範囲 ${fmt(xlo)} ≤ x ≤ ${fmt(xhi)} で数値的に作成。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 速度と加速度 ======================= */
+  (() => {
+    const ctl = $('#c-motion');
+    const st = { preset: 'circle', t: 0.8 };
+    const PRESETS = {
+      circle: { label: '円運動 (cos t, sin t)', xtex: '\\cos t', ytex: '\\sin t', x: Math.cos, y: Math.sin, vx: (t) => -Math.sin(t), vy: Math.cos, ax: (t) => -Math.cos(t), ay: (t) => -Math.sin(t), t0: 0, t1: 2 * Math.PI, view: [-2.4, 2.4, -1.7, 1.7], s: 1 },
+      ellipse: { label: '楕円運動 (3cos t, 2sin t)', xtex: '3\\cos t', ytex: '2\\sin t', x: (t) => 3 * Math.cos(t), y: (t) => 2 * Math.sin(t), vx: (t) => -3 * Math.sin(t), vy: (t) => 2 * Math.cos(t), ax: (t) => -3 * Math.cos(t), ay: (t) => -2 * Math.sin(t), t0: 0, t1: 2 * Math.PI, view: [-5, 5, -3.5, 3.5], s: 0.7 },
+      proj: { label: '放物運動 (t, 4t − t²)', xtex: 't', ytex: '4t-t^2', x: (t) => t, y: (t) => 4 * t - t * t, vx: () => 1, vy: (t) => 4 - 2 * t, ax: () => 0, ay: () => -2, t0: 0, t1: 4, view: [-1, 6, -1, 5], s: 0.5 },
+      cycloid: { label: 'サイクロイド (t−sin t, 1−cos t)', xtex: 't-\\sin t', ytex: '1-\\cos t', x: (t) => t - Math.sin(t), y: (t) => 1 - Math.cos(t), vx: (t) => 1 - Math.cos(t), vy: Math.sin, ax: Math.sin, ay: Math.cos, t0: 0, t1: 4 * Math.PI, view: [-1, 13.5, -1, 3.2], s: 0.8 },
+      line: { label: '直線上の運動 x = t³ − 3t', xtex: 't^3-3t', x: (t) => t ** 3 - 3 * t, vx: (t) => 3 * t * t - 3, ax: (t) => 6 * t, t0: 0, t1: 2.5, view: [-4, 10, -1.2, 1.2], s: 0.25, line: true },
+    };
+    const cur = () => PRESETS[st.preset];
+    const pA = new Plot('#cv-motion-a', { xmin: -2.4, xmax: 2.4, ymin: -1.7, ymax: 1.7, equal: true, aspect: 0.62 });
+    const pB = new Plot('#cv-motion-b', { xmin: 0, xmax: 2.5, ymin: -5, ymax: 12, equal: false, aspect: 0.72, xLabel: 't', yLabel: '' });
+    const row = $('#row-motion'), wrapB = $('#wrap-motion-b');
+    const anim = UI.animator((dt) => { const p = cur(); st.t += dt * (p.t1 - p.t0) / 8; if (st.t > p.t1) st.t = p.t0; sT.set(st.t); draw(); });
+
+    UI.heading(ctl, '運動');
+    UI.select(ctl, { label: '点の運動', options: Object.entries(PRESETS).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; setup(); draw(); } });
+    const sT = UI.slider(ctl, { label: '時刻 $t$', min: 0, max: 6.28, step: 0.01, value: st.t, onInput: (v) => { st.t = v; draw(); } });
+    const btn = UI.button(ctl, { label: '▶ 動かす', primary: true, onClick: () => { anim.toggle(); btn.innerHTML = anim.running ? '■ 止める' : '▶ 動かす'; } });
+    UI.texAll(ctl);
+
+    function setup() {
+      const p = cur();
+      sT.setRange(p.t0, p.t1, 0.01); st.t = clamp(st.t, p.t0, p.t1); sT.set(st.t);
+      row.classList.toggle('canvas-row', !!p.line);
+      wrapB.style.display = p.line ? '' : 'none';
+      pA.opts.equal = !p.line; pA.opts.axes = !p.line; pA.opts.grid = !p.line;
+      pA.setView(...p.view);
+    }
+    const readout = $('#r-motion');
+    function draw() {
+      const p = cur(), t = st.t;
+      if (p.line) {
+        const x = p.x(t), v = p.vx(t), a = p.ax(t);
+        pA.render((P) => {
+          const y0 = 0;
+          P.segment(P.win.xmin + 0.3, y0, P.win.xmax - 0.3, y0, { color: C.borderStrong, width: 1.5 });
+          for (let k = -4; k <= 10; k++) { P.segment(k, -0.08, k, 0.08, { color: C.borderStrong, width: 1 }); P.text(k, -0.1, String(k), { color: C.faint, align: 'center', baseline: 'top' }); }
+          P.text(P.win.xmax - 0.3, 0, 'x', { color: C.muted, dx: -4, dy: -10, font: Plot.FONT_MATH });
+          P.param(p.x, () => 0.35, p.t0, t, { color: C.ink, width: 3, alpha: 0.4 });
+          if (Math.abs(v) > 1e-9) { P.arrow(x, 0.35, x + v * p.s, 0.35, { color: C.sage, width: 2.4 }); P.text(x + v * p.s, 0.35, 'v', { color: C.sage, dx: v > 0 ? 6 : -14, dy: -8, font: Plot.FONT_MATH, bg: true }); }
+          if (Math.abs(a) > 1e-9) { P.arrow(x, 0.7, x + a * p.s, 0.7, { color: C.ochre, width: 2.4 }); P.text(x + a * p.s, 0.7, 'a', { color: C.ochre, dx: a > 0 ? 6 : -14, dy: -8, font: Plot.FONT_MATH, bg: true }); }
+          P.point(x, 0, { color: C.clay, r: 7, label: `x(${fmt(t)}) = ${fmt(x, 3)}`, dx: 10, dy: 30 });
+        });
+        pB.setView(p.t0, p.t1, -5, 12);
+        pB.render((P) => {
+          P.fn(p.x, { color: C.ink, width: 2.4 });
+          P.fn(p.vx, { color: C.sage, width: 2 });
+          P.fn(p.ax, { color: C.ochre, width: 2, dash: [5, 4] });
+          P.vline(t, { color: C.clay, width: 1.2, dash: [4, 4] });
+          P.point(t, x, { color: C.ink, r: 5 }); P.point(t, v, { color: C.sage, r: 5 }); P.point(t, a, { color: C.ochre, r: 5 });
+          P.legend([{ label: 'x(t) = t³ − 3t', color: C.ink }, { label: 'v(t) = 3t² − 3', color: C.sage }, { label: 'a(t) = 6t', color: C.ochre, dash: [5, 4] }], { left: 12, top: 34 });
+        });
+        readout.innerHTML = `
+          <div class="tex-block">$$x=t^3-3t,\\qquad v=\\frac{dx}{dt}=3t^2-3,\\qquad a=\\frac{dv}{dt}=6t$$</div>
+          <div class="readout-grid">
+            <div class="stat ochre"><div class="k">t</div><div class="v">${fmt(t)}</div></div>
+            <div class="stat ink"><div class="k">位置 x</div><div class="v">${fmt(x, 4)}</div></div>
+            <div class="stat sage"><div class="k">速度 v</div><div class="v">${fmt(v, 4)}</div></div>
+            <div class="stat ochre"><div class="k">加速度 a</div><div class="v">${fmt(a, 4)}</div></div>
+          </div>
+          <p class="small">t=1 で v=0（折り返し）、t=√3≈1.732 で原点に戻る。v と a の符号が同じなら加速、異なれば減速。</p>`;
+      } else {
+        const x = p.x(t), y = p.y(t), vx = p.vx(t), vy = p.vy(t), ax = p.ax(t), ay = p.ay(t);
+        const speed = Math.hypot(vx, vy), amag = Math.hypot(ax, ay);
+        pA.render((P) => {
+          P.param(p.x, p.y, p.t0, p.t1, { color: C.ink, width: 1.5, alpha: 0.35 });
+          P.param(p.x, p.y, p.t0, t, { color: C.ink, width: 2.6 });
+          if (speed > 1e-9) { P.arrow(x, y, x + vx * p.s, y + vy * p.s, { color: C.sage, width: 2.4 }); P.text(x + vx * p.s, y + vy * p.s, 'v', { color: C.sage, dx: 6, dy: -6, font: Plot.FONT_MATH, bg: true }); }
+          if (amag > 1e-9) { P.arrow(x, y, x + ax * p.s, y + ay * p.s, { color: C.ochre, width: 2.4 }); P.text(x + ax * p.s, y + ay * p.s, 'a', { color: C.ochre, dx: 6, dy: 14, font: Plot.FONT_MATH, bg: true }); }
+          P.point(x, y, { color: C.clay, r: 6.5, label: `t=${fmt(t)}`, dx: 10, dy: 20 });
+        });
+        readout.innerHTML = `
+          <div class="tex-block">$$x=${p.xtex},\\ y=${p.ytex}\\qquad \\vec v=\\left(\\frac{dx}{dt},\\frac{dy}{dt}\\right),\\quad \\vec a=\\left(\\frac{d^2x}{dt^2},\\frac{d^2y}{dt^2}\\right)$$</div>
+          <div class="readout-grid">
+            <div class="stat ochre"><div class="k">t</div><div class="v">${fmt(t)}</div></div>
+            <div class="stat clay"><div class="k">位置 (x, y)</div><div class="v">(${fmt(x, 3)}, ${fmt(y, 3)})</div></div>
+            <div class="stat sage"><div class="k">速度 v = (dx/dt, dy/dt)</div><div class="v">(${fmt(vx, 3)}, ${fmt(vy, 3)})</div></div>
+            <div class="stat sage"><div class="k">速さ |v|</div><div class="v">${fmt(speed, 4)}</div></div>
+            <div class="stat ochre"><div class="k">加速度 a</div><div class="v">(${fmt(ax, 3)}, ${fmt(ay, 3)})</div></div>
+            <div class="stat ochre"><div class="k">|a|</div><div class="v">${fmt(amag, 4)}</div></div>
+          </div>
+          <p class="small">図の矢印は見やすさのため ${fmt(p.s)} 倍の長さで描いている。</p>`;
+      }
+      UI.texAll(readout);
+    }
+    setup(); draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'functions', label: 'いろいろな関数の導関数' },
+    { id: 'rules', label: '合成・積・商・媒介変数' },
+    { id: 'mvt', label: '平均値の定理' },
+    { id: 'shape', label: 'グラフの概形' },
+    { id: 'motion', label: '速度と加速度' },
+  ]);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>図形と方程式</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>図形と方程式</h1>
+    <p class="lede">点をドラッグして、直線の方程式・点と直線の距離、内分点・外分点、円と直線の位置関係、軌跡と領域がどう変わるかを確かめます。座標はすべて 0.5 刻みに揃うので、式の係数を手計算と照らし合わせられます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 直線の方程式 -->
+  <section class="tool-body" data-tab="line">
+    <div class="layout">
+      <aside class="controls" id="c-line"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-line"></canvas><div class="caption">A, B, P をドラッグできます</div></div>
+        <div class="readout" id="r-line"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">2 点を通る直線と、点と直線の距離</div>
+        2 点 $\mathrm{A}(x_1,y_1),\ \mathrm{B}(x_2,y_2)$ を通る直線は、$x_1\ne x_2$ のとき $y-y_1=\dfrac{y_2-y_1}{x_2-x_1}(x-x_1)$。整理して $ax+by+c=0$ の形にすると、点 $\mathrm{P}(x_0,y_0)$ との距離は
+        $$d=\frac{|ax_0+by_0+c|}{\sqrt{a^2+b^2}}$$
+      </div>
+      <ul>
+        <li>A と B を動かして、傾き $m$ の分子・分母がそれぞれ $y$ の差・$x$ の差になっていることを確かめよう。A と B の $x$ 座標をそろえると $x=$ 定数 の直線になり、$y=mx+n$ の形では書けない。</li>
+        <li>P を動かすと、垂線の足 H と距離 $d$ が変わる。P が直線上に乗ると $ax_0+by_0+c=0$、つまり $d=0$。</li>
+        <li>「P を通る直線 m」を出して平行・垂直を切り替える。平行なら $a,b$ が同じで $c$ だけ違い、垂直なら傾きの積が $-1$（$m_1m_2=-1$）になる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 内分点・外分点 -->
+  <section class="tool-body" data-tab="division">
+    <div class="layout">
+      <aside class="controls" id="c-division"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-division"></canvas><div class="caption">A, B（と C）をドラッグできます</div></div>
+        <div class="readout" id="r-division"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">内分点・外分点の公式</div>
+        線分 AB を $m:n$ に内分する点は $\left(\dfrac{nx_1+mx_2}{m+n},\ \dfrac{ny_1+my_2}{m+n}\right)$、外分する点は $\left(\dfrac{-nx_1+mx_2}{m-n},\ \dfrac{-ny_1+my_2}{m-n}\right)$。
+        「A に近い方に $n$、B に近い方に $m$」とたすき掛けに掛けるのがポイント。三角形 ABC の重心は $\left(\dfrac{x_1+x_2+x_3}{3},\ \dfrac{y_1+y_2+y_3}{3}\right)$。
+      </div>
+      <ul>
+        <li>$m:n$ を変えると、P が線分 AB 上を動く。$m=n$ なら中点。$m$ を大きくすると P は B に近づく（$m$ は AP の長さの比）。</li>
+        <li>「外分」に切り替えると、P は線分の外側に飛び出す。$m>n$ なら B の向こう側、$m\lt n$ なら A の向こう側。$m=n$ のとき外分点は存在しない（分母が 0）。</li>
+        <li>「重心」を入れると、3 本の中線の交点 G が現れる。G は各中線を $2:1$ に内分している。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 円と直線 -->
+  <section class="tool-body" data-tab="circle">
+    <div class="layout">
+      <aside class="controls" id="c-circle"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-circle"></canvas><div class="caption">中心・半径の点・直線上の 2 点をドラッグできます</div></div>
+        <div class="readout" id="r-circle"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">円と直線の位置関係は「中心と直線の距離」で決まる</div>
+        円 $(x-a)^2+(y-b)^2=r^2$ と直線 $\ell$ について、中心から $\ell$ までの距離を $d$ とすると、
+        $d\lt r$ なら 2 点で交わる、$d=r$ なら接する、$d>r$ なら共有点をもたない。判別式 $D$ で調べるのと同じ結果になります。
+      </div>
+      <div class="note sage">
+        <div class="title">接線の方程式</div>
+        円 $x^2+y^2=r^2$ 上の点 $(x_1,y_1)$ における接線は $x_1x+y_1y=r^2$。中心が $(a,b)$ なら $(x_1-a)(x-a)+(y_1-b)(y-b)=r^2$。接線は半径 OT と垂直です。
+      </div>
+      <ul>
+        <li>直線の 2 点を動かして、$d$ と $r$ の大小が切り替わる瞬間に交点が 2 個 → 1 個 → 0 個と変わるのを見る。</li>
+        <li>中心が原点でないときの展開形 $x^2+y^2+lx+my+n=0$ を見て、$l=-2a,\ m=-2b$ から中心が読み取れることを確かめよう。</li>
+        <li>「接線」を入れて T を円の上で動かすと、接線の式の $x,y$ の係数が T の座標そのものになる（中心が原点のとき）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 軌跡と領域 -->
+  <section class="tool-body" data-tab="locus">
+    <div class="layout">
+      <aside class="controls" id="c-locus"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-locus"></canvas><div class="caption" id="cap-locus">A, B, P をドラッグできます</div></div>
+        <div class="readout" id="r-locus"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">軌跡：条件を式にする</div>
+        2 定点 A, B からの距離の比が $k:1$（$k\ne1$）である点 P の軌跡は円（アポロニウスの円）。$\mathrm{AP}^2=k^2\mathrm{BP}^2$ を座標で書いて整理すると円の方程式になり、その円は AB を $k:1$ に内分する点と外分する点を直径の両端にもちます。$k=1$ のときは AB の垂直二等分線。
+      </div>
+      <div class="note sage">
+        <div class="title">領域：境界線で分けて、どちら側かを調べる</div>
+        不等式 $y>f(x)$ の表す領域は曲線 $y=f(x)$ の上側、$x^2+y^2\lt r^2$ は円の内部。連立不等式の領域は共通部分。等号を含まなければ境界は点線（含まない）、含めば実線。
+      </div>
+      <ul>
+        <li>軌跡：$k$ を動かして円の大きさと中心の位置がどう変わるかを見る。$k$ が 1 に近づくと円は大きくなり、$k=1$ で直線になる。P を動かしても $\mathrm{AP}:\mathrm{BP}$ は $k:1$ のまま。</li>
+        <li>領域：不等号の向きを切り替えて塗られる側が変わることを確認する。3 つを重ねると共通部分だけが残る。</li>
+        <li>線形計画法：$x+y=k$ の直線を動かし、領域と共有点をもつ範囲で $k$ がどこまで大きくできるかを見る。最大になるのは直線が領域の端（頂点や境界）に触れるとき。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学II', title: '図形と方程式' });
+
+  const snap = (x) => Math.round(x * 2) / 2;
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const sgn = (x, d = 2) => (x < 0 ? '-' : '+') + fmt(Math.abs(x), d);
+  /** 既約分数の TeX（負号は前に） */
+  const frac = (p, q) => {
+    if (q < 0) { p = -p; q = -q; }
+    const g = UI.gcd(p, q) || 1; p /= g; q /= g;
+    if (q === 1) return String(p);
+    return (p < 0 ? '-' : '') + `\\frac{${Math.abs(p)}}{${q}}`;
+  };
+  /** 数値 → できれば分数の TeX */
+  const num = (x, d = 2) => { const f = UI.toFrac(x, 24); return f ? frac(f[0], f[1]) : fmt(x, d); };
+  /** 2 点を通る直線 ax+by+c=0 の整数係数（座標は 0.5 刻み） */
+  function lineInts(x1, y1, x2, y2) {
+    let a = Math.round((y2 - y1) * 4), b = Math.round((x1 - x2) * 4), c = Math.round(-((y2 - y1) * x1 + (x1 - x2) * y1) * 4);
+    const g = UI.gcd(UI.gcd(a, b), c) || 1; a /= g; b /= g; c /= g;
+    if (a < 0 || (a === 0 && b < 0)) { a = -a; b = -b; c = -c; }
+    return [a, b, c];
+  }
+  const texABC = (a, b, c) => { const s = (UI.texTerm(a, 'x', 0, true) + ' ' + UI.texTerm(b, 'y', 0) + ' ' + UI.texTerm(c, '', 0)).trim().replace(/^\+\s*/, ''); return (s || '0') + '=0'; };
+  /** ax+by+c=0 → y=mx+n または x=k の TeX */
+  function texSlope(a, b, c) {
+    if (b === 0) return `x=${frac(-c, a)}`;
+    const m = frac(-a, b), n = frac(-c, b);
+    let s = 'y=';
+    if (m === '0') s += '';
+    else if (m === '1') s += 'x';
+    else if (m === '-1') s += '-x';
+    else s += m + 'x';
+    if (n !== '0') s += (s === 'y=' ? '' : (n.startsWith('-') ? '' : '+')) + n;
+    if (s === 'y=') s += '0';
+    return s;
+  }
+  const dist = (ax, ay, bx, by) => Math.hypot(bx - ax, by - ay);
+  const par = (x, d = 2) => x < 0 ? `(${fmt(x, d)})` : fmt(x, d);
+  const sqTex = (v, sym) => Math.abs(v) < 1e-9 ? `${sym}^2` : `(${sym}${sgn(-v, 2)})^2`;
+  const pt = (x, y) => `(${fmt(x, 1)},\\ ${fmt(y, 1)})`;
+
+  /* ======================= 直線の方程式 ======================= */
+  (() => {
+    const ctl = $('#c-line');
+    const st = { A: [-3, -1], B: [2, 3], P: [3, -2], second: false, rel: 'parallel' };
+    const plot = new Plot('#cv-line', { xmin: -6, xmax: 6, ymin: -6, ymax: 6 });
+    const mk = (key, color, label) => plot.addHandle({ x: st[key][0], y: st[key][1], color, label, onMove: (x, y) => { st[key] = [clamp(snap(x), -6, 6), clamp(snap(y), -6, 6)]; return st[key]; } });
+    const hA = mk('A', C.ink, 'A'), hB = mk('B', C.ink, 'B'), hP = mk('P', C.ochre, 'P');
+
+    UI.heading(ctl, '直線を決める 2 点');
+    UI.note(ctl, { tone: 'ink', html: 'A, B をドラッグして直線 $\\ell$ を決めます。P（橙）は距離を測る点です。' });
+    UI.buttonRow(ctl, [
+      { label: 'リセット', small: true, onClick: () => { st.A = [-3, -1]; st.B = [2, 3]; st.P = [3, -2]; draw(); } },
+      { label: 'P を l の上に', small: true, onClick: () => { st.P = st.B.slice(); draw(); } },
+    ]);
+    UI.heading(ctl, '点と直線の距離');
+    const showPerp = UI.checkbox(ctl, { label: '垂線 PH と距離を表示', checked: true, onChange: draw });
+    UI.heading(ctl, 'もう 1 本の直線');
+    const chkM = UI.checkbox(ctl, { label: '直線 m を表示', checked: false, onChange: (v) => { st.second = v; draw(); } });
+    UI.segmented(ctl, { options: [{ value: 'parallel', label: 'l に平行' }, { value: 'perp', label: 'l に垂直' }], value: 'parallel', onChange: (v) => { st.rel = v; if (!st.second) chkM.set(true); st.second = true; draw(); } });
+
+    const readout = $('#r-line');
+    function draw() {
+      hA.x = st.A[0]; hA.y = st.A[1]; hB.x = st.B[0]; hB.y = st.B[1]; hP.x = st.P[0]; hP.y = st.P[1];
+      const [x1, y1] = st.A, [x2, y2] = st.B, [x0, y0] = st.P;
+      const same = x1 === x2 && y1 === y2;
+      const [a, b, c] = same ? [0, 0, 0] : lineInts(x1, y1, x2, y2);
+      const nn = a * a + b * b;
+      const val = a * x0 + b * y0 + c;
+      const d = same ? NaN : Math.abs(val) / Math.sqrt(nn);
+      const t = same ? 0 : val / nn;
+      const H = [x0 - a * t, y0 - b * t];
+      let m2 = null;
+      if (st.second && !same) {
+        let A2, B2, C2;
+        if (st.rel === 'parallel') { A2 = a; B2 = b; C2 = -(a * x0 + b * y0); } else { A2 = b; B2 = -a; C2 = -(b * x0 - a * y0); }
+        let A3 = Math.round(A2 * 2), B3 = Math.round(B2 * 2), C3 = Math.round(C2 * 2);
+        const g = UI.gcd(UI.gcd(A3, B3), C3) || 1; A3 /= g; B3 /= g; C3 /= g;
+        if (A3 < 0 || (A3 === 0 && B3 < 0)) { A3 = -A3; B3 = -B3; C3 = -C3; }
+        m2 = [A3, B3, C3];
+      }
+      plot.render((P) => {
+        if (!same) {
+          P.lineABC(a, b, c, { color: C.ink, width: 2.4 });
+          P.text(x2, y2, 'l', { color: C.inkText, font: Plot.FONT_MATH, dx: 14, dy: 18, bg: true });
+        }
+        if (m2) {
+          P.lineABC(m2[0], m2[1], m2[2], { color: C.sage, width: 2, dash: [8, 6] });
+          if (st.rel === 'perp' && !same) P.angleMark(x0, y0, x0 - b, y0 + a, x0 + a, y0 + b, { r: 0.5, right: true, color: C.sage });
+        }
+        if (showPerp.get() && !same && d > 1e-9) {
+          P.segment(x0, y0, H[0], H[1], { color: C.clay, width: 1.6, dash: [5, 4] });
+          P.angleMark(H[0], H[1], x0, y0, x2 === H[0] && y2 === H[1] ? x1 : x2, x2 === H[0] && y2 === H[1] ? y1 : y2, { r: 0.4, right: true, color: C.clay });
+          P.point(H[0], H[1], { color: C.clay, r: 5, label: 'H', dx: 8, dy: 16 });
+          P.text((x0 + H[0]) / 2, (y0 + H[1]) / 2, `d = ${fmt(d, 3)}`, { color: C.clay, dx: 8, dy: -6, bg: true });
+        }
+      });
+      if (same) { readout.innerHTML = '<p class="small">A と B が一致しています。別の点に動かしてください。</p>'; return; }
+      const slopeTex = b === 0 ? '\\text{傾きなし（}y\\text{ 軸に平行）}' : `m=\\frac{y_2-y_1}{x_2-x_1}=\\frac{${fmt(y2, 1)}-(${fmt(y1, 1)})}{${fmt(x2, 1)}-(${fmt(x1, 1)})}=${frac(Math.round((y2 - y1) * 2), Math.round((x2 - x1) * 2))}`;
+      let html = `
+        <div class="tex-block">$$\\ell:\\ ${texSlope(a, b, c)}\\qquad\\Longleftrightarrow\\qquad ${texABC(a, b, c)}$$</div>
+        <div class="tex-block small">$$${slopeTex}$$</div>
+        <div class="kv">
+          <span class="k">A, B</span><span class="v">A(${fmt(x1, 1)}, ${fmt(y1, 1)})　B(${fmt(x2, 1)}, ${fmt(y2, 1)})</span>
+          <span class="k">P</span><span class="v">P(${fmt(x0, 1)}, ${fmt(y0, 1)})　H(${fmt(H[0], 3)}, ${fmt(H[1], 3)})</span>
+        </div>`;
+      if (showPerp.get()) html += `
+        <div class="tex-block">$$d=\\frac{|ax_0+by_0+c|}{\\sqrt{a^2+b^2}}=\\frac{|${a}\\cdot(${fmt(x0, 1)})${sgn(b, 0)}\\cdot(${fmt(y0, 1)})${sgn(c, 0)}|}{\\sqrt{${par(a, 0)}^2+${par(b, 0)}^2}}=\\frac{${fmt(Math.abs(val), 2)}}{\\sqrt{${nn}}}${d > 0 ? '=' + fmt(d, 3) : '=0'}$$</div>
+        <div class="readout-grid">
+          <div class="stat clay"><div class="k">点 P と直線 l の距離 d</div><div class="v">${fmt(d, 3)}${d < 1e-9 ? '（P は l 上）' : ''}</div></div>
+          <div class="stat"><div class="k">傾き</div><div class="v">${b === 0 ? 'なし' : fmt(-a / b, 3)}</div></div>
+        </div>`;
+      if (m2) {
+        const m1 = b === 0 ? null : -a / b, mm = m2[1] === 0 ? null : -m2[0] / m2[1];
+        const prodTxt = st.rel === 'parallel'
+          ? `m_1=m_2${m1 == null ? '（どちらも y 軸に平行）' : '=' + num(m1)}`
+          : (m1 == null || mm == null ? '\\text{一方が }x\\text{ 軸、他方が }y\\text{ 軸に平行}' : `m_1 m_2=(${num(m1)})\\times(${num(mm)})=${fmt(m1 * mm, 2)}`);
+        html += `
+          <hr>
+          <div class="tex-block">$$m:\\ ${texSlope(m2[0], m2[1], m2[2])}\\qquad\\Longleftrightarrow\\qquad ${texABC(m2[0], m2[1], m2[2])}\\qquad(${st.rel === 'parallel' ? '\\ell\\parallel m' : '\\ell\\perp m'})$$</div>
+          <div class="tex-block small">$$${prodTxt}$$</div>`;
+      }
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    plot.onChange = draw;
+    draw();
+  })();
+
+  /* ======================= 内分点・外分点 ======================= */
+  (() => {
+    const ctl = $('#c-division');
+    const st = { A: [-4, -2], B: [3, 2], Cc: [-1, 4], m: 2, n: 3, mode: 'in', centroid: false };
+    const plot = new Plot('#cv-division', { xmin: -7, xmax: 7, ymin: -6, ymax: 6 });
+    const mk = (key, color, label, vis) => plot.addHandle({ x: st[key][0], y: st[key][1], color, label, visible: vis, onMove: (x, y) => { st[key] = [clamp(snap(x), -7, 7), clamp(snap(y), -6, 6)]; return st[key]; } });
+    const hA = mk('A', C.ink, 'A'), hB = mk('B', C.ink, 'B'), hC = mk('Cc', C.ochre, 'C', () => st.centroid);
+
+    UI.heading(ctl, '内分・外分の比');
+    const sM = UI.slider(ctl, { label: '$m$', min: 1, max: 5, step: 1, value: st.m, digits: 0, onInput: (v) => { st.m = v; draw(); } });
+    const sN = UI.slider(ctl, { label: '$n$', min: 1, max: 5, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+    UI.segmented(ctl, { options: [{ value: 'in', label: '内分' }, { value: 'out', label: '外分' }], value: 'in', onChange: (v) => { st.mode = v; draw(); } });
+    UI.divider(ctl);
+    UI.checkbox(ctl, { label: '点 C と三角形 ABC の重心 G', checked: false, onChange: (v) => { st.centroid = v; draw(); } });
+    UI.buttonRow(ctl, [{ label: 'リセット', small: true, onClick: () => { st.A = [-4, -2]; st.B = [3, 2]; st.Cc = [-1, 4]; draw(); } }]);
+
+    const readout = $('#r-division');
+    function draw() {
+      hA.x = st.A[0]; hA.y = st.A[1]; hB.x = st.B[0]; hB.y = st.B[1]; hC.x = st.Cc[0]; hC.y = st.Cc[1];
+      const [x1, y1] = st.A, [x2, y2] = st.B, [x3, y3] = st.Cc, { m, n } = st;
+      const inner = st.mode === 'in';
+      const den = inner ? m + n : m - n;
+      const Pp = den === 0 ? null : [((inner ? n : -n) * x1 + m * x2) / den, ((inner ? n : -n) * y1 + m * y2) / den];
+      const G = [(x1 + x2 + x3) / 3, (y1 + y2 + y3) / 3];
+      plot.render((P) => {
+        if (st.centroid) {
+          P.polygon([st.A, st.B, st.Cc], { color: C.ochre, width: 1.5, fill: Plot.rgba(C.ochre, 0.06) });
+          P.segment(x1, y1, (x2 + x3) / 2, (y2 + y3) / 2, { color: C.faint, width: 1, dash: [4, 4] });
+          P.segment(x2, y2, (x1 + x3) / 2, (y1 + y3) / 2, { color: C.faint, width: 1, dash: [4, 4] });
+          P.segment(x3, y3, (x1 + x2) / 2, (y1 + y2) / 2, { color: C.faint, width: 1, dash: [4, 4] });
+          P.point(G[0], G[1], { color: C.sage, r: 6, label: 'G', dx: 10, dy: -6 });
+        }
+        if (Pp) {
+          if (!inner) P.line(x1, y1, x2 - x1, y2 - y1, { color: C.ink, width: 1, dash: [3, 5], alpha: 0.6 });
+          P.segment(x1, y1, Pp[0], Pp[1], { color: C.ochre, width: 5, alpha: 0.35 });
+          P.segment(Pp[0], Pp[1], x2, y2, { color: C.clay, width: 5, alpha: 0.35 });
+          const nx = -(y2 - y1), ny = x2 - x1, L = Math.hypot(nx, ny) || 1;
+          const off = 0.55 / L;
+          P.text((x1 + Pp[0]) / 2 + nx * off, (y1 + Pp[1]) / 2 + ny * off, `m = ${m}`, { color: C.ochre, align: 'center', baseline: 'middle', bg: true });
+          P.text((x2 + Pp[0]) / 2 - nx * off, (y2 + Pp[1]) / 2 - ny * off, `n = ${n}`, { color: C.clay, align: 'center', baseline: 'middle', bg: true });
+          P.point(Pp[0], Pp[1], { color: C.sage, r: 6, label: 'P', dx: 8, dy: 18 });
+        }
+        P.segment(x1, y1, x2, y2, { color: C.ink, width: 2.2 });
+      });
+      let html;
+      if (!Pp) {
+        html = `<div class="tex-block">$$\\frac{-nx_1+mx_2}{m-n}\\ \\text{の分母が}\\ m-n=0$$</div><p class="small">$m=n$ のとき外分点は存在しません（線分の外側でその比になる点はない）。$m\\ne n$ にしてください。</p>`;
+      } else {
+        const sN2 = inner ? `${n}` : `(-${n})`;
+        const denTex = inner ? `${m}+${n}` : `${m}-${n}`;
+        const fx = `\\frac{${sN2}\\cdot(${fmt(x1, 1)})+${m}\\cdot(${fmt(x2, 1)})}{${denTex}}`;
+        const fy = `\\frac{${sN2}\\cdot(${fmt(y1, 1)})+${m}\\cdot(${fmt(y2, 1)})}{${denTex}}`;
+        const general = inner ? `\\left(\\frac{nx_1+mx_2}{m+n},\\ \\frac{ny_1+my_2}{m+n}\\right)` : `\\left(\\frac{-nx_1+mx_2}{m-n},\\ \\frac{-ny_1+my_2}{m-n}\\right)`;
+        html = `
+          <div class="tex-block">$$\\mathrm{P}=${general}=\\left(${fx},\\ ${fy}\\right)=\\left(${num(Pp[0])},\\ ${num(Pp[1])}\\right)$$</div>
+          <div class="readout-grid">
+            <div class="stat sage"><div class="k">${inner ? '内分点' : '外分点'} P（m:n = ${m}:${n}）</div><div class="v">(${fmt(Pp[0], 3)}, ${fmt(Pp[1], 3)})</div></div>
+            <div class="stat"><div class="k">AP : PB（長さの比）</div><div class="v">${fmt(dist(x1, y1, Pp[0], Pp[1]), 2)} : ${fmt(dist(Pp[0], Pp[1], x2, y2), 2)}</div></div>
+            <div class="stat"><div class="k">A, B</div><div class="v">(${fmt(x1, 1)}, ${fmt(y1, 1)}), (${fmt(x2, 1)}, ${fmt(y2, 1)})</div></div>
+          </div>`;
+      }
+      if (st.centroid) html += `
+        <hr>
+        <div class="tex-block">$$\\mathrm{G}=\\left(\\frac{x_1+x_2+x_3}{3},\\ \\frac{y_1+y_2+y_3}{3}\\right)=\\left(\\frac{(${fmt(x1, 1)})+(${fmt(x2, 1)})+(${fmt(x3, 1)})}{3},\\ \\frac{(${fmt(y1, 1)})+(${fmt(y2, 1)})+(${fmt(y3, 1)})}{3}\\right)=\\left(${num(G[0])},\\ ${num(G[1])}\\right)$$</div>
+        <p class="small">重心 G は中線（点線）の交点で、各中線を頂点側から $2:1$ に内分する。</p>`;
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    plot.onChange = draw;
+    draw();
+  })();
+
+  /* ======================= 円と直線 ======================= */
+  (() => {
+    const ctl = $('#c-circle');
+    const st = { O: [1, 0.5], r: 3, phi: Math.PI / 4, L1: [-4, 3], L2: [4, 1], tangent: false, psi: Math.PI * 2 / 3 };
+    const plot = new Plot('#cv-circle', { xmin: -7, xmax: 7, ymin: -6, ymax: 6 });
+    const hO = plot.addHandle({ x: st.O[0], y: st.O[1], color: C.ochre, label: 'C', onMove: (x, y) => { st.O = [clamp(snap(x), -6, 6), clamp(snap(y), -5, 5)]; return st.O; } });
+    const hR = plot.addHandle({ x: 0, y: 0, color: C.ochre, label: 'r', onMove: (x, y) => {
+      const dx = x - st.O[0], dy = y - st.O[1];
+      st.r = clamp(Math.round(Math.hypot(dx, dy) * 2) / 2, 0.5, 6); st.phi = Math.atan2(dy, dx); sR.set(st.r);
+      return [st.O[0] + st.r * Math.cos(st.phi), st.O[1] + st.r * Math.sin(st.phi)];
+    } });
+    const hL1 = plot.addHandle({ x: st.L1[0], y: st.L1[1], color: C.ink, r: 6, onMove: (x, y) => { st.L1 = [clamp(snap(x), -7, 7), clamp(snap(y), -6, 6)]; return st.L1; } });
+    const hL2 = plot.addHandle({ x: st.L2[0], y: st.L2[1], color: C.ink, r: 6, onMove: (x, y) => { st.L2 = [clamp(snap(x), -7, 7), clamp(snap(y), -6, 6)]; return st.L2; } });
+    const hT = plot.addHandle({ x: 0, y: 0, color: C.sage, label: 'T', visible: () => st.tangent, onMove: (x, y) => {
+      st.psi = Math.round(Math.atan2(y - st.O[1], x - st.O[0]) / (Math.PI / 12)) * (Math.PI / 12);
+      return [st.O[0] + st.r * Math.cos(st.psi), st.O[1] + st.r * Math.sin(st.psi)];
+    } });
+
+    UI.heading(ctl, '円');
+    const sR = UI.slider(ctl, { label: '半径 $r$', min: 0.5, max: 6, step: 0.5, value: st.r, digits: 1, onInput: (v) => { st.r = v; draw(); } });
+    UI.buttonRow(ctl, [
+      { label: '中心を原点に', small: true, onClick: () => { st.O = [0, 0]; draw(); } },
+      { label: 'リセット', small: true, onClick: () => { st.O = [1, 0.5]; st.r = 3; st.L1 = [-4, 3]; st.L2 = [4, 1]; sR.set(3); draw(); } },
+    ]);
+    UI.heading(ctl, '直線');
+    UI.note(ctl, { tone: 'ink', html: '直線上の 2 つの青い点をドラッグして直線を動かします。' });
+    UI.buttonRow(ctl, [{ label: '直線を接するように', small: true, onClick: () => {
+      const [a, b, c] = lineInts(st.L1[0], st.L1[1], st.L2[0], st.L2[1]);
+      const nn = Math.sqrt(a * a + b * b); if (!nn) return;
+      const dd = (a * st.O[0] + b * st.O[1] + c) / nn;
+      const shift = dd - (dd >= 0 ? 1 : -1) * st.r;
+      st.L1 = [st.L1[0] + a / nn * shift, st.L1[1] + b / nn * shift];
+      st.L2 = [st.L2[0] + a / nn * shift, st.L2[1] + b / nn * shift];
+      draw();
+    } }]);
+    UI.heading(ctl, '接線');
+    UI.checkbox(ctl, { label: '円周上の点 T での接線', checked: false, onChange: (v) => { st.tangent = v; draw(); } });
+
+    const readout = $('#r-circle');
+    function draw() {
+      const [p, q] = st.O, r = st.r;
+      hO.x = p; hO.y = q; hR.x = p + r * Math.cos(st.phi); hR.y = q + r * Math.sin(st.phi);
+      hL1.x = st.L1[0]; hL1.y = st.L1[1]; hL2.x = st.L2[0]; hL2.y = st.L2[1];
+      const T = [p + r * Math.cos(st.psi), q + r * Math.sin(st.psi)];
+      hT.x = T[0]; hT.y = T[1];
+      const snapped = Number.isInteger(st.L1[0] * 2) && Number.isInteger(st.L1[1] * 2) && Number.isInteger(st.L2[0] * 2) && Number.isInteger(st.L2[1] * 2);
+      const same = st.L1[0] === st.L2[0] && st.L1[1] === st.L2[1];
+      let a, b, c;
+      if (snapped) [a, b, c] = lineInts(st.L1[0], st.L1[1], st.L2[0], st.L2[1]);
+      else { a = st.L2[1] - st.L1[1]; b = st.L1[0] - st.L2[0]; c = -(a * st.L1[0] + b * st.L1[1]); if (a < 0 || (a === 0 && b < 0)) { a = -a; b = -b; c = -c; } }
+      const nn = Math.sqrt(a * a + b * b);
+      const val = a * p + b * q + c;
+      const d = same ? NaN : Math.abs(val) / nn;
+      const t = same ? 0 : val / (nn * nn);
+      const H = [p - a * t, q - b * t];
+      const rel = same ? null : d < r - 1e-9 ? 'cross' : Math.abs(d - r) <= 1e-9 ? 'touch' : 'none';
+      const pts = [];
+      if (rel === 'cross') { const h = Math.sqrt(r * r - d * d); const ux = -b / nn, uy = a / nn; pts.push([H[0] + ux * h, H[1] + uy * h], [H[0] - ux * h, H[1] - uy * h]); }
+      else if (rel === 'touch') pts.push(H);
+      plot.render((P) => {
+        P.circle(p, q, r, { color: C.ink, width: 2.4, fill: Plot.rgba(C.ink, 0.05) });
+        P.segment(p, q, hR.x, hR.y, { color: C.ochre, width: 1.2, dash: [4, 4] });
+        if (!same) {
+          P.lineABC(a, b, c, { color: C.ink, width: 2 });
+          P.segment(p, q, H[0], H[1], { color: C.clay, width: 1.5, dash: [5, 4] });
+          P.point(H[0], H[1], { color: C.clay, r: 4.5, label: 'H', dx: 8, dy: 16 });
+          P.text((p + H[0]) / 2, (q + H[1]) / 2, `d = ${fmt(d, 2)}`, { color: C.clay, dx: 8, dy: -4, bg: true });
+          pts.forEach((pt2, i) => P.point(pt2[0], pt2[1], { color: rel === 'touch' ? C.ochre : C.sage, r: 6, label: rel === 'touch' ? '接点' : `(${fmt(pt2[0], 2)}, ${fmt(pt2[1], 2)})`, dx: 10, dy: i ? 18 : -8 }));
+        }
+        if (st.tangent) {
+          P.line(T[0], T[1], -(T[1] - q), T[0] - p, { color: C.sage, width: 2.2, dash: [8, 5] });
+          P.segment(p, q, T[0], T[1], { color: C.sage, width: 1.2 });
+          P.angleMark(T[0], T[1], p, q, T[0] - (T[1] - q), T[1] + (T[0] - p), { r: 0.45, right: true, color: C.sage });
+        }
+      });
+      const circTex = `${sqTex(p, 'x')}+${sqTex(q, 'y')}=${fmt(r, 1)}^2`;
+      const circTex2 = (p === 0 && q === 0) ? `x^2+y^2=${fmt(r * r, 2)}` : `x^2+y^2${UI.texTerm(-2 * p, 'x', 1)}${UI.texTerm(-2 * q, 'y', 1)}${UI.texTerm(p * p + q * q - r * r, '', 2)}=0`;
+      let html = `<div class="tex-block">$$\\text{円 }C:\\ ${circTex}\\quad\\Longleftrightarrow\\quad ${circTex2}$$</div>`;
+      if (same) html += '<p class="small">直線の 2 点が一致しています。</p>';
+      else {
+        const lineTex = snapped ? `${texSlope(a, b, c)}\\quad\\Longleftrightarrow\\quad ${texABC(a, b, c)}` : `${fmt(a, 2)}x${sgn(b, 2)}y${sgn(c, 2)}=0`;
+        const relTxt = rel === 'cross' ? '異なる 2 点で交わる' : rel === 'touch' ? '接する（1 点を共有）' : '共有点なし';
+        const tone = rel === 'cross' ? 'sage' : rel === 'touch' ? 'ochre' : 'clay';
+        const cmp = rel === 'cross' ? '<' : rel === 'touch' ? '=' : '>';
+        html += `
+          <div class="tex-block">$$\\text{直線 }\\ell:\\ ${lineTex}$$</div>
+          <div class="tex-block">$$d=\\frac{|${fmt(a, 2)}\\cdot(${fmt(p, 1)})${sgn(b, 2)}\\cdot(${fmt(q, 1)})${sgn(c, 2)}|}{\\sqrt{${par(a, 2)}^2+${par(b, 2)}^2}}=${fmt(d, 3)}\\ ${cmp}\\ ${fmt(r, 1)}=r$$</div>
+          <div class="readout-grid">
+            <div class="stat clay"><div class="k">中心と直線の距離 d</div><div class="v">${fmt(d, 3)}</div></div>
+            <div class="stat ink"><div class="k">半径 r</div><div class="v">${fmt(r, 1)}</div></div>
+            <div class="stat ${tone}"><div class="k">位置関係（d ${cmp} r）</div><div class="v">${relTxt}</div></div>
+            <div class="stat"><div class="k">共有点</div><div class="v">${pts.length ? pts.map((pt2) => `(${fmt(pt2[0], 2)}, ${fmt(pt2[1], 2)})`).join('<br>') : 'なし'}</div></div>
+          </div>`;
+      }
+      if (st.tangent) {
+        const x1 = T[0], y1 = T[1];
+        const tanTex = (p === 0 && q === 0)
+          ? `${fmt(x1, 2)}\\,x${sgn(y1, 2)}\\,y=${fmt(r * r, 2)}`
+          : `(${fmt(x1, 2)}${sgn(-p, 1)})(x${sgn(-p, 1)})+(${fmt(y1, 2)}${sgn(-q, 1)})(y${sgn(-q, 1)})=${fmt(r * r, 2)}`;
+        html += `
+          <hr>
+          <div class="tex-block">$$\\text{T}(${fmt(x1, 2)},\\ ${fmt(y1, 2)})\\ \\text{における接線}:\\quad ${(p === 0 && q === 0) ? 'x_1x+y_1y=r^2' : '(x_1-a)(x-a)+(y_1-b)(y-b)=r^2'}\\quad\\Longrightarrow\\quad ${tanTex}$$</div>
+          <p class="small">接線は半径 CT に垂直。T は 15° 刻みで円周上を動きます。</p>`;
+      }
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    plot.onChange = draw;
+    draw();
+  })();
+
+  /* ======================= 軌跡と領域 ======================= */
+  (() => {
+    const ctl = $('#c-locus');
+    const st = { mode: 'locus', A: [-2, 0], B: [3, 0], k: 2, P: [1, 2],
+      ineq: [
+        { on: true, op: '>=', a: 1, b: -1 },
+        { on: true, op: '<=', r: 3 },
+        { on: true, op: '<=', c: 1 },
+      ], lp: false, kobj: 2 };
+    const plot = new Plot('#cv-locus', { xmin: -7, xmax: 7, ymin: -6, ymax: 6 });
+    const isLocus = () => st.mode === 'locus';
+    const hA = plot.addHandle({ x: st.A[0], y: st.A[1], color: C.ink, label: 'A', visible: isLocus, onMove: (x, y) => { st.A = [clamp(snap(x), -7, 7), clamp(snap(y), -6, 6)]; return st.A; } });
+    const hB = plot.addHandle({ x: st.B[0], y: st.B[1], color: C.ink, label: 'B', visible: isLocus, onMove: (x, y) => { st.B = [clamp(snap(x), -7, 7), clamp(snap(y), -6, 6)]; return st.B; } });
+    const hP = plot.addHandle({ x: st.P[0], y: st.P[1], color: C.ochre, label: 'P', visible: isLocus, onMove: (x, y) => { st.P = projectToLocus(x, y); return st.P; } });
+
+    UI.segmented(ctl, { options: [{ value: 'locus', label: '軌跡' }, { value: 'region', label: '領域' }], value: 'locus', onChange: (v) => { st.mode = v; boxL.style.display = v === 'locus' ? '' : 'none'; boxR.style.display = v === 'region' ? '' : 'none'; $('#cap-locus').textContent = v === 'locus' ? 'A, B, P をドラッグできます' : '塗られた部分が連立不等式の表す領域'; draw(); } });
+    const boxL = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    const boxR = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(boxL, boxR);
+    boxR.style.display = 'none';
+
+    UI.heading(boxL, '距離の比');
+    const sK = UI.slider(boxL, { label: '$k$（AP : BP = $k$ : 1）', min: 0.5, max: 3, step: 0.1, value: st.k, digits: 1, onInput: (v) => { st.k = v; st.P = projectToLocus(st.P[0], st.P[1]); draw(); } });
+    UI.buttonRow(boxL, [
+      { label: 'k = 1（垂直二等分線）', small: true, onClick: () => { st.k = 1; sK.set(1); st.P = projectToLocus(st.P[0], st.P[1]); draw(); } },
+      { label: 'k = 2', small: true, onClick: () => { st.k = 2; sK.set(2); st.P = projectToLocus(st.P[0], st.P[1]); draw(); } },
+    ]);
+    UI.note(boxL, { tone: 'ochre', html: 'P は軌跡の上を滑るように動きます。$\\mathrm{AP}:\\mathrm{BP}$ がつねに $k:1$ であることを読み取り欄で確かめてください。' });
+
+    const opOpts = (list) => list.map((o) => ({ value: o, label: { '>': '>', '>=': '≥', '<': '<', '<=': '≤' }[o] }));
+    UI.heading(boxR, '① 直線');
+    const q1 = st.ineq[0];
+    UI.checkbox(boxR, { label: '$y \\lessgtr ax+b$ を使う', checked: true, onChange: (v) => { q1.on = v; draw(); } });
+    UI.segmented(boxR, { options: opOpts(['>', '>=', '<', '<=']), value: q1.op, onChange: (v) => { q1.op = v; draw(); } });
+    UI.slider(boxR, { label: '$a$', min: -3, max: 3, step: 0.5, value: q1.a, digits: 1, onInput: (v) => { q1.a = v; draw(); } });
+    UI.slider(boxR, { label: '$b$', min: -5, max: 5, step: 0.5, value: q1.b, digits: 1, onInput: (v) => { q1.b = v; draw(); } });
+    UI.heading(boxR, '② 円');
+    const q2 = st.ineq[1];
+    UI.checkbox(boxR, { label: '$x^2+y^2 \\lessgtr r^2$ を使う', checked: true, onChange: (v) => { q2.on = v; draw(); } });
+    UI.segmented(boxR, { options: opOpts(['<', '<=', '>', '>=']), value: q2.op, onChange: (v) => { q2.op = v; draw(); } });
+    UI.slider(boxR, { label: '$r$', min: 0.5, max: 5, step: 0.5, value: q2.r, digits: 1, onInput: (v) => { q2.r = v; draw(); } });
+    UI.heading(boxR, '③ 放物線');
+    const q3 = st.ineq[2];
+    UI.checkbox(boxR, { label: '$y \\lessgtr x^2+c$ を使う', checked: true, onChange: (v) => { q3.on = v; draw(); } });
+    UI.segmented(boxR, { options: opOpts(['<', '<=', '>', '>=']), value: q3.op, onChange: (v) => { q3.op = v; draw(); } });
+    UI.slider(boxR, { label: '$c$', min: -5, max: 5, step: 0.5, value: q3.c, digits: 1, onInput: (v) => { q3.c = v; draw(); } });
+    UI.heading(boxR, '線形計画法');
+    UI.checkbox(boxR, { label: '$x+y=k$ の直線を表示', checked: false, onChange: (v) => { st.lp = v; draw(); } });
+    const sObj = UI.slider(boxR, { label: '$k$', min: -8, max: 8, step: 0.05, value: st.kobj, digits: 2, onInput: (v) => { st.kobj = v; draw(); } });
+    UI.buttonRow(boxR, [{ label: 'k を最大値に合わせる', small: true, onClick: () => { const s = scanObjective(); if (s.max) { st.kobj = Math.round(s.max.v * 100) / 100; sObj.set(st.kobj); st.lp = true; draw(); } } }]);
+
+    /* --- 軌跡 --- */
+    function locusData() {
+      const [x1, y1] = st.A, [x2, y2] = st.B, k = st.k, k2 = k * k;
+      if (Math.abs(k - 1) < 1e-9) {
+        const a = 2 * (x2 - x1), b = 2 * (y2 - y1), c = x1 * x1 + y1 * y1 - x2 * x2 - y2 * y2;
+        let A = Math.round(a * 4), B = Math.round(b * 4), Cc = Math.round(c * 4);
+        const g = UI.gcd(UI.gcd(A, B), Cc) || 1; A /= g; B /= g; Cc /= g;
+        if (A < 0 || (A === 0 && B < 0)) { A = -A; B = -B; Cc = -Cc; }
+        return { line: true, a, b, c, ints: [A, B, Cc] };
+      }
+      const cx = (x1 - k2 * x2) / (1 - k2), cy = (y1 - k2 * y2) / (1 - k2);
+      const cc = (x1 * x1 + y1 * y1 - k2 * (x2 * x2 + y2 * y2)) / (1 - k2);
+      const R = Math.sqrt(Math.max(0, cx * cx + cy * cy - cc));
+      return { line: false, cx, cy, R, cc };
+    }
+    function projectToLocus(x, y) {
+      const L = locusData();
+      if (L.line) {
+        const nn = L.a * L.a + L.b * L.b; if (!nn) return [x, y];
+        const t = (L.a * x + L.b * y + L.c) / nn; return [x - L.a * t, y - L.b * t];
+      }
+      const ang = Math.atan2(y - L.cy, x - L.cx);
+      return [L.cx + L.R * Math.cos(ang), L.cy + L.R * Math.sin(ang)];
+    }
+    function drawLocus(P) {
+      const [x1, y1] = st.A, [x2, y2] = st.B, k = st.k, L = locusData();
+      const F = (x, y) => (x - x1) ** 2 + (y - y1) ** 2 - k * k * ((x - x2) ** 2 + (y - y2) ** 2);
+      P.segment(x1, y1, x2, y2, { color: C.faint, width: 1, dash: [3, 5] });
+      P.implicit(F, { color: C.sage, width: 2.6, res: 200 });
+      if (!L.line) {
+        P.point(L.cx, L.cy, { color: C.sage, r: 3.5, label: '中心', dx: 8, dy: -8 });
+        const Di = [(x1 + k * x2) / (1 + k), (y1 + k * y2) / (1 + k)];
+        const De = [(x1 - k * x2) / (1 - k), (y1 - k * y2) / (1 - k)];
+        P.point(Di[0], Di[1], { color: C.clay, r: 4, label: '内分点', dx: -20, dy: -8 });
+        P.point(De[0], De[1], { color: C.clay, r: 4, label: '外分点', dx: -20, dy: -8 });
+      }
+      const [px, py] = st.P;
+      P.segment(x1, y1, px, py, { color: C.ochre, width: 1.5 });
+      P.segment(x2, y2, px, py, { color: C.ochre, width: 1.5 });
+      const sideLabel = (qx, qy, ox, oy, str) => {
+        const mx = (qx + px) / 2, my = (qy + py) / 2;
+        let nx = -(py - qy), ny = px - qx; const L2 = Math.hypot(nx, ny) || 1; nx /= L2; ny /= L2;
+        if (nx * (mx - ox) + ny * (my - oy) < 0) { nx = -nx; ny = -ny; }
+        P.text(mx + nx * 0.6, my + ny * 0.6, str, { color: C.ochre, align: 'center', baseline: 'middle', bg: true });
+      };
+      sideLabel(x1, y1, x2, y2, `AP = ${fmt(dist(x1, y1, px, py), 2)}`);
+      sideLabel(x2, y2, x1, y1, `BP = ${fmt(dist(x2, y2, px, py), 2)}`);
+    }
+    function locusReadout() {
+      const [x1, y1] = st.A, [x2, y2] = st.B, k = st.k, k2 = k * k, L = locusData();
+      const [px, py] = st.P;
+      const AP = dist(x1, y1, px, py), BP = dist(x2, y2, px, py);
+      const cond = `\\mathrm{AP}:\\mathrm{BP}=${fmt(k, 1)}:1\\ \\Longleftrightarrow\\ \\mathrm{AP}^2=${fmt(k2, 2)}\\,\\mathrm{BP}^2`;
+      const expand = `${sqTex(x1, 'x')}+${sqTex(y1, 'y')}=${fmt(k2, 2)}\\{${sqTex(x2, 'x')}+${sqTex(y2, 'y')}\\}`;
+      let result;
+      if (L.line) result = `${texABC(...L.ints)}\\quad\\text{（AB の垂直二等分線）}`;
+      else result = `${sqTex(L.cx, 'x')}+${sqTex(L.cy, 'y')}=${fmt(L.R * L.R, 3)}\\quad\\text{中心}\\ (${fmt(L.cx, 2)},\\ ${fmt(L.cy, 2)}),\\ \\text{半径}\\ ${fmt(L.R, 3)}`;
+      return `
+        <div class="tex-block">$$${cond}$$</div>
+        <div class="tex-block small">$$${expand}$$</div>
+        <div class="tex-block">$$\\Longrightarrow\\quad ${result}$$</div>
+        <div class="readout-grid">
+          <div class="stat ochre"><div class="k">P の位置</div><div class="v">(${fmt(px, 2)}, ${fmt(py, 2)})</div></div>
+          <div class="stat"><div class="k">AP, BP</div><div class="v">${fmt(AP, 3)}, ${fmt(BP, 3)}</div></div>
+          <div class="stat sage"><div class="k">AP ÷ BP</div><div class="v">${BP > 1e-9 ? fmt(AP / BP, 3) : '—'}　(k = ${fmt(k, 1)})</div></div>
+        </div>`;
+    }
+
+    /* --- 領域 --- */
+    const cmp = (op, lhs, rhs) => op === '>' ? lhs > rhs : op === '>=' ? lhs >= rhs : op === '<' ? lhs < rhs : lhs <= rhs;
+    const inRegion = (x, y) => {
+      const [q1, q2, q3] = st.ineq;
+      if (q1.on && !cmp(q1.op, y, q1.a * x + q1.b)) return false;
+      if (q2.on && !cmp(q2.op, x * x + y * y, q2.r * q2.r)) return false;
+      if (q3.on && !cmp(q3.op, y, x * x + q3.c)) return false;
+      return true;
+    };
+    function scanObjective() {
+      const w = plot.win;
+      let max = null, min = null;
+      const step = 0.05;
+      const consider = (x, y) => { if (!inRegion(x, y)) return; const v = x + y; if (!max || v > max.v) max = { x, y, v }; if (!min || v < min.v) min = { x, y, v }; };
+      for (let x = Math.ceil(w.xmin / step) * step; x <= w.xmax; x += step) for (let y = Math.ceil(w.ymin / step) * step; y <= w.ymax; y += step) consider(x, y);
+      const refine = (best) => { if (!best) return; const b = { ...best }; for (let x = b.x - step; x <= b.x + step; x += step / 20) for (let y = b.y - step; y <= b.y + step; y += step / 20) consider(x, y); };
+      refine(max); refine(min);
+      const edge = (o) => o && (o.x <= w.xmin + step || o.x >= w.xmax - step || o.y <= w.ymin + step || o.y >= w.ymax - step);
+      return { max, min, maxEdge: edge(max), minEdge: edge(min) };
+    }
+    function drawRegion(P) {
+      const [q1, q2, q3] = st.ineq;
+      const strict = (op) => op === '>' || op === '<';
+      const anyOn = q1.on || q2.on || q3.on;
+      if (anyOn) P.region(inRegion, { fill: Plot.rgba(C.sage, 0.28), step: 3 });
+      if (q1.on) P.fn((x) => q1.a * x + q1.b, { color: C.ink, width: 2, dash: strict(q1.op) ? [7, 6] : [] });
+      if (q2.on) P.circle(0, 0, q2.r, { color: C.ink, width: 2, dash: strict(q2.op) ? [7, 6] : [] });
+      if (q3.on) P.fn((x) => x * x + q3.c, { color: C.ink, width: 2, dash: strict(q3.op) ? [7, 6] : [] });
+      if (st.lp) {
+        P.lineABC(1, 1, -st.kobj, { color: C.ochre, width: 2.2 });
+        P.text(st.kobj, 0, `x+y=${fmt(st.kobj, 2)}`, { color: C.ochre, dx: 6, dy: 18, bg: true });
+        const s = scanObjective();
+        if (s.max) P.point(s.max.x, s.max.y, { color: C.sage, r: 6, label: `最大 ${fmt(s.max.v, 2)}`, dx: 10, dy: -8 });
+        if (s.min) P.point(s.min.x, s.min.y, { color: C.clay, r: 5, label: `最小 ${fmt(s.min.v, 2)}`, dx: 10, dy: 18 });
+      }
+    }
+    function regionReadout() {
+      const [q1, q2, q3] = st.ineq;
+      const opTex = { '>': '>', '>=': '\\ge', '<': '<', '<=': '\\le' };
+      const rows = [];
+      if (q1.on) rows.push(`y ${opTex[q1.op]} ${UI.texPoly([q1.a, q1.b], 'x', 1)}`);
+      if (q2.on) rows.push(`x^2+y^2 ${opTex[q2.op]} ${fmt(q2.r * q2.r, 2)}`);
+      if (q3.on) rows.push(`y ${opTex[q3.op]} ${UI.texPoly([1, 0, q3.c], 'x', 1)}`);
+      let html = rows.length
+        ? `<div class="tex-block">$$\\begin{cases}${rows.join('\\\\')}\\end{cases}$$</div><p class="small">点線の境界は含まない（$<,>$）、実線の境界は含む（$\\le,\\ge$）。塗られた部分が共通部分。</p>`
+        : '<p class="small">不等式を 1 つ以上「使う」にしてください。</p>';
+      if (st.lp) {
+        const s = scanObjective();
+        const strictAny = (q1.on && (q1.op === '>' || q1.op === '<')) || (q2.on && (q2.op === '>' || q2.op === '<')) || (q3.on && (q3.op === '>' || q3.op === '<'));
+        html += `
+          <hr>
+          <div class="tex-block">$$x+y=k\\quad\\Longleftrightarrow\\quad y=-x+k\\qquad(k=${fmt(st.kobj, 2)})$$</div>
+          <div class="readout-grid">
+            <div class="stat sage"><div class="k">領域内での x+y の最大${strictAny ? '（上限）' : ''}</div><div class="v">${s.max ? `${fmt(s.max.v, 2)}　(${fmt(s.max.x, 2)}, ${fmt(s.max.y, 2)})` : '—'}${s.maxEdge ? '<br><span class="small">表示範囲の端に達しています（有界でない）</span>' : ''}</div></div>
+            <div class="stat clay"><div class="k">領域内での x+y の最小${strictAny ? '（下限）' : ''}</div><div class="v">${s.min ? `${fmt(s.min.v, 2)}　(${fmt(s.min.x, 2)}, ${fmt(s.min.y, 2)})` : '—'}${s.minEdge ? '<br><span class="small">表示範囲の端に達しています（有界でない）</span>' : ''}</div></div>
+            <div class="stat ${s.max && st.kobj <= s.max.v + 1e-9 && s.min && st.kobj >= s.min.v - 1e-9 ? 'ochre' : ''}"><div class="k">直線 x+y=k と領域</div><div class="v">${!s.max ? '領域なし' : (st.kobj <= s.max.v + 1e-9 && st.kobj >= s.min.v - 1e-9 ? '共有点あり' : '共有点なし')}</div></div>
+          </div>
+          <p class="small">最大・最小は 0.05 刻みの格子で探索した近似値です。直線 $y=-x+k$ を平行移動して、領域と共有点をもつ最後の位置（$y$ 切片 $k$ が最大）を探すのが線形計画法の考え方。</p>`;
+      }
+      return html;
+    }
+
+    const readout = $('#r-locus');
+    function draw() {
+      hA.x = st.A[0]; hA.y = st.A[1]; hB.x = st.B[0]; hB.y = st.B[1]; hP.x = st.P[0]; hP.y = st.P[1];
+      plot.render((P) => { if (isLocus()) drawLocus(P); else drawRegion(P); });
+      readout.innerHTML = isLocus() ? locusReadout() : regionReadout();
+      UI.texAll(readout);
+    }
+    plot.onChange = draw;
+    st.P = projectToLocus(st.P[0], st.P[1]);
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'line', label: '直線の方程式' },
+    { id: 'division', label: '内分点・外分点' },
+    { id: 'circle', label: '円と直線' },
+    { id: 'locus', label: '軌跡と領域' },
+  ]);
+});
+</script>
+</body>
+</html>

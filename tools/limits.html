@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>極限</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>極限</h1>
+    <p class="lede">数列の極限、関数の極限、無限級数、そして自然対数の底 $e$。「限りなく近づく」を、$\varepsilon$ の帯や左右からの接近、面積の図で目に見える形にします。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 数列の極限 -->
+  <section class="tool-body" data-tab="seq">
+    <div class="layout">
+      <aside class="controls" id="c-seq"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-seq"></canvas><div class="caption">横軸 n、縦軸 aₙ。緑の帯は L±ε</div></div>
+        <div class="readout" id="r-seq"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">数列の収束</div>
+        $n$ を限りなく大きくするとき $a_n$ が一定の値 $L$ に限りなく近づくなら、$\displaystyle\lim_{n\to\infty}a_n=L$ と書き、数列は $L$ に<b>収束</b>するという。
+        「限りなく近づく」とは、どんなに小さい $\varepsilon>0$ をとっても、ある番号 $N(\varepsilon)$ から先の項がすべて帯 $L-\varepsilon\lt a_n\lt L+\varepsilon$ に入る、ということです。
+      </div>
+      <ul>
+        <li>$\varepsilon$ を小さくすると帯が細くなり、帯に入り始める番号 $N(\varepsilon)$ が大きくなる。それでも必ず見つかるのが「収束」。</li>
+        <li>$r^n$ で $r$ を動かすと、$|r|<1$ なら $0$ に収束、$r=1$ なら $1$、$r>1$ なら正の無限大に発散、$r\le-1$ なら振動する。境目の $r=\pm1$ の様子を見比べよう。</li>
+        <li>$\dfrac{\sin n}{n}$ は $-\dfrac1n\le\dfrac{\sin n}{n}\le\dfrac1n$（黄土色の破線）に挟まれる。両側が $0$ に収束するので、はさみうちの原理で $0$ に収束する。</li>
+        <li>$\sqrt{n+1}-\sqrt{n}$ は $\infty-\infty$ の形だが、有理化すると $\dfrac{1}{\sqrt{n+1}+\sqrt n}\to0$。$\dfrac{n^2}{2^n}$ は指数の方が速く増えるので $0$ へ。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 関数の極限 -->
+  <section class="tool-body" data-tab="func">
+    <div class="layout">
+      <aside class="controls" id="c-func"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-func"></canvas><div class="caption">曲線上の黄土色の点をドラッグして δ を変えられます</div></div>
+        <div class="readout" id="r-func"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">関数の極限と左右の極限</div>
+        $x$ が $a$ と異なる値をとりながら $a$ に限りなく近づくとき $f(x)$ が $L$ に近づくなら $\displaystyle\lim_{x\to a}f(x)=L$。
+        $x=a$ での値 $f(a)$ は関係ない（定義されていなくてもよい）。左から近づく極限 $\displaystyle\lim_{x\to a-0}f(x)$ と右から近づく極限 $\displaystyle\lim_{x\to a+0}f(x)$ が一致するときに限り、極限が存在します。
+      </div>
+      <ul>
+        <li>$\delta$ を小さくして、左右の点 $x=a\pm\delta$ の $f$ の値が同じ値に集まるかを見る。表の値でも確かめよう。</li>
+        <li>$\dfrac{x^2-1}{x-1}$ は $x\ne1$ では $x+1$ と同じ。グラフに「穴」が空いているだけで、極限は $2$。</li>
+        <li>$\dfrac{|x|}{x}$ は左右の極限が $-1$ と $1$ で異なる。$\dfrac1x$ は左右で $-\infty,\ +\infty$。どちらも極限は存在しない。</li>
+        <li>$\dfrac{\sin x}{x}\to1$、$\dfrac{e^x-1}{x}\to1$、$(1+x)^{1/x}\to e$ は微分法で繰り返し使う重要な極限。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 無限級数 -->
+  <section class="tool-body" data-tab="series">
+    <div class="layout">
+      <aside class="controls" id="c-series"></aside>
+      <div class="stage">
+        <div class="canvas-row">
+          <div class="canvas-wrap"><canvas id="cv-series-a"></canvas><div class="caption">部分和 Sₙ</div></div>
+          <div class="canvas-wrap"><canvas id="cv-series-b"></canvas><div class="caption">面積・長さで見る</div></div>
+        </div>
+        <div class="readout" id="r-series"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">無限等比級数</div>
+        $a+ar+ar^2+\cdots$ の部分和は $S_n=\dfrac{a(1-r^n)}{1-r}$（$r\ne1$）。$|r|<1$ のとき $r^n\to0$ だから
+        $$\sum_{k=1}^{\infty}ar^{k-1}=\lim_{n\to\infty}S_n=\frac{a}{1-r}$$
+        に収束し、$|r|\ge1$ のときは（$a\ne0$ なら）発散する。
+      </div>
+      <ul>
+        <li>$r$ を $1$ に近づけると和は大きくなり、$r=1$ を越えた瞬間に部分和が止まらなくなる。$r=-1$ では $S_n$ が振動する。</li>
+        <li>「$\dfrac12$ の正方形」では、面積 $1$ の正方形を $\dfrac12,\dfrac14,\dfrac18,\dots$ と埋めていく。いつまでも埋め尽くせないが、余りはいくらでも小さくなる。</li>
+        <li>循環小数 $0.999\ldots$ は初項 $0.9$、公比 $0.1$ の無限等比級数。和は $\dfrac{0.9}{1-0.1}=1$、つまり $0.999\ldots=1$ である。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 自然対数の底 e -->
+  <section class="tool-body" data-tab="e">
+    <div class="layout">
+      <aside class="controls" id="c-e"></aside>
+      <div class="stage">
+        <div class="canvas-row">
+          <div class="canvas-wrap"><canvas id="cv-e-a"></canvas><div class="caption">(1+1/n)^n と e</div></div>
+          <div class="canvas-wrap"><canvas id="cv-e-b"></canvas><div class="caption">x=0 での接線の傾き</div></div>
+        </div>
+        <div class="readout" id="r-e"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage">
+        <div class="title">e が特別な理由</div>
+        $y=a^x$ の $x=0$ での接線の傾きは $\displaystyle\lim_{h\to0}\frac{a^h-1}{h}$ で、$a=2$ なら約 $0.69$、$a=3$ なら約 $1.10$。
+        傾きがちょうど $1$ になる底が $e=2.71828\ldots$ です。このとき $(e^x)'=e^x$ となり、微分しても形が変わらない。
+        $e$ は $\displaystyle\lim_{n\to\infty}\left(1+\frac1n\right)^n$ としても定義できます。
+      </div>
+      <ul>
+        <li>左の図：$n$ を増やすと $(1+1/n)^n$ は単調に増えながら $e$ に近づく。$n=10^4$ でも小数第 3 位までしか合わない、ゆっくりした収束。</li>
+        <li>右の図：$h$ を $0$ に近づけると、$(0,1)$ と $(h,e^h)$ を結ぶ割線の傾き $\dfrac{e^h-1}{h}$ が $1$ に近づく。$2^x,3^x$ の接線と傾きを見比べよう。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学III', title: '極限' });
+
+  /* ======================= 数列の極限 ======================= */
+  (() => {
+    const ctl = $('#c-seq');
+    const st = { preset: 'inv', N: 30, eps: 0.2, r: 0.8 };
+    const PRESETS = {
+      inv: { label: '1/n', tex: () => 'a_n=\\dfrac{1}{n}', f: (n) => 1 / n, lim: () => ({ type: 'conv', L: 0 }) },
+      alt: { label: '(−1)^n / n', tex: () => 'a_n=\\dfrac{(-1)^n}{n}', f: (n) => (n % 2 ? -1 : 1) / n, lim: () => ({ type: 'conv', L: 0 }) },
+      ratio: { label: 'n/(n+1)', tex: () => 'a_n=\\dfrac{n}{n+1}', f: (n) => n / (n + 1), lim: () => ({ type: 'conv', L: 1 }) },
+      pow: { label: 'r^n（r を動かす）', tex: () => `a_n=r^n\\quad(r=${fmt(st.r)})`, f: (n) => Math.pow(st.r, n), lim: () => {
+        const r = st.r;
+        if (Math.abs(r) < 1) return { type: 'conv', L: 0 };
+        if (Math.abs(r - 1) < 1e-9) return { type: 'conv', L: 1 };
+        if (r > 1) return { type: 'div', L: Infinity };
+        return { type: 'osc', L: NaN };
+      } },
+      e: { label: '(1+1/n)^n', tex: () => 'a_n=\\left(1+\\dfrac{1}{n}\\right)^{n}', f: (n) => Math.pow(1 + 1 / n, n), lim: () => ({ type: 'conv', L: Math.E, Ltex: 'e' }) },
+      sinc: { label: 'sin n / n（はさみうち）', tex: () => 'a_n=\\dfrac{\\sin n}{n}', f: (n) => Math.sin(n) / n, lim: () => ({ type: 'conv', L: 0 }), bounds: true },
+      sqrt: { label: '√(n+1) − √n', tex: () => 'a_n=\\sqrt{n+1}-\\sqrt{n}', f: (n) => Math.sqrt(n + 1) - Math.sqrt(n), lim: () => ({ type: 'conv', L: 0 }) },
+      n2: { label: 'n² / 2^n', tex: () => 'a_n=\\dfrac{n^2}{2^n}', f: (n) => n * n / Math.pow(2, n), lim: () => ({ type: 'conv', L: 0 }) },
+    };
+
+    const plot = new Plot('#cv-seq', { xmin: 0, xmax: 31, ymin: -1, ymax: 1.5, equal: false, aspect: 0.6, xLabel: 'n', yLabel: '' });
+
+    UI.heading(ctl, '数列');
+    UI.select(ctl, { label: '$a_n$ の式', options: Object.entries(PRESETS).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; sR.el.style.display = v === 'pow' ? '' : 'none'; draw(); } });
+    const sR = UI.slider(ctl, { label: '$r$', min: -1.2, max: 1.2, step: 0.05, value: st.r, onInput: (v) => { st.r = Math.round(v * 100) / 100; draw(); } });
+    sR.el.style.display = 'none';
+    UI.slider(ctl, { label: '表示する項数 $N$', min: 10, max: 100, step: 1, value: st.N, digits: 0, onInput: (v) => { st.N = v; draw(); } });
+    UI.divider(ctl);
+    UI.heading(ctl, '帯の幅');
+    UI.slider(ctl, { label: '$\\varepsilon$', min: 0.05, max: 1, step: 0.05, value: st.eps, onInput: (v) => { st.eps = v; draw(); } });
+    UI.texAll(ctl);
+
+    const readout = $('#r-seq');
+    function firstN(f, L, eps) {
+      let last = 0;
+      for (let n = 1; n <= Math.max(st.N, 20000); n++) if (Math.abs(f(n) - L) >= eps) last = n;
+      return last + 1;
+    }
+    function draw() {
+      const p = PRESETS[st.preset], f = p.f, lim = p.lim();
+      const N = st.N, eps = st.eps;
+      const vals = [];
+      for (let n = 1; n <= N; n++) vals.push(f(n));
+      const conv = lim.type === 'conv';
+      const Ne = conv ? firstN(f, lim.L, eps) : null;
+
+      let lo = Math.min(0, ...vals), hi = Math.max(0, ...vals);
+      if (conv) { lo = Math.min(lo, lim.L - eps); hi = Math.max(hi, lim.L + eps); }
+      lo = Math.max(lo, -6); hi = Math.min(hi, 6);
+      const pad = (hi - lo) * 0.12 || 1;
+      const xr = N * 1.09 + 1;
+      plot.setView(0, xr, lo - pad, hi + pad);
+
+      plot.render((P) => {
+        if (conv) {
+          P.rect(0, lim.L - eps, xr, 2 * eps, { color: 'none', fill: Plot.rgba(C.sage, 0.16) });
+          P.hline(lim.L + eps, { color: C.sage, width: 1, dash: [3, 4] });
+          P.hline(lim.L - eps, { color: C.sage, width: 1, dash: [3, 4] });
+          P.hline(lim.L, { color: C.clay, width: 1.4, dash: [7, 4] });
+          P.text(xr, lim.L, `L=${lim.Ltex || fmt(lim.L, 3)}`, { color: C.clay, align: 'right', dx: -6, dy: -6, font: Plot.FONT_MATH, bg: true });
+          P.text(xr, lim.L + eps, 'L+ε', { color: C.sage, align: 'right', dx: -6, dy: -4, font: Plot.FONT_MATH, bg: true });
+          P.text(xr, lim.L - eps, 'L−ε', { color: C.sage, align: 'right', dx: -6, dy: 14, font: Plot.FONT_MATH, bg: true });
+        }
+        if (p.bounds) {
+          P.fn((x) => 1 / x, { color: C.ochre, width: 1.5, dash: [6, 4], domain: [0.6, xr] });
+          P.fn((x) => -1 / x, { color: C.ochre, width: 1.5, dash: [6, 4], domain: [0.6, xr] });
+          P.text(2, 1 / 2, '1/n', { color: C.ochre, dx: 6, dy: -6, font: Plot.FONT_MATH, bg: true });
+          P.text(2, -1 / 2, '−1/n', { color: C.ochre, dx: 6, dy: 16, font: Plot.FONT_MATH, bg: true });
+        }
+        if (conv && Ne <= N) {
+          P.vline(Ne, { color: C.clay, width: 1.2, dash: [4, 4] });
+          P.text(Ne, P.win.ymax, `N(ε)=${Ne}`, { color: C.clay, dx: 6, dy: 40, font: Plot.FONT_MATH, bg: true });
+        }
+        const r = N > 60 ? 3 : N > 30 ? 3.8 : 4.8;
+        vals.forEach((v, i) => {
+          const n = i + 1;
+          const inside = conv && n >= Ne;
+          P.point(n, v, { color: inside ? C.sage : C.ink, r });
+        });
+      });
+
+      const typeLabel = lim.type === 'conv' ? '収束' : lim.type === 'div' ? '発散（正の無限大）' : (st.r < -1 ? '振動（発散）' : '振動');
+      const tone = lim.type === 'conv' ? 'sage' : 'clay';
+      const limTex = lim.type === 'conv' ? (lim.Ltex || fmt(lim.L, 4)) : lim.type === 'div' ? '\\infty' : '\\text{なし}';
+      const ns = [1, 2, 3, 5, 10, 20, 50, 100];
+      readout.innerHTML = `
+        <div class="tex-block">$$${p.tex()},\\qquad \\lim_{n\\to\\infty}a_n=${limTex}$$</div>
+        <div class="readout-grid">
+          <div class="stat ${tone}"><div class="k">極限のようす</div><div class="v">${typeLabel}</div></div>
+          <div class="stat ${tone}"><div class="k">極限値</div><div class="v">${lim.type === 'conv' ? fmt(lim.L, 5) : lim.type === 'div' ? '∞' : '—'}</div></div>
+          <div class="stat clay"><div class="k">N(ε)：以後すべて帯に入る番号</div><div class="v">${conv ? Ne + (Ne > N ? '（表示範囲外）' : '') : '—'}</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:0.6rem"><table class="data">
+          <tr><th>n</th>${ns.map((n) => `<td>${n}</td>`).join('')}</tr>
+          <tr><th>aₙ</th>${ns.map((n) => { const v = f(n); const cls = conv && Math.abs(v - lim.L) < eps ? ' class="hl-sage"' : ''; return `<td${cls}>${fmt(v, 5)}</td>`; }).join('')}</tr>
+        </table></div>
+        <p class="small">${conv ? `緑の背景は帯 L±ε に入っている項。n ≥ N(ε) の点は緑で描いている。` : '極限値をもたないので帯は描かない。'}</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 関数の極限 ======================= */
+  (() => {
+    const ctl = $('#c-func');
+    const st = { preset: 'hole', delta: 0.5, M: 10 };
+    const PRESETS = {
+      hole: { label: '(x²−1)/(x−1)　x→1', tex: 'f(x)=\\dfrac{x^2-1}{x-1}', a: 1, f: (x) => (x * x - 1) / (x - 1), L: 2, R: 2, view: [-2, 4, -1, 5], holes: [[1, 2]], note: 'x\\ne1 \\text{ では } f(x)=x+1' },
+      sinc: { label: 'sin x / x　x→0', tex: 'f(x)=\\dfrac{\\sin x}{x}', a: 0, f: (x) => Math.sin(x) / x, L: 1, R: 1, view: [-9, 9, -0.6, 1.5], holes: [[0, 1]] },
+      epow: { label: '(1+x)^{1/x}　x→0', tex: 'f(x)=(1+x)^{\\frac{1}{x}}', a: 0, f: (x) => Math.pow(1 + x, 1 / x), L: Math.E, R: Math.E, Ltex: 'e', view: [-1.3, 4, -0.5, 4.5], holes: [[0, Math.E]] },
+      expm1: { label: '(e^x−1)/x　x→0', tex: 'f(x)=\\dfrac{e^x-1}{x}', a: 0, f: (x) => Math.expm1(x) / x, L: 1, R: 1, view: [-4, 3, -0.5, 4], holes: [[0, 1]] },
+      recip: { label: '1/x　x→0', tex: 'f(x)=\\dfrac{1}{x}', a: 0, f: (x) => 1 / x, L: -Infinity, R: Infinity, view: [-4, 4, -4, 4] },
+      sign: { label: '|x|/x　x→0', tex: 'f(x)=\\dfrac{|x|}{x}', a: 0, f: (x) => Math.abs(x) / x, L: -1, R: 1, view: [-3, 3, -2, 2], holes: [[0, -1], [0, 1]], split: true },
+      sqrt: { label: '(√(x+1)−1)/x　x→0', tex: 'f(x)=\\dfrac{\\sqrt{x+1}-1}{x}', a: 0, f: (x) => (Math.sqrt(x + 1) - 1) / x, L: 0.5, R: 0.5, Ltex: '\\dfrac12', view: [-1.5, 4, -0.3, 1.3], holes: [[0, 0.5]] },
+      inf: { label: 'x²/(x²+1)　x→∞', tex: 'f(x)=\\dfrac{x^2}{x^2+1}', a: Infinity, f: (x) => x * x / (x * x + 1), L: 1, R: 1, view: [-3, 42, -0.3, 1.5], asym: 1 },
+    };
+    const cur = () => PRESETS[st.preset];
+    const isInf = () => st.preset === 'inf';
+
+    const plot = new Plot('#cv-func', { xmin: -2, xmax: 4, ymin: -1, ymax: 5, equal: false, aspect: 0.6 });
+    const hR = plot.addHandle({ x: 1.5, y: 2.5, color: C.ochre, r: 7, onMove: (x) => {
+      const p = cur();
+      if (isInf()) { st.M = Math.max(0.5, Math.min(40, Math.round(x * 2) / 2)); sM.set(st.M); }
+      else { st.delta = Math.max(0.01, Math.min(2, Math.round(Math.abs(x - p.a) * 100) / 100)); sD.set(st.delta); }
+      draw();
+    } });
+    const hL = plot.addHandle({ x: 0.5, y: 1.5, color: C.ochre, r: 7, visible: () => !isInf(), onMove: (x) => {
+      const p = cur();
+      st.delta = Math.max(0.01, Math.min(2, Math.round(Math.abs(x - p.a) * 100) / 100)); sD.set(st.delta);
+      draw();
+    } });
+
+    UI.heading(ctl, '関数と近づける値');
+    UI.select(ctl, { label: '$f(x)$ と $x\\to a$', options: Object.entries(PRESETS).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; sD.el.style.display = v === 'inf' ? 'none' : ''; sM.el.style.display = v === 'inf' ? '' : 'none'; draw(); } });
+    const sD = UI.slider(ctl, { label: '$\\delta$（$a$ からの距離）', min: 0.01, max: 2, step: 0.01, value: st.delta, onInput: (v) => { st.delta = v; draw(); } });
+    const sM = UI.slider(ctl, { label: '$x$（大きくする）', min: 0.5, max: 40, step: 0.5, value: st.M, digits: 1, onInput: (v) => { st.M = v; draw(); } });
+    sM.el.style.display = 'none';
+    UI.buttonRow(ctl, [
+      { label: 'δ = 0.1', small: true, onClick: () => { st.delta = 0.1; sD.set(0.1); draw(); } },
+      { label: 'δ = 0.01', small: true, onClick: () => { st.delta = 0.01; sD.set(0.01); draw(); } },
+    ]);
+    UI.texAll(ctl);
+
+    const readout = $('#r-func');
+    const fv = (v) => (v === Infinity ? '+∞' : v === -Infinity ? '−∞' : fmt(v, 5));
+    function draw() {
+      const p = cur(), f = p.f, a = p.a;
+      plot.setView(...p.view);
+      const xl = a - st.delta, xr = isInf() ? st.M : a + st.delta;
+      if (isInf()) { hR.x = xr; hR.y = f(xr); }
+      else { hR.x = xr; hR.y = f(xr); hL.x = xl; hL.y = f(xl); }
+      plot.render((P) => {
+        if (p.split) { P.fn(f, { color: C.ink, width: 2.6, domain: [P.win.xmin, a] }); P.fn(f, { color: C.ink, width: 2.6, domain: [a, P.win.xmax] }); }
+        else P.fn(f, { color: C.ink, width: 2.6 });
+        if (p.asym != null) {
+          P.hline(p.asym, { color: C.clay, width: 1.2, dash: [7, 4] });
+          P.text(P.win.xmax, p.asym, `y=${fmt(p.asym)}（漸近線）`, { color: C.clay, align: 'right', dx: -8, dy: -6, bg: true });
+        }
+        if (!isInf()) {
+          P.vline(a, { color: C.clay, width: 1, dash: [4, 4] });
+          P.text(a, P.win.ymax, `x=${fmt(a)}`, { color: C.clay, dx: 6, dy: 18, font: Plot.FONT_MATH, bg: true });
+          if (isFinite(p.L) && p.L === p.R) P.hline(p.L, { color: C.sage, width: 1, dash: [3, 4] });
+        }
+        for (const [hx, hy] of (p.holes || [])) P.point(hx, hy, { color: C.clay, hollow: true, r: 5.5 });
+        if (p.holes && p.holes.length === 1) P.label(p.holes[0][0], p.holes[0][1], `穴 (${fmt(a)}, ${p.Ltex === 'e' ? 'e' : fmt(p.L, 3)})`, { color: C.clay, dx: 14, dy: 26 });
+        const pts = isInf() ? [[xr, f(xr), 'x']] : [[xl, f(xl), 'a−δ'], [xr, f(xr), 'a+δ']];
+        for (const [x, y, lab] of pts) {
+          if (!isFinite(y)) continue;
+          P.dropLines(x, y, { color: C.ochre });
+          P.text(x, 0, lab, { color: C.ochre, align: 'center', dy: lab === 'a−δ' ? -8 : 18, font: Plot.FONT_MATH, bg: true });
+          P.text(x, y, `f=${fmt(y, 4)}`, { color: C.ochre, dx: lab === 'a−δ' ? -12 : 14, dy: -12, align: lab === 'a−δ' ? 'right' : 'left', font: Plot.FONT_MATH, bg: true });
+        }
+      });
+
+      let stats, table, texLine;
+      if (isInf()) {
+        texLine = `${p.tex},\\qquad \\lim_{x\\to\\infty}f(x)=${fmt(p.L)}`;
+        stats = `
+          <div class="stat ochre"><div class="k">いまの x</div><div class="v">${fmt(xr, 2)}</div></div>
+          <div class="stat ochre"><div class="k">f(x)</div><div class="v">${fmt(f(xr), 6)}</div></div>
+          <div class="stat sage"><div class="k">x→∞ の極限</div><div class="v">${fmt(p.L)}（漸近線 y=${fmt(p.asym)}）</div></div>`;
+        const xs = [1, 10, 100, 1000, 10000];
+        table = `<table class="data"><tr><th>x</th>${xs.map((x) => `<td>${x}</td>`).join('')}<td>→ ∞</td></tr>
+          <tr><th>f(x)</th>${xs.map((x) => `<td>${fmt(f(x), 8)}</td>`).join('')}<td class="hl-sage">→ ${fmt(p.L)}</td></tr></table>`;
+      } else {
+        const exists = isFinite(p.L) && isFinite(p.R) && Math.abs(p.L - p.R) < 1e-12;
+        const Lt = p.Ltex || (isFinite(p.L) ? fmt(p.L, 4) : (p.L > 0 ? '\\infty' : '-\\infty'));
+        const Rt = p.Ltex || (isFinite(p.R) ? fmt(p.R, 4) : (p.R > 0 ? '\\infty' : '-\\infty'));
+        texLine = `${p.tex}${p.note ? ',\\quad ' + p.note : ''},\\qquad \\lim_{x\\to ${fmt(a)}-0}f(x)=${Lt},\\quad \\lim_{x\\to ${fmt(a)}+0}f(x)=${Rt}`;
+        stats = `
+          <div class="stat ink"><div class="k">左側極限 x→${fmt(a)}−0</div><div class="v">${fv(p.L)}</div></div>
+          <div class="stat ink"><div class="k">右側極限 x→${fmt(a)}+0</div><div class="v">${fv(p.R)}</div></div>
+          <div class="stat ${exists ? 'sage' : 'clay'}"><div class="k">極限 lim f(x)</div><div class="v">${exists ? '存在する： ' + fmt(p.L, 5) : '存在しない'}</div></div>
+          <div class="stat ochre"><div class="k">f(a−δ), f(a+δ)（δ=${fmt(st.delta)}）</div><div class="v">${fv(f(xl))}, ${fv(f(xr))}</div></div>`;
+        const ds = [1, 0.1, 0.01, 0.001];
+        table = `<table class="data">
+          <tr><th>x（左から）</th>${ds.map((d) => `<td>${fmt(a - d, 3)}</td>`).join('')}<td>→ ${fmt(a)}−0</td></tr>
+          <tr><th>f(x)</th>${ds.map((d) => `<td>${fv(f(a - d))}</td>`).join('')}<td class="${exists ? 'hl-sage' : 'hl-clay'}">→ ${fv(p.L)}</td></tr>
+          <tr><th>x（右から）</th>${ds.map((d) => `<td>${fmt(a + d, 3)}</td>`).join('')}<td>→ ${fmt(a)}+0</td></tr>
+          <tr><th>f(x)</th>${ds.map((d) => `<td>${fv(f(a + d))}</td>`).join('')}<td class="${exists ? 'hl-sage' : 'hl-clay'}">→ ${fv(p.R)}</td></tr></table>`;
+      }
+      readout.innerHTML = `
+        <div class="tex-block">$$${texLine}$$</div>
+        <div class="readout-grid">${stats}</div>
+        <div class="table-wrap" style="margin-top:0.6rem">${table}</div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 無限級数 ======================= */
+  (() => {
+    const ctl = $('#c-series');
+    const st = { a: 1, r: 0.5, n: 5, preset: 'custom' };
+    const PRESETS = [
+      { value: 'custom', label: '自由に動かす' },
+      { value: 'half', label: '1/2 の正方形：1/2 + 1/4 + 1/8 + …' },
+      { value: 'nines', label: '0.999… = 0.9 + 0.09 + 0.009 + …' },
+      { value: 'threes', label: '0.333… = 0.3 + 0.03 + 0.003 + …' },
+    ];
+    const pA = new Plot('#cv-series-a', { xmin: 0, xmax: 31, ymin: -1, ymax: 3, equal: false, aspect: 0.7, xLabel: 'n', yLabel: '' });
+    const pB = new Plot('#cv-series-b', { xmin: -0.2, xmax: 2.4, ymin: -0.6, ymax: 1.6, equal: true, aspect: 0.7, grid: false, axes: false });
+
+    UI.heading(ctl, '無限等比級数');
+    const sel = UI.select(ctl, { label: '例', options: PRESETS, value: 'custom', onChange: (v) => {
+      st.preset = v;
+      if (v === 'half') { st.a = 0.5; st.r = 0.5; } else if (v === 'nines') { st.a = 0.9; st.r = 0.1; } else if (v === 'threes') { st.a = 0.3; st.r = 0.1; }
+      sA.set(st.a); sRr.set(st.r); draw();
+    } });
+    const sA = UI.slider(ctl, { label: '初項 $a$', min: 0.1, max: 2, step: 0.1, value: st.a, onInput: (v) => { st.a = v; custom(); draw(); } });
+    const sRr = UI.slider(ctl, { label: '公比 $r$', min: -1.2, max: 1.2, step: 0.05, value: st.r, onInput: (v) => { st.r = Math.round(v * 100) / 100; custom(); draw(); } });
+    const sN = UI.slider(ctl, { label: '項数 $n$', min: 1, max: 30, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+    function custom() { st.preset = 'custom'; sel.set('custom'); }
+    UI.texAll(ctl);
+
+    const readout = $('#r-series');
+    const S = (n) => (Math.abs(st.r - 1) < 1e-9 ? st.a * n : st.a * (1 - Math.pow(st.r, n)) / (1 - st.r));
+
+    function drawSquare(P) {
+      P.rect(0, 0, 1, 1, { color: C.border, width: 1.2 });
+      let x0 = 0, x1 = 1, y0 = 0, y1 = 1;
+      for (let k = 0; k < 12; k++) {
+        const col = k % 2 ? C.sage : C.ink;
+        let rx, ry, rw, rh;
+        if (k % 2 === 0) { const xm = (x0 + x1) / 2; rx = x0; ry = y0; rw = xm - x0; rh = y1 - y0; x0 = xm; }
+        else { const ym = (y0 + y1) / 2; rx = x0; ry = ym; rw = x1 - x0; rh = y1 - ym; y1 = ym; }
+        const active = k < st.n;
+        P.rect(rx, ry, rw, rh, { color: active ? col : C.borderSubtle, width: 1, fill: active ? Plot.rgba(col, 0.35) : 'rgba(0,0,0,0)' });
+        if (P.px(rw) > 22 && P.px(rh) > 16 && active) P.text(rx + rw / 2, ry + rh / 2, k < 3 ? ['1/2', '1/4', '1/8'][k] : `1/${Math.pow(2, k + 1)}`, { color: col, align: 'center', baseline: 'middle', font: Plot.FONT_MATH });
+      }
+      P.text(0.5, 1, '面積 1 の正方形', { color: C.muted, align: 'center', dy: -8 });
+      P.text(0.5, 0, `Sₙ = ${fmt(S(st.n), 5)}　余り = ${fmt(1 - S(st.n), 5)}`, { color: C.clay, align: 'center', dy: 20 });
+    }
+    function drawBars(P) {
+      const total = st.a / (1 - st.r);
+      P.segment(0, -0.25, total, -0.25, { color: C.clay, width: 2 });
+      P.segment(0, -0.32, 0, -0.18, { color: C.clay, width: 2 });
+      P.segment(total, -0.32, total, -0.18, { color: C.clay, width: 2 });
+      P.text(total / 2, -0.25, `a/(1−r) = ${fmt(total, 4)}`, { color: C.clay, align: 'center', dy: 20, font: Plot.FONT_MATH });
+      let x = 0;
+      for (let k = 0; k < 40; k++) {
+        const w = st.a * Math.pow(st.r, k);
+        if (P.px(w) < 0.5) break;
+        const col = k % 2 ? C.sage : C.ink;
+        const active = k < st.n;
+        P.rect(x, 0, w, 1, { color: active ? col : C.borderSubtle, width: 1, fill: active ? Plot.rgba(col, 0.35) : 'rgba(0,0,0,0)' });
+        if (P.px(w) > 26 && active) P.text(x + w / 2, 0.5, k === 0 ? 'a' : k === 1 ? 'ar' : `ar${k < 10 ? '⁰¹²³⁴⁵⁶⁷⁸⁹'[k] : '^' + k}`, { color: col, align: 'center', baseline: 'middle', font: Plot.FONT_MATH });
+        x += w;
+      }
+      P.segment(S(st.n), -0.05, S(st.n), 1.05, { color: C.clay, width: 1.5, dash: [4, 3] });
+      P.text(S(st.n), 1.05, `Sₙ=${fmt(S(st.n), 4)}`, { color: C.clay, align: 'center', dy: -6, font: Plot.FONT_MATH, bg: true });
+    }
+    function drawArrows(P, xmin, xmax) {
+      P.segment(xmin, 0, xmax, 0, { color: C.borderStrong, width: 1.2 });
+      P.point(0, 0, { color: C.muted, r: 3, label: '0', dx: -4, dy: 20 });
+      const K = Math.min(st.n, 12);
+      for (let k = 0; k < K; k++) {
+        const y = 1 - k * 0.085;
+        const col = k % 2 ? C.sage : C.ink;
+        P.segment(S(k), 0, S(k), y, { color: C.borderSubtle, width: 1 });
+        P.arrow(S(k), y, S(k + 1), y, { color: col, width: 2 });
+      }
+      P.point(S(st.n), 0, { color: C.clay, r: 5, label: `Sₙ=${fmt(S(st.n), 3)}`, dx: 8, dy: 20 });
+      if (Math.abs(st.r) < 1) { const t = st.a / (1 - st.r); P.segment(t, -0.1, t, 1.05, { color: C.clay, width: 1.2, dash: [4, 3] }); P.text(t, 1.05, `a/(1−r)=${fmt(t, 3)}`, { color: C.clay, align: 'center', dy: -6, font: Plot.FONT_MATH, bg: true }); }
+    }
+
+    function draw() {
+      const a = st.a, r = st.r, n = st.n;
+      const conv = Math.abs(r) < 1;
+      const total = conv ? a / (1 - r) : NaN;
+      const Ss = []; for (let k = 1; k <= 30; k++) Ss.push(S(k));
+      let lo = Math.min(0, ...Ss), hi = Math.max(0, ...Ss);
+      if (conv) { lo = Math.min(lo, total); hi = Math.max(hi, total); }
+      lo = Math.max(lo, -12); hi = Math.min(hi, 12);
+      const pad = (hi - lo) * 0.12 || 1;
+      pA.setView(0, 34, lo - pad, hi + pad * 2.5);
+      pA.render((P) => {
+        if (conv) { P.hline(total, { color: C.clay, width: 1.4, dash: [7, 4] }); P.text(34, total, `a/(1−r)=${fmt(total, 4)}`, { color: C.clay, align: 'right', dx: -6, dy: -6, font: Plot.FONT_MATH, bg: true }); }
+        Ss.forEach((v, i) => { P.segment(i + 1, 0, i + 1, v, { color: C.ink, width: 1, alpha: 0.25 }); P.point(i + 1, v, { color: C.ink, r: 4 }); });
+        P.point(n, S(n), { color: C.clay, r: 6.5, label: `S${n} = ${fmt(S(n), 4)}`, dx: 10, dy: 22 });
+      });
+
+      const mode = st.preset === 'half' ? 'square' : (r > 0 && r < 1) ? 'bars' : 'arrows';
+      if (mode === 'square') pB.setView(-0.15, 1.15, -0.25, 1.2);
+      else if (mode === 'bars') { const t = a / (1 - r); pB.setView(-0.05 * t, t * 1.05, -0.55, 1.35); }
+      else {
+        const K = Math.abs(r) >= 1 ? Math.min(n, 8) : Math.min(n, 12);
+        let mn = 0, mx = 0; for (let k = 0; k <= K; k++) { mn = Math.min(mn, S(k)); mx = Math.max(mx, S(k)); }
+        if (conv) { mn = Math.min(mn, total); mx = Math.max(mx, total); }
+        const w = (mx - mn) || 1; pB.setView(mn - w * 0.15, mx + w * 0.2, -0.45, 1.25);
+      }
+      pB.render((P) => {
+        if (mode === 'square') drawSquare(P); else if (mode === 'bars') drawBars(P); else drawArrows(P, P.win.xmin + 0.05 * (P.win.xmax - P.win.xmin), P.win.xmax - 0.05 * (P.win.xmax - P.win.xmin));
+      });
+
+      const rIs1 = Math.abs(r - 1) < 1e-9;
+      const formula = rIs1 ? `S_n=na` : `S_n=\\dfrac{a(1-r^n)}{1-r}`;
+      const nums = rIs1 ? `S_{${n}}=${n}\\cdot${fmt(a)}=${fmt(S(n), 5)}` : `S_{${n}}=\\dfrac{${fmt(a)}\\,(1-(${fmt(r)})^{${n}})}{1-(${fmt(r)})}=${fmt(S(n), 5)}`;
+      let sumTex;
+      if (st.preset === 'nines') sumTex = `0.999\\ldots=0.9+0.09+0.009+\\cdots=\\dfrac{0.9}{1-0.1}=1`;
+      else if (st.preset === 'threes') sumTex = `0.333\\ldots=0.3+0.03+0.003+\\cdots=\\dfrac{0.3}{1-0.1}=\\dfrac13`;
+      else if (st.preset === 'half') sumTex = `\\dfrac12+\\dfrac14+\\dfrac18+\\cdots=\\dfrac{1/2}{1-1/2}=1`;
+      else if (conv) sumTex = `\\sum_{k=1}^{\\infty}ar^{k-1}=\\dfrac{a}{1-r}=\\dfrac{${fmt(a)}}{1-(${fmt(r)})}=${fmt(total, 5)}`;
+      else sumTex = `|r|=${fmt(Math.abs(r))}\\ge1 \\text{ なので発散}`;
+      const kind = conv ? '収束' : rIs1 ? '発散（S_n = na → ∞）' : r > 1 ? '発散（+∞）' : '振動（発散）';
+      readout.innerHTML = `
+        <div class="tex-block">$$${formula},\\qquad ${nums}$$</div>
+        <div class="tex-block">$$${sumTex}$$</div>
+        <div class="readout-grid">
+          <div class="stat ochre"><div class="k">a, r</div><div class="v">${fmt(a)}, ${fmt(r)}</div></div>
+          <div class="stat clay"><div class="k">部分和 S${n}</div><div class="v">${fmt(S(n), 5)}</div></div>
+          <div class="stat ${conv ? 'sage' : 'clay'}"><div class="k">収束条件 |r| &lt; 1</div><div class="v">${conv ? '成り立つ：' : '成り立たない：'}${kind}</div></div>
+          <div class="stat ${conv ? 'sage' : 'clay'}"><div class="k">無限級数の和</div><div class="v">${conv ? fmt(total, 5) : '—'}</div></div>
+          ${conv ? `<div class="stat"><div class="k">余り a/(1−r) − S${n}</div><div class="v">${fmt(total - S(n), 6)}</div></div>` : ''}
+        </div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 自然対数の底 e ======================= */
+  (() => {
+    const ctl = $('#c-e');
+    const st = { N: 20, h: 0.5, others: true };
+    const pA = new Plot('#cv-e-a', { xmin: 0, xmax: 21, ymin: 1.8, ymax: 2.9, equal: false, aspect: 0.7, xLabel: 'n', yLabel: '' });
+    const pB = new Plot('#cv-e-b', { xmin: -2.5, xmax: 2.5, ymin: -0.8, ymax: 4.5, equal: true, aspect: 0.7 });
+    const hH = pB.addHandle({ x: 0.5, y: Math.exp(0.5), color: C.ochre, r: 7, onMove: (x) => { st.h = Math.max(0.01, Math.min(2, Math.round(x * 100) / 100)); sH.set(st.h); draw(); } });
+
+    UI.heading(ctl, '左の図：数列');
+    UI.slider(ctl, { label: '$n$ の最大', min: 1, max: 100, step: 1, value: st.N, digits: 0, onInput: (v) => { st.N = v; draw(); } });
+    UI.divider(ctl);
+    UI.heading(ctl, '右の図：接線の傾き');
+    const sH = UI.slider(ctl, { label: '$h$', min: 0.01, max: 2, step: 0.01, value: st.h, onInput: (v) => { st.h = v; draw(); } });
+    UI.checkbox(ctl, { label: '$y=2^x,\\ 3^x$ も表示', checked: true, onChange: (v) => { st.others = v; draw(); } });
+    UI.buttonRow(ctl, [{ label: 'h = 0.01', small: true, onClick: () => { st.h = 0.01; sH.set(0.01); draw(); } }]);
+    UI.texAll(ctl);
+
+    const readout = $('#r-e');
+    const en = (n) => Math.pow(1 + 1 / n, n);
+    function draw() {
+      pA.setView(0, st.N + 1, 1.85, 2.9);
+      pA.render((P) => {
+        P.hline(Math.E, { color: C.clay, width: 1.4, dash: [7, 4] });
+        P.text(st.N + 1, Math.E, 'e = 2.71828…', { color: C.clay, align: 'right', dx: -6, dy: -6, font: Plot.FONT_MATH, bg: true });
+        const r = st.N > 50 ? 3 : 4.5;
+        for (let n = 1; n <= st.N; n++) P.point(n, en(n), { color: C.ink, r });
+        P.point(st.N, en(st.N), { color: C.ink, r: 6, label: `(1+1/${st.N})^${st.N} = ${fmt(en(st.N), 4)}`, dx: -8, dy: 18, align: 'right' });
+      });
+      const h = st.h;
+      hH.x = h; hH.y = Math.exp(h);
+      pB.render((P) => {
+        if (st.others) {
+          P.fn((x) => Math.pow(2, x), { color: C.ochre, width: 1.5, dash: [6, 4], alpha: 0.6 });
+          P.fn((x) => Math.pow(3, x), { color: C.clay, width: 1.5, dash: [6, 4], alpha: 0.6 });
+          P.line(0, 1, 1, Math.LN2, { color: C.ochre, width: 1, alpha: 0.6 });
+          P.line(0, 1, 1, Math.log(3), { color: C.clay, width: 1, alpha: 0.6 });
+        }
+        P.fn(Math.exp, { color: C.ink, width: 2.6 });
+        P.line(0, 1, 1, 1, { color: C.sage, width: 2 });
+        const items = [{ label: 'y = eˣ', color: C.ink }, { label: '接線 y = x + 1', color: C.sage, width: 2 }];
+        if (st.others) items.push({ label: 'y = 2ˣ（傾き ln 2）', color: C.ochre, dash: [5, 4], width: 2 }, { label: 'y = 3ˣ（傾き ln 3）', color: C.clay, dash: [5, 4], width: 2 });
+        P.legend(items, { left: 20, top: 34 });
+        P.segment(0, 1, h, Math.exp(h), { color: C.ochre, width: 2.2 });
+        P.segment(0, 1, h, 1, { color: C.ochre, width: 1, dash: [3, 3] });
+        P.segment(h, 1, h, Math.exp(h), { color: C.ochre, width: 1, dash: [3, 3] });
+        P.point(0, 1, { color: C.sage, r: 5.5, label: '(0, 1)', dx: -10, dy: -10, align: 'right' });
+        if (h >= 0.2) {
+          P.text(h / 2, 1, 'h', { color: C.ochre, align: 'center', dy: 16, font: Plot.FONT_MATH, bg: true });
+          P.text(h, (1 + Math.exp(h)) / 2, 'eʰ−1', { color: C.ochre, dx: 10, baseline: 'middle', font: Plot.FONT_MATH, bg: true });
+        }
+      });
+      const q = Math.expm1(h) / h;
+      const ns = [1, 10, 100, 1000, 10000];
+      readout.innerHTML = `
+        <div class="tex-block">$$\\lim_{n\\to\\infty}\\left(1+\\frac1n\\right)^n=e,\\qquad \\lim_{h\\to0}\\frac{e^h-1}{h}=1,\\qquad \\frac{e^{${fmt(h)}}-1}{${fmt(h)}}=${fmt(q, 5)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ochre"><div class="k">傾き (2^h−1)/h → ln 2</div><div class="v">${fmt(Math.expm1(h * Math.LN2) / h, 4)} → ${fmt(Math.LN2, 4)}</div></div>
+          <div class="stat sage"><div class="k">傾き (e^h−1)/h → 1</div><div class="v">${fmt(q, 4)} → 1</div></div>
+          <div class="stat clay"><div class="k">傾き (3^h−1)/h → ln 3</div><div class="v">${fmt(Math.expm1(h * Math.log(3)) / h, 4)} → ${fmt(Math.log(3), 4)}</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:0.6rem"><table class="data">
+          <tr><th>n</th>${ns.map((n) => `<td>${n === 10000 ? '10⁴' : n}</td>`).join('')}<td>→ ∞</td></tr>
+          <tr><th>(1+1/n)ⁿ</th>${ns.map((n) => `<td>${fmt(en(n), 5)}</td>`).join('')}<td class="hl-sage">e = ${fmt(Math.E, 5)}</td></tr>
+        </table></div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'seq', label: '数列の極限' },
+    { id: 'func', label: '関数の極限' },
+    { id: 'series', label: '無限級数' },
+    { id: 'e', label: '自然対数の底 e' },
+  ]);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>微分・積分（数学II）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>微分・積分（数学II）</h1>
+    <p class="lede">割線が接線に近づく様子、導関数の符号とグラフの増減、方程式の実数解の個数、定積分と面積の関係を、点をドラッグしながら確かめられます。対象は 3 次以下の整式です。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 微分係数と接線 -->
+  <section class="tool-body" data-tab="tangent">
+    <div class="layout">
+      <aside class="controls" id="c-tangent"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-tangent"></canvas><div class="caption">点 A をドラッグすると曲線の上を動きます</div></div>
+        <div class="readout" id="r-tangent"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">微分係数は「平均変化率の極限」</div>
+        $$f'(a)=\lim_{h\to0}\frac{f(a+h)-f(a)}{h}$$
+        点 A$(a,\,f(a))$ と B$(a+h,\,f(a+h))$ を結ぶ直線（割線）の傾きが平均変化率。$h$ を $0$ に近づけると B は A に近づき、割線は接線に近づきます。その傾きの行き先が微分係数 $f'(a)$ で、接線の方程式は $y=f'(a)(x-a)+f(a)$ です。
+      </div>
+      <ul>
+        <li>$h$ のスライダーを小さくしていく（または「$h\to0$ を再生」）と、橙の割線が緑の接線に重なっていく。読み取り欄の平均変化率が $f'(a)$ に近づくことを数値で確認しよう。</li>
+        <li>A を極大・極小の位置に置くと接線が水平になり $f'(a)=0$。曲線の増加している所では $f'(a)\gt0$、減少している所では $f'(a)\lt0$。</li>
+        <li>$f(x)=x^2$ で A を $x=1$ に置くと、$h=1$ では平均変化率 $3$、$h=0.1$ では $2.1$、極限は $2=f'(1)$。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 導関数のグラフと増減 -->
+  <section class="tool-body" data-tab="derivative">
+    <div class="layout">
+      <aside class="controls" id="c-deriv"></aside>
+      <div class="stage">
+        <div class="canvas-row">
+          <div class="canvas-wrap"><canvas id="cv-deriv-f"></canvas><div class="caption">y = f(x)　点をドラッグ</div></div>
+          <div class="canvas-wrap"><canvas id="cv-deriv-df"></canvas><div class="caption">y = f'(x)</div></div>
+        </div>
+        <div class="readout" id="r-deriv"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage">
+        <div class="title">f' の符号が f の増減を決める</div>
+        $f'(x)\gt0$ の区間で $f$ は増加、$f'(x)\lt0$ の区間で減少。$f'(x)=0$ で符号が $+$ から $-$ に変わる点が極大、$-$ から $+$ に変わる点が極小です。この対応を表にしたものが増減表です。
+      </div>
+      <ul>
+        <li>左の点をドラッグして、接線の傾き（緑の線）が右のグラフの高さ $f'(x)$ に等しいことを確かめよう。接線が右上がりなら $f'$ は $x$ 軸より上にある。</li>
+        <li>背景の色は $f'\gt0$ が緑、$f'\lt0$ が赤。左右のグラフで同じ色分けになっている。</li>
+        <li>係数を変えて、$f'(x)=0$ が実数解を持たない（判別式 $\le0$）ときは極値がなく、つねに増加（または減少）になることを見よう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 極値と実数解の個数 -->
+  <section class="tool-body" data-tab="extrema">
+    <div class="layout">
+      <aside class="controls" id="c-extrema"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-extrema"></canvas><div class="caption">直線 y = k の点をドラッグして上下に動かせます</div></div>
+        <div class="readout" id="r-extrema"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note clay">
+        <div class="title">方程式 f(x)=k の実数解の個数 ＝ 共有点の個数</div>
+        $y=f(x)$ のグラフと直線 $y=k$ の共有点の個数が、方程式の実数解の個数です。3 次関数が極値をもつとき、$k$ が極小値と極大値の間なら 3 個、極値に等しければ 2 個、外側なら 1 個。
+      </div>
+      <ul>
+        <li>$k$ を動かして、赤の破線（極大値・極小値）をまたぐ瞬間に解の個数が $1\to2\to3$ と変わるのを見よう。</li>
+        <li>係数を変えて極値がない形（例：$x^3+x$）にすると、$k$ をどこに置いても解は 1 個。</li>
+        <li>「$f(x)=k$ の解の個数を調べよ」という問題は、$f$ の増減表を書いて極値を求めることに帰着する。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 定積分と面積 -->
+  <section class="tool-body" data-tab="integral">
+    <div class="layout">
+      <aside class="controls" id="c-integral"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-integral"></canvas><div class="caption">x 軸上の a, b をドラッグできます</div></div>
+        <div class="readout" id="r-integral"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">定積分と面積</div>
+        $F'(x)=f(x)$ のとき $\displaystyle\int_a^b f(x)\,dx=\Big[F(x)\Big]_a^b=F(b)-F(a)$。グラフが $x$ 軸より上にある部分は面積そのもの（緑）、下にある部分は面積にマイナスをつけた値（赤）として足し合わされます。面積を求めるときは、下にある部分の符号を反転させて足します。
+      </div>
+      <div class="note ochre">
+        <div class="title">2 曲線の間の面積と 1/6 公式</div>
+        $a\le x\le b$ で $f(x)\ge g(x)$ のとき、面積は $\displaystyle\int_a^b\{f(x)-g(x)\}\,dx$。放物線 $y=px^2+\cdots$ と直線が $x=\alpha,\ \beta$ で交わるとき、その間の面積は $\dfrac{|p|}{6}(\beta-\alpha)^3$ で求まります。
+      </div>
+      <ul>
+        <li>$a,\ b$ を動かして、$x$ 軸より下の部分（赤）が定積分の値を減らすことを確かめよう。$f(x)=x^3-3x$ を $-\sqrt3$ から $\sqrt3$ まで積分すると $0$ になる。</li>
+        <li>「区分求積」で $n$ を増やすと、長方形の面積の和が定積分の値に近づく。</li>
+        <li>「2 曲線」で「交点に合わせる」を押し、$\dfrac{|p|}{6}(\beta-\alpha)^3$ と定積分の値が一致することを見よう。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学II', title: '微分・積分' });
+
+  /* 多項式 (高次から) のユーティリティ */
+  const evalPoly = (co, x) => co.reduce((s, c) => s * x + c, 0);
+  const derivPoly = (co) => { const n = co.length - 1; return co.slice(0, n).map((c, i) => c * (n - i)); };
+  const integPoly = (co) => { const n = co.length - 1; return co.map((c, i) => c / (n - i + 1)).concat([0]); };
+  const texPoly = (co, v = 'x') => UI.texPoly(co, v, 2);
+  const texIntegPoly = (co) => {
+    const n = co.length - 1;
+    let s = '';
+    co.forEach((c, i) => {
+      if (Math.abs(c) < 1e-12) return;
+      const p = n - i + 1;
+      const fr = UI.toFrac(Math.abs(c) / p, 60);
+      let mag = fr ? (fr[1] === 1 ? (fr[0] === 1 ? '' : String(fr[0])) : `\\tfrac{${fr[0]}}{${fr[1]}}`) : fmt(Math.abs(c) / p, 3);
+      const sym = p === 1 ? 'x' : `x^{${p}}`;
+      if (mag === '' && !sym) mag = '1';
+      s += (s ? (c < 0 ? '-' : '+') : (c < 0 ? '-' : '')) + mag + sym;
+    });
+    return s || '0';
+  };
+  /** 区間 [lo,hi] で g(x)=0 の解 (符号変化を二分法) */
+  function findRoots(g, lo, hi, n = 1200) {
+    const out = [];
+    let px = lo, pv = g(lo);
+    for (let i = 1; i <= n; i++) {
+      const x = lo + (hi - lo) * i / n, v = g(x);
+      if (pv === 0) { if (!out.length || Math.abs(out[out.length - 1] - px) > 1e-6) out.push(px); }
+      else if (pv * v < 0) {
+        let a = px, b = x, fa = pv;
+        for (let k = 0; k < 50; k++) { const m = (a + b) / 2, fm = g(m); if (fa * fm <= 0) b = m; else { a = m; fa = fm; } }
+        out.push((a + b) / 2);
+      }
+      px = x; pv = v;
+    }
+    return out;
+  }
+  const quadRoots = (a, b, c) => {
+    if (Math.abs(a) < 1e-12) return Math.abs(b) < 1e-12 ? [] : [-c / b];
+    const D = b * b - 4 * a * c;
+    if (D < -1e-12) return [];
+    if (D <= 1e-12) return [-b / (2 * a)];
+    return [(-b - Math.sqrt(D)) / (2 * a), (-b + Math.sqrt(D)) / (2 * a)].sort((x, y) => x - y);
+  };
+  const PRESETS = [
+    { label: 'x²', co: [0, 1, 0, 0] },
+    { label: 'x³ − 3x', co: [1, 0, -3, 0] },
+    { label: '−x² + 4x', co: [0, -1, 4, 0] },
+    { label: 'x³ − x² − 2x', co: [1, -1, -2, 0] },
+  ];
+  const niceBound = (v) => { const cands = [4, 6, 8, 10, 15, 20, 30, 40, 60, 80, 120]; for (const c of cands) if (v <= c * 0.9) return c; return 150; };
+  const texLine = (m, n) => 'y=' + UI.texPoly([m, n]);
+
+  /* ======================= 微分係数と接線 ======================= */
+  (() => {
+    const ctl = $('#c-tangent');
+    const st = { co: [0, 1, 0, 0], a: 1, h: 1 };
+    const f = (x) => evalPoly(st.co, x);
+    const df = (x) => evalPoly(derivPoly(st.co), x);
+    const plot = new Plot('#cv-tangent', { xmin: -4, xmax: 4, ymin: -5, ymax: 7, equal: false, aspect: 0.66 });
+    const hA = plot.addHandle({ x: st.a, y: f(st.a), color: C.ink, label: 'A', onMove: (x) => { st.a = Math.max(-3.5, Math.min(3.5, Math.round(x * 4) / 4)); draw(); return [st.a, f(st.a)]; } });
+
+    UI.heading(ctl, '関数 f(x)');
+    UI.select(ctl, { options: PRESETS.map((p, i) => ({ value: i, label: 'f(x) = ' + p.label })), value: 0, onChange: (v) => { st.co = PRESETS[+v].co.slice(); draw(); } });
+    UI.heading(ctl, '点 A と h');
+    const sA = UI.slider(ctl, { label: '$a$（A の $x$ 座標）', min: -3.5, max: 3.5, step: 0.25, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+    const sH = UI.slider(ctl, { label: '$h$', min: 0.01, max: 2, step: 0.01, value: st.h, onInput: (v) => { st.h = v; draw(); } });
+    const anim = UI.animator((dt) => { st.h = Math.max(0.01, st.h * Math.pow(0.25, dt)); sH.set(st.h); draw(); if (st.h <= 0.0101) { anim.stop(); btn.textContent = 'h → 0 を再生'; } });
+    const btn = UI.button(ctl, { label: 'h → 0 を再生', primary: true, onClick: () => { if (anim.running) { anim.stop(); btn.textContent = 'h → 0 を再生'; } else { if (st.h <= 0.011) { st.h = 2; } anim.start(); btn.textContent = '停止'; } } });
+    UI.buttonRow(ctl, [
+      { label: 'h = 1', small: true, onClick: () => { st.h = 1; sH.set(1); draw(); } },
+      { label: 'h = 0.1', small: true, onClick: () => { st.h = 0.1; sH.set(0.1); draw(); } },
+      { label: 'h = 0.01', small: true, onClick: () => { st.h = 0.01; sH.set(0.01); draw(); } },
+    ]);
+
+    const readout = $('#r-tangent');
+    function draw() {
+      const a = st.a, h = st.h, fa = f(a), fb = f(a + h), m = df(a), avg = (fb - fa) / h;
+      hA.x = a; hA.y = fa; sA.set(a);
+      let lo = -1, hi = 1;
+      for (let t = -3; t <= 3; t += 0.05) { lo = Math.min(lo, f(t)); hi = Math.max(hi, f(t)); }
+      const pad = (hi - lo) * 0.15;
+      plot.setView(-4, 4, lo - pad, hi + pad);
+      plot.render((P) => {
+        P.fn(f, { color: C.ink, width: 2.6 });
+        P.line(a, fa, 1, m, { color: C.sage, width: 2.2 });
+        P.line(a, fa, 1, avg, { color: C.ochre, width: 2, dash: [8, 5] });
+        P.segment(a, fa, a + h, fa, { color: C.faint, width: 1, dash: [3, 3] });
+        P.segment(a + h, fa, a + h, fb, { color: C.faint, width: 1, dash: [3, 3] });
+        if (h > 0.15) {
+          P.text(a + h / 2, fa, 'h', { color: C.muted, align: 'center', baseline: fb >= fa ? 'top' : 'bottom', dy: fb >= fa ? 4 : -4, font: Plot.FONT_MATH, bg: true });
+          P.text(a + h, (fa + fb) / 2, 'f(a+h)−f(a)', { color: C.muted, align: 'left', baseline: 'middle', dx: 6, font: Plot.FONT_MATH, bg: true });
+        }
+        P.point(a + h, fb, { color: C.ochre, r: 5.5, label: 'B', dx: 8, dy: -8 });
+        P.legend([{ label: `接線（傾き ${fmt(m, 3)}）`, color: C.sage }, { label: `割線（傾き ${fmt(avg, 3)}）`, color: C.ochre, dash: [8, 5] }], { left: 12, top: 34 });
+      });
+      const b0 = fa - m * a;
+      readout.innerHTML = `
+        <div class="tex-block">$$f(x)=${texPoly(st.co)},\\qquad f'(x)=${texPoly(derivPoly(st.co))}$$</div>
+        <div class="readout-grid">
+          <div class="stat ochre"><div class="k">平均変化率 (f(a+h)−f(a))/h</div><div class="v">${fmt(avg, 4)}</div></div>
+          <div class="stat sage"><div class="k">微分係数 f'(a)</div><div class="v">${fmt(m, 4)}</div></div>
+          <div class="stat"><div class="k">差</div><div class="v">${fmt(Math.abs(avg - m), 4)}</div></div>
+        </div>
+        <div class="tex-block">$$\\frac{f(${fmt(a)}+${fmt(h)})-f(${fmt(a)})}{${fmt(h)}}=\\frac{${fmt(fb, 3)}-${fmt(fa, 3)}}{${fmt(h)}}=${fmt(avg, 4)}\\ \\xrightarrow{\\ h\\to0\\ }\\ f'(${fmt(a)})=${fmt(m, 4)}$$</div>
+        <div class="tex-block">$$\\text{接線：}\\ y=${fmt(m, 3)}(x${a < 0 ? '+' : '-'}${fmt(Math.abs(a))})${fa < 0 ? '-' : '+'}${fmt(Math.abs(fa), 3)}\\quad\\Longrightarrow\\quad y=${UI.texPoly([m, b0], 'x', 3)}$$</div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 導関数のグラフと増減 ======================= */
+  (() => {
+    const ctl = $('#c-deriv');
+    const st = { co: [1, 0, -3, 0], x: 0.5 };
+    const f = (x) => evalPoly(st.co, x);
+    const df = (x) => evalPoly(derivPoly(st.co), x);
+    const pf = new Plot('#cv-deriv-f', { xmin: -4, xmax: 4, ymin: -8, ymax: 8, equal: false, aspect: 0.85 });
+    const pd = new Plot('#cv-deriv-df', { xmin: -4, xmax: 4, ymin: -12, ymax: 12, equal: false, aspect: 0.85, yLabel: "y" });
+    const hX = pf.addHandle({ x: st.x, y: f(st.x), color: C.ochre, onMove: (x) => { st.x = Math.max(-3.9, Math.min(3.9, Math.round(x * 20) / 20)); draw(); return [st.x, f(st.x)]; } });
+    const hX2 = pd.addHandle({ x: st.x, y: df(st.x), color: C.ochre, onMove: (x) => { st.x = Math.max(-3.9, Math.min(3.9, Math.round(x * 20) / 20)); draw(); return [st.x, df(st.x)]; } });
+
+    UI.heading(ctl, '関数 f(x) = ax³ + bx² + cx + d');
+    const sel = UI.select(ctl, { options: PRESETS.map((p, i) => ({ value: i, label: 'f(x) = ' + p.label })), value: 1, onChange: (v) => { st.co = PRESETS[+v].co.slice(); syncSliders(); draw(); } });
+    const sl = [
+      UI.slider(ctl, { label: '$a$', min: -2, max: 2, step: 1, value: st.co[0], digits: 0, onInput: (v) => { st.co[0] = v; draw(); } }),
+      UI.slider(ctl, { label: '$b$', min: -4, max: 4, step: 1, value: st.co[1], digits: 0, onInput: (v) => { st.co[1] = v; draw(); } }),
+      UI.slider(ctl, { label: '$c$', min: -6, max: 6, step: 1, value: st.co[2], digits: 0, onInput: (v) => { st.co[2] = v; draw(); } }),
+      UI.slider(ctl, { label: '$d$', min: -4, max: 4, step: 1, value: st.co[3], digits: 0, onInput: (v) => { st.co[3] = v; draw(); } }),
+    ];
+    const syncSliders = () => sl.forEach((s, i) => s.set(st.co[i]));
+    UI.heading(ctl, '注目する x');
+    const sX = UI.slider(ctl, { label: '$x$', min: -3.9, max: 3.9, step: 0.05, value: st.x, onInput: (v) => { st.x = v; draw(); } });
+
+    const readout = $('#r-deriv');
+    function shadeSigns(P, crit) {
+      const bounds = [P.win.xmin, ...crit.filter((c) => c > P.win.xmin && c < P.win.xmax), P.win.xmax];
+      for (let i = 0; i < bounds.length - 1; i++) {
+        const mid = (bounds[i] + bounds[i + 1]) / 2, s = df(mid);
+        if (Math.abs(s) < 1e-9) continue;
+        P.rect(bounds[i], P.win.ymin, bounds[i + 1] - bounds[i], P.win.ymax - P.win.ymin, { color: 'none', fill: Plot.rgba(s > 0 ? C.sage : C.clay, 0.10) });
+      }
+    }
+    function draw() {
+      const x = st.x, fx = f(x), m = df(x);
+      const d = derivPoly(st.co);
+      const crit = quadRoots(d[0], d[1], d[2]).filter((r) => isFinite(r));
+      hX.x = x; hX.y = fx; hX2.x = x; hX2.y = m; sX.set(x);
+      let yf = 0, yd = 0;
+      for (let t = -2.5; t <= 2.5; t += 0.05) { yf = Math.max(yf, Math.abs(f(t))); yd = Math.max(yd, Math.abs(df(t))); }
+      pf.setView(-4, 4, -niceBound(yf), niceBound(yf));
+      pd.setView(-4, 4, -niceBound(yd), niceBound(yd));
+      pf.render((P) => {
+        shadeSigns(P, crit);
+        P.fn(f, { color: C.ink, width: 2.6 });
+        for (const c of crit) P.point(c, f(c), { color: C.clay, r: 5, hollow: true });
+        P.vline(x, { color: C.ochre, width: 1, dash: [4, 4] });
+        P.line(x, fx, 1, m, { color: C.sage, width: 2 });
+        P.text(x, fx, `傾き ${fmt(m, 2)}`, { color: C.sageSolid, dx: 12, dy: 20, bg: true });
+      });
+      pd.render((P) => {
+        shadeSigns(P, crit);
+        P.fn(df, { color: C.sage, width: 2.6 });
+        for (const c of crit) P.point(c, 0, { color: C.clay, r: 5, hollow: true, label: `x=${fmt(c, 2)}`, dx: -8, dy: 22 });
+        P.vline(x, { color: C.ochre, width: 1, dash: [4, 4] });
+        P.dropLines(x, m, { color: C.ochre });
+        P.text(x, m, `f'(x) = ${fmt(m, 2)}`, { color: C.sageSolid, dx: 12, dy: m >= 0 ? -10 : 20, bg: true });
+      });
+
+      // 増減表
+      const cells = [];
+      const cols = [];
+      const cs = crit.slice().sort((p, q) => p - q);
+      const uniq = cs.filter((c, i) => i === 0 || Math.abs(c - cs[i - 1]) > 1e-9);
+      const intervalsX = [-Infinity, ...uniq, Infinity];
+      for (let i = 0; i < intervalsX.length - 1; i++) {
+        const lo = intervalsX[i], hi = intervalsX[i + 1];
+        const mid = !isFinite(lo) ? (isFinite(hi) ? hi - 1 : 0) : !isFinite(hi) ? lo + 1 : (lo + hi) / 2;
+        const s = df(mid);
+        cols.push({ x: '…', d: Math.abs(s) < 1e-9 ? '0' : s > 0 ? '+' : '−', f: Math.abs(s) < 1e-9 ? '一定' : s > 0 ? '↗' : '↘', cls: '' });
+        if (i < uniq.length) {
+          const c = uniq[i];
+          const left = df(c - 1e-3), right = df(c + 1e-3);
+          const kind = left > 0 && right < 0 ? '極大' : left < 0 && right > 0 ? '極小' : '';
+          cols.push({ x: fmt(c, 2), d: '0', f: (kind ? `<span class="small">${kind}</span> ` : '') + fmt(f(c), 2), cls: kind === '極大' ? 'hl-clay' : kind === '極小' ? 'hl-sage' : '' });
+        }
+      }
+      const row = (k, key) => `<tr><th>${k}</th>${cols.map((c) => `<td class="${key === 'f' ? c.cls : ''}">${c[key]}</td>`).join('')}</tr>`;
+      const isCubic = Math.abs(st.co[0]) > 1e-12;
+      const Dd = d[1] * d[1] - 4 * d[0] * d[2];
+      readout.innerHTML = `
+        <div class="tex-block">$$f(x)=${texPoly(st.co)},\\qquad f'(x)=${texPoly(d)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ochre"><div class="k">x</div><div class="v">${fmt(x, 2)}</div></div>
+          <div class="stat ink"><div class="k">f(x)</div><div class="v">${fmt(fx, 3)}</div></div>
+          <div class="stat sage"><div class="k">f'(x) ＝ 接線の傾き</div><div class="v">${fmt(m, 3)}</div></div>
+          <div class="stat ${Math.abs(m) < 1e-9 ? 'clay' : m > 0 ? 'sage' : 'clay'}"><div class="k">x のまわりで f は</div><div class="v">${Math.abs(m) < 1e-9 ? 'f\'=0' : m > 0 ? '増加' : '減少'}</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:0.6rem"><table class="data">${row('$x$', 'x')}${row("$f'(x)$", 'd')}${row('$f(x)$', 'f')}</table></div>
+        <p class="small">${isCubic ? (Dd > 1e-9 ? `$f'(x)=0$ は異なる 2 つの実数解をもつので、極大と極小が 1 つずつある。` : Dd < -1e-9 ? `$f'(x)=0$ が実数解をもたない（判別式 $\\lt0$）ので、$f'$ の符号は変わらず極値はない。` : `$f'(x)=0$ は重解。$f'$ の符号は変わらないので、そこでは接線が水平になるが極値ではない。`) : Math.abs(st.co[1]) > 1e-12 ? '2 次関数：頂点で極値をとる。' : '1 次以下：$f\'$ は定数で、増減は変わらない。'}</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 極値と実数解の個数 ======================= */
+  (() => {
+    const ctl = $('#c-extrema');
+    const st = { co: [1, 0, -3, 0], k: 1 };
+    const f = (x) => evalPoly(st.co, x);
+    const plot = new Plot('#cv-extrema', { xmin: -4, xmax: 4, ymin: -8, ymax: 8, equal: false, aspect: 0.66 });
+    const hK = plot.addHandle({ x: 3.2, y: st.k, color: C.ochre, label: 'y = k', onMove: (x, y) => { st.k = Math.max(-10, Math.min(10, Math.round(y * 10) / 10)); sK.set(st.k); draw(); return [3.2, st.k]; } });
+
+    UI.heading(ctl, '関数 f(x) = ax³ + bx² + cx + d');
+    UI.select(ctl, { options: PRESETS.map((p, i) => ({ value: i, label: 'f(x) = ' + p.label })), value: 1, onChange: (v) => { st.co = PRESETS[+v].co.slice(); sl.forEach((s, i) => s.set(st.co[i])); draw(); } });
+    const sl = [
+      UI.slider(ctl, { label: '$a$', min: -2, max: 2, step: 1, value: st.co[0], digits: 0, onInput: (v) => { st.co[0] = v; draw(); } }),
+      UI.slider(ctl, { label: '$b$', min: -4, max: 4, step: 1, value: st.co[1], digits: 0, onInput: (v) => { st.co[1] = v; draw(); } }),
+      UI.slider(ctl, { label: '$c$', min: -6, max: 6, step: 1, value: st.co[2], digits: 0, onInput: (v) => { st.co[2] = v; draw(); } }),
+      UI.slider(ctl, { label: '$d$', min: -4, max: 4, step: 1, value: st.co[3], digits: 0, onInput: (v) => { st.co[3] = v; draw(); } }),
+    ];
+    UI.heading(ctl, '直線 y = k');
+    const sK = UI.slider(ctl, { label: '$k$', min: -10, max: 10, step: 0.1, value: st.k, onInput: (v) => { st.k = v; draw(); } });
+
+    const readout = $('#r-extrema');
+    function draw() {
+      const k = st.k;
+      const d = derivPoly(st.co);
+      const crit = quadRoots(d[0], d[1], d[2]).filter((r) => isFinite(r));
+      const ext = crit.map((c) => { const l = evalPoly(d, c - 1e-3), r = evalPoly(d, c + 1e-3); return { x: c, y: f(c), kind: l > 0 && r < 0 ? '極大' : l < 0 && r > 0 ? '極小' : '' }; }).filter((e) => e.kind);
+      let yf = Math.abs(k);
+      for (let t = -2.5; t <= 2.5; t += 0.05) yf = Math.max(yf, Math.abs(f(t)));
+      for (const e of ext) yf = Math.max(yf, Math.abs(e.y) * 1.2);
+      const Y = niceBound(yf);
+      plot.setView(-4, 4, -Y, Y);
+      const sols = findRoots((x) => f(x) - k, -40, 40, 4000);
+      hK.y = k; hK.x = 3.2;
+      plot.render((P) => {
+        P.fn(f, { color: C.ink, width: 2.6 });
+        for (const e of ext) {
+          P.hline(e.y, { color: C.clay, width: 1.2, dash: [6, 4] });
+          P.text(P.win.xmin, e.y, `${e.kind}値 ${fmt(e.y, 2)}`, { color: C.clay, dx: 8, dy: -6, bg: true });
+          P.point(e.x, e.y, { color: C.clay, r: 4.5 });
+        }
+        P.hline(k, { color: C.ochre, width: 2 });
+        for (const s of sols) { P.point(s, k, { color: C.sage, r: 6.5 }); P.segment(s, 0, s, k, { color: C.sage, width: 1, dash: [3, 4] }); P.text(s, 0, fmt(s, 2), { color: C.sageSolid, align: 'center', baseline: 'top', dy: 6, bg: true }); }
+      });
+      const n = sols.length;
+      let why;
+      if (ext.length === 2) {
+        const lo = Math.min(ext[0].y, ext[1].y), hi = Math.max(ext[0].y, ext[1].y);
+        why = Math.abs(k - lo) < 1e-6 || Math.abs(k - hi) < 1e-6 ? `$k$ が極値に等しいので、接する点を含めて 2 個。` : k > lo && k < hi ? `極小値 $${fmt(lo, 2)}\\lt k\\lt$ 極大値 $${fmt(hi, 2)}$ なので 3 個。` : `$k$ が極値の範囲の外なので 1 個。`;
+      } else if (ext.length === 1) why = `2 次関数：$k$ が${ext[0].kind}値 $${fmt(ext[0].y, 2)}$ より${(ext[0].kind === '極小') ? '大きければ 2 個、等しければ 1 個、小さければ 0 個' : '小さければ 2 個、等しければ 1 個、大きければ 0 個'}。`;
+      else why = Math.abs(st.co[0]) > 1e-12 ? `極値をもたない 3 次関数なので、どんな $k$ でも 1 個。` : `1 次以下の関数。`;
+      readout.innerHTML = `
+        <div class="tex-block">$$${texPoly(st.co)}=${fmt(k)}$$</div>
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">実数解の個数</div><div class="v">${n} 個</div></div>
+          <div class="stat"><div class="k">解</div><div class="v">${n ? sols.map((s) => fmt(s, 3)).join(', ') : 'なし'}</div></div>
+          ${ext.map((e) => `<div class="stat clay"><div class="k">${e.kind}値（x = ${fmt(e.x, 2)}）</div><div class="v">${fmt(e.y, 3)}</div></div>`).join('')}
+        </div>
+        <p class="small">${why}</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 定積分と面積 ======================= */
+  (() => {
+    const ctl = $('#c-integral');
+    const IPRESETS = [
+      { label: 'x²', co: [1, 0, 0] },
+      { label: '−x² + 4', co: [-1, 0, 4] },
+      { label: 'x³ − 3x', co: [1, 0, -3, 0] },
+      { label: '(x − 1)(x − 3)', co: [1, -4, 3] },
+    ];
+    const st = { co: [1, 0, 0], a: 0, b: 2, mode: 'def', n: 8, m: 1, q: 2 };
+    const f = (x) => evalPoly(st.co, x);
+    const g = (x) => st.m * x + st.q;
+    const F = (x) => evalPoly(integPoly(st.co), x);
+    const plot = new Plot('#cv-integral', { xmin: -4.5, xmax: 4.5, ymin: -5, ymax: 7, equal: false, aspect: 0.66 });
+    const snap = (x) => Math.round(x * 4) / 4;
+    const hA = plot.addHandle({ x: st.a, y: 0, color: C.ochre, label: 'a', dx: -6, dy: 26, onMove: (x) => { st.a = Math.min(snap(x), st.b - 0.25); sA.set(st.a); draw(); return [st.a, 0]; } });
+    const hB = plot.addHandle({ x: st.b, y: 0, color: C.ochre, label: 'b', dx: -6, dy: 26, onMove: (x) => { st.b = Math.max(snap(x), st.a + 0.25); sB.set(st.b); draw(); return [st.b, 0]; } });
+
+    UI.heading(ctl, 'テーマ');
+    UI.segmented(ctl, { options: [{ value: 'def', label: '定積分' }, { value: 'riemann', label: '区分求積' }, { value: 'two', label: '2 曲線' }], value: 'def', onChange: (v) => { st.mode = v; nBox.style.display = v === 'riemann' ? 'flex' : 'none'; gBox.style.display = v === 'two' ? 'flex' : 'none'; draw(); } });
+    UI.heading(ctl, '関数 f(x)');
+    UI.select(ctl, { options: IPRESETS.map((p, i) => ({ value: i, label: 'f(x) = ' + p.label })), value: 0, onChange: (v) => { st.co = IPRESETS[+v].co.slice(); draw(); } });
+    UI.heading(ctl, '区間 [a, b]');
+    const sA = UI.slider(ctl, { label: '$a$', min: -4, max: 4, step: 0.25, value: st.a, onInput: (v) => { st.a = Math.min(v, st.b - 0.25); sA.set(st.a); draw(); } });
+    const sB = UI.slider(ctl, { label: '$b$', min: -4, max: 4, step: 0.25, value: st.b, onInput: (v) => { st.b = Math.max(v, st.a + 0.25); sB.set(st.b); draw(); } });
+    const nBox = UI.el('div', { style: 'display:none;flex-direction:column;gap:0.55rem' });
+    const gBox = UI.el('div', { style: 'display:none;flex-direction:column;gap:0.55rem' });
+    ctl.append(nBox, gBox);
+    UI.heading(nBox, '長方形の個数');
+    UI.slider(nBox, { label: '$n$', min: 1, max: 60, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+    UI.heading(gBox, '直線 g(x) = mx + n');
+    const sM = UI.slider(gBox, { label: '$m$（傾き）', min: -4, max: 4, step: 0.5, value: st.m, onInput: (v) => { st.m = v; draw(); } });
+    const sQ = UI.slider(gBox, { label: '$n$（切片）', min: -6, max: 6, step: 0.5, value: st.q, onInput: (v) => { st.q = v; draw(); } });
+    UI.buttonRow(gBox, [{ label: '交点に合わせる（a, b ← α, β）', small: true, onClick: () => {
+      const r = findRoots((x) => f(x) - g(x), -4, 4);
+      if (r.length >= 2) { st.a = r[0]; st.b = r[1]; sA.set(st.a); sB.set(st.b); draw(); }
+    } }]);
+
+    const readout = $('#r-integral');
+    function shadeSigned(P, top, bottom, a, b) {
+      P.fillBetween((x) => Math.max(top(x), bottom(x)), bottom, a, b, { fill: Plot.rgba(C.sage, 0.35), samples: 300 });
+      P.fillBetween((x) => Math.min(top(x), bottom(x)), bottom, a, b, { fill: Plot.rgba(C.clay, 0.35), samples: 300 });
+    }
+    function draw() {
+      const { a, b, mode } = st;
+      hA.x = a; hB.x = b;
+      const I = F(b) - F(a);
+      let pos = 0, neg = 0;
+      const NS = 2000;
+      for (let i = 0; i < NS; i++) { const x = a + (b - a) * (i + 0.5) / NS, v = f(x) * (b - a) / NS; if (v > 0) pos += v; else neg += v; }
+      const zeros = findRoots(f, a, b).filter((z) => z > a + 1e-6 && z < b - 1e-6);
+      let riemann = 0;
+      if (mode === 'riemann') { const w = (b - a) / st.n; for (let i = 0; i < st.n; i++) riemann += f(a + i * w) * w; }
+      let I2 = 0, roots2 = [];
+      if (mode === 'two') { const G = (x) => evalPoly(integPoly([st.m, st.q]), x); I2 = I - (G(b) - G(a)); roots2 = findRoots((x) => f(x) - g(x), -4, 4); }
+
+      plot.render((P) => {
+        if (mode === 'def') shadeSigned(P, f, () => 0, a, b);
+        else if (mode === 'two') shadeSigned(P, f, g, a, b);
+        else {
+          const w = (b - a) / st.n;
+          for (let i = 0; i < st.n; i++) { const x = a + i * w, y = f(x); P.rect(x, 0, w, y, { color: C.ochreDeep, width: 1, fill: Plot.rgba(C.ochre, 0.32) }); }
+          P.fillBetween(f, () => 0, a, b, { fill: Plot.rgba(C.ink, 0.06), samples: 300 });
+        }
+        P.fn(f, { color: C.ink, width: 2.6 });
+        if (mode === 'two') { P.fn(g, { color: C.clay, width: 2 }); for (const r of roots2) P.point(r, g(r), { color: C.clay, r: 4.5, hollow: true }); }
+        P.segment(a, 0, a, f(a), { color: C.ochre, width: 1.2, dash: [4, 4] });
+        P.segment(b, 0, b, f(b), { color: C.ochre, width: 1.2, dash: [4, 4] });
+        if (mode === 'def') for (const z of zeros) P.point(z, 0, { color: C.clay, r: 4, hollow: true, label: fmt(z, 2), dx: -6, dy: -8 });
+        const items = [{ label: `y = f(x)`, color: C.ink }];
+        if (mode === 'two') items.push({ label: 'y = g(x)', color: C.clay });
+        P.legend(items, { left: 12, top: 34 });
+      });
+
+      const Fco = integPoly(st.co);
+      const texF = texIntegPoly(st.co);
+      let html = `<div class="tex-block">$$\\int_{${fmt(a)}}^{${fmt(b)}}\\left(${texPoly(st.co)}\\right)dx=\\Big[${texF}\\Big]_{${fmt(a)}}^{${fmt(b)}}=${fmt(F(b), 3)}-(${fmt(F(a), 3)})=${fmt(I, 4)}$$</div>`;
+      if (mode === 'def') {
+        html += `<div class="readout-grid">
+          <div class="stat ink"><div class="k">定積分の値</div><div class="v">${fmt(I, 4)}</div></div>
+          <div class="stat sage"><div class="k">x 軸より上の部分（＋）</div><div class="v">${fmt(pos, 4)}</div></div>
+          <div class="stat clay"><div class="k">x 軸より下の部分（−）</div><div class="v">${fmt(neg, 4)}</div></div>
+          <div class="stat"><div class="k">面積（絶対値の和）</div><div class="v">${fmt(pos - neg, 4)}</div></div>
+        </div>
+        <p class="small">${zeros.length ? `区間内で $x=${zeros.map((z) => fmt(z, 2)).join(',\\ ')}$ を境に符号が変わる。面積を求めるなら、そこで積分を分けて下の部分の符号を反転する。` : 'この区間ではグラフは $x$ 軸の片側にある。'}</p>`;
+      } else if (mode === 'riemann') {
+        const w = (b - a) / st.n;
+        html += `<div class="readout-grid">
+          <div class="stat ochre"><div class="k">長方形の和（n = ${st.n}, 幅 ${fmt(w, 3)}）</div><div class="v">${fmt(riemann, 4)}</div></div>
+          <div class="stat ink"><div class="k">定積分</div><div class="v">${fmt(I, 4)}</div></div>
+          <div class="stat"><div class="k">誤差</div><div class="v">${fmt(Math.abs(riemann - I), 4)}</div></div>
+        </div>
+        <div class="tex-block">$$\\sum_{k=0}^{n-1} f\\!\\left(a+k\\,\\frac{b-a}{n}\\right)\\frac{b-a}{n}\\ \\xrightarrow{\\ n\\to\\infty\\ }\\ \\int_a^b f(x)\\,dx$$</div>
+        <p class="small">左端の高さの長方形を並べている。$n$ を大きくすると和が定積分に近づく（数学IIIの区分求積法の考え方）。</p>`;
+      } else {
+        const isQuad = st.co.length === 3;
+        const snapped = roots2.length >= 2 && Math.abs(roots2[0] - a) < 1e-6 && Math.abs(roots2[1] - b) < 1e-6;
+        const p = isQuad ? st.co[0] : 0;
+        html = `<div class="tex-block">$$\\int_{${fmt(a)}}^{${fmt(b)}}\\{f(x)-g(x)\\}dx=\\int_{${fmt(a)}}^{${fmt(b)}}\\left(${texPoly(st.co.slice(0, -2).concat([st.co[st.co.length - 2] - st.m, st.co[st.co.length - 1] - st.q]))}\\right)dx=${fmt(I2, 4)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">∫(f − g) dx</div><div class="v">${fmt(I2, 4)}</div></div>
+          <div class="stat clay"><div class="k">交点の x 座標 α, β</div><div class="v">${roots2.length ? roots2.map((r) => fmt(r, 3)).join(', ') : 'なし'}</div></div>
+          ${isQuad && roots2.length >= 2 ? `<div class="stat sage"><div class="k">1/6 公式 |p|(β−α)³/6</div><div class="v">${fmt(Math.abs(p) * Math.pow(roots2[1] - roots2[0], 3) / 6, 4)}</div></div>` : ''}
+        </div>
+        <p class="small">$g(x)=${texPoly([st.m, st.q])}$。緑は $f\\gt g$、赤は $f\\lt g$ の部分。${isQuad && roots2.length >= 2 ? (snapped ? `区間が交点 $\\alpha,\\beta$ に一致しているので、$\\dfrac{|${fmt(p)}|}{6}(${fmt(roots2[1], 3)}-${roots2[0] < 0 ? `(${fmt(roots2[0], 3)})` : fmt(roots2[0], 3)})^3=${fmt(Math.abs(p) * Math.pow(roots2[1] - roots2[0], 3) / 6, 4)}$ と定積分の絶対値が一致する。` : '「交点に合わせる」を押すと 1/6 公式と比較できる。') : ''}</p>`;
+      }
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'tangent', label: '微分係数と接線' },
+    { id: 'derivative', label: '導関数と増減' },
+    { id: 'extrema', label: '極値と実数解の個数' },
+    { id: 'integral', label: '定積分と面積' },
+  ]);
+});
+</script>
+</body>
+</html>

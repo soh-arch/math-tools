@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ベクトル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<style>.controls .segmented { flex-wrap: wrap; } .controls .segmented button { white-space: nowrap; }</style>
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>ベクトル</h1>
+    <p class="lede">矢印の先をドラッグして、和・差・実数倍、内積と正射影、一次独立な 2 つのベクトルによる分解、位置ベクトルで表す点や領域、空間ベクトルを目で確かめます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 和・差・実数倍 -->
+  <section class="tool-body" data-tab="addsub">
+    <div class="layout">
+      <aside class="controls" id="c-addsub"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-addsub"></canvas><div class="caption">a, b の先端をドラッグできます</div></div>
+        <div class="readout" id="r-addsub"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">和は平行四辺形、差は「引く方の先端から引かれる方の先端へ」</div>
+        $\vec a=(a_1,a_2),\ \vec b=(b_1,b_2)$ のとき $\vec a+\vec b=(a_1+b_1,\ a_2+b_2)$、$\vec a-\vec b=(a_1-b_1,\ a_2-b_2)$、$k\vec a=(ka_1,\ ka_2)$。
+        $\vec a+\vec b$ は $\vec a$ の先端に $\vec b$ を継ぎ足した矢印で、$\vec a$ と $\vec b$ が作る平行四辺形の対角線になります。
+        $\vec a-\vec b$ は $\vec b$ の先端から $\vec a$ の先端へ向かう矢印と同じ（向きと大きさが等しい）です。
+      </div>
+      <ul>
+        <li>$\vec b$ を $\vec a$ と同じ向きにすると平行四辺形がつぶれ、$|\vec a+\vec b|=|\vec a|+|\vec b|$ になる。逆向きにすると $|\vec a-\vec b|$ が最大になる。</li>
+        <li>$k$ を負にすると $k\vec a$ は逆向きになる。$|k\vec a|=|k|\,|\vec a|$ を読み取り欄で確かめよう。</li>
+        <li>「継ぎ足し」表示に切り替えると、$\vec b$ を平行移動しても同じベクトルであることが見える。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 内積 -->
+  <section class="tool-body" data-tab="dot">
+    <div class="layout">
+      <aside class="controls" id="c-dot"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-dot"></canvas><div class="caption">a, b の先端をドラッグできます</div></div>
+        <div class="readout" id="r-dot"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">内積の 2 つの顔</div>
+        定義は $\vec a\cdot\vec b=|\vec a|\,|\vec b|\cos\theta$（$\theta$ はなす角、$0^\circ\le\theta\le180^\circ$）。成分では $\vec a\cdot\vec b=a_1b_1+a_2b_2$。
+        $|\vec b|\cos\theta$ は $\vec b$ を $\vec a$ の方向に正射影した長さ（緑の太線、$\theta>90^\circ$ なら負）なので、内積は「$|\vec a|\times$（$\vec b$ の $\vec a$ 方向の成分）」です。
+      </div>
+      <ul>
+        <li>$\vec b$ の先端を $\vec a$ に垂直な位置へ動かすと内積が $0$ になる。「垂直にする」ボタンで確かめて、$a_1b_1+a_2b_2=0$ を計算で確認しよう。</li>
+        <li>$\vec b$ を回して $\theta$ が $90^\circ$ を越える瞬間に、正射影の向きが反転し内積の符号が変わる。</li>
+        <li>$|\vec b|$ を変えずに $\theta$ だけ動かすと、内積は $\cos\theta$ に比例して変わる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 一次独立と分解 -->
+  <section class="tool-body" data-tab="decomp">
+    <div class="layout">
+      <aside class="controls" id="c-decomp"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-decomp"></canvas><div class="caption">a, b, p の先端をドラッグできます</div></div>
+        <div class="readout" id="r-decomp"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">平面上の任意のベクトルは $s\vec a+t\vec b$ とただ一通りに表せる</div>
+        $\vec a,\vec b$ が一次独立（$\vec 0$ でなく平行でない）なら、任意の $\vec p$ に対して $\vec p=s\vec a+t\vec b$ となる実数 $s,t$ がただ一組存在します。
+        成分で書くと $\begin{cases}a_1s+b_1t=p_1\\ a_2s+b_2t=p_2\end{cases}$ という連立方程式で、$a_1b_2-a_2b_1\ne0$ が解けるための条件です。
+      </div>
+      <ul>
+        <li>薄い斜めの格子は $s,t$ が整数の点。$\vec p$ を格子点に置くと $s,t$ が整数になる（「整数に吸着」で試せる）。</li>
+        <li>$\vec b$ を $\vec a$ と平行にすると格子がつぶれて $s,t$ が定まらない（一次従属）。$\vec p$ がその直線上にないと表せないことを見よう。</li>
+        <li>$\vec a,\vec b$ を $(1,0),(0,1)$ にすると、いつもの $xy$ 座標に戻る。斜交座標は「基底を取り替えた座標」だとわかる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 位置ベクトルと図形 -->
+  <section class="tool-body" data-tab="position">
+    <div class="layout">
+      <aside class="controls" id="c-position"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-position"></canvas><div class="caption">A, B をドラッグできます</div></div>
+        <div class="readout" id="r-position"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">$\overrightarrow{OP}=s\overrightarrow{OA}+t\overrightarrow{OB}$ の $(s,t)$ が点 P の「住所」</div>
+        線分 AB を $m:n$ に内分する点は $\overrightarrow{OP}=\dfrac{n\vec a+m\vec b}{m+n}$、重心は $\dfrac{\vec a+\vec b}{3}$（三角形 OAB）。
+        点 P が直線 AB 上 $\iff s+t=1$。三角形 OAB の内部および周 $\iff s\ge0,\ t\ge0,\ s+t\le1$。
+      </div>
+      <ul>
+        <li>「線分 AB 上」で $s$ を動かすと、$t=1-s$ となり P は AB 上を動く。$s$ が $0$ から $1$ の外に出ると直線 AB 上ではあるが線分の外になる。</li>
+        <li>「軌跡」で $k$ を変えると、直線 $s+t=k$ は AB に平行に動く。$k=1$ で AB そのもの、$k=0$ で O を通る。</li>
+        <li>内分点の $m:n$ を変えて、$s=\dfrac{n}{m+n},\ t=\dfrac{m}{m+n}$（$m$ と $n$ の位置が入れ替わる）ことを読み取り欄で確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 空間ベクトル -->
+  <section class="tool-body" data-tab="space">
+    <div class="layout">
+      <aside class="controls" id="c-space"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-space"></canvas><div class="caption">画面をドラッグすると視点が回ります</div></div>
+        <div class="readout" id="r-space"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">成分が 3 つになっても、計算のかたちは同じ</div>
+        $\vec a=(a_1,a_2,a_3)$ のとき $|\vec a|=\sqrt{a_1^2+a_2^2+a_3^2}$（直方体の対角線）、$\vec a\cdot\vec b=a_1b_1+a_2b_2+a_3b_3=|\vec a||\vec b|\cos\theta$。
+        なす角 $\theta$ は 2 つのベクトルを含む平面の中で測ります。
+      </div>
+      <ul>
+        <li>視点を回して、$\vec a$ の点線の直方体（各成分）が本当に $x,y,z$ 方向の長さになっていることを確かめよう。</li>
+        <li>$\vec a$ と $\vec b$ を含む平面が画面と平行になる向きから見ると、$\theta$ が正しい大きさに見える。他の向きでは見かけの角度が変わる（射影）。</li>
+        <li>$\vec b=(1,1,0)$、$\vec a=(0,0,2)$ など、内積が $0$ になる組み合わせをつくって垂直を確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学C', title: 'ベクトル' });
+
+  const VEC = '';
+  const texVec = (name, v, d = 2) => `\\vec{${name}}=(${fmt(v.x, d)},\\ ${fmt(v.y, d)})`;
+  const norm = (v) => Math.hypot(v.x, v.y);
+  const snap = (v) => Math.round(v * 2) / 2;
+  const PURPLE = C.series[4];
+
+  /* ======================= 和・差・実数倍 ======================= */
+  (() => {
+    const ctl = $('#c-addsub');
+    const st = { a: { x: 3, y: 1 }, b: { x: 1, y: 2.5 }, k: 1.5, mode: 'para' };
+    const plot = new Plot('#cv-addsub', { xmin: -7, xmax: 7, ymin: -5.5, ymax: 5.5 });
+    const hA = plot.addHandle({ x: st.a.x, y: st.a.y, color: C.ink, label: 'a' + VEC, onMove: (x, y) => { st.a = { x: snap(x), y: snap(y) }; return [st.a.x, st.a.y]; } });
+    const hB = plot.addHandle({ x: st.b.x, y: st.b.y, color: C.clay, label: 'b' + VEC, onMove: (x, y) => { st.b = { x: snap(x), y: snap(y) }; return [st.b.x, st.b.y]; } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, '表示');
+    const cSum = UI.checkbox(ctl, { label: '和 $\\vec a+\\vec b$', checked: true, onChange: draw });
+    const seg = UI.segmented(ctl, { options: [{ value: 'para', label: '平行四辺形' }, { value: 'tail', label: '継ぎ足し' }], value: 'para', onChange: (v) => { st.mode = v; draw(); } });
+    const cDiff = UI.checkbox(ctl, { label: '差 $\\vec a-\\vec b$', checked: true, onChange: draw });
+    const cK = UI.checkbox(ctl, { label: '実数倍 $k\\vec a$', checked: true, onChange: draw });
+    const sK = UI.slider(ctl, { label: '$k$', min: -2, max: 2, step: 0.25, value: st.k, onInput: (v) => { st.k = v; draw(); } });
+    UI.divider(ctl);
+    UI.buttonRow(ctl, [
+      { label: 'b を a と同じ向きに', small: true, onClick: () => { const n = norm(st.a) || 1; const m = norm(st.b); st.b = { x: st.a.x / n * m, y: st.a.y / n * m }; draw(); } },
+      { label: 'リセット', small: true, onClick: () => { st.a = { x: 3, y: 1 }; st.b = { x: 1, y: 2.5 }; st.k = 1.5; sK.set(st.k); draw(); } },
+    ]);
+
+    const readout = $('#r-addsub');
+    function draw() {
+      hA.x = st.a.x; hA.y = st.a.y; hB.x = st.b.x; hB.y = st.b.y;
+      const a = st.a, b = st.b, k = st.k;
+      const sum = { x: a.x + b.x, y: a.y + b.y }, dif = { x: a.x - b.x, y: a.y - b.y }, ka = { x: k * a.x, y: k * a.y };
+      plot.render((P) => {
+        if (cK.get()) {
+          P.arrow(0, 0, ka.x, ka.y, { color: C.ochre, width: 7, alpha: 0.35, head: 16 });
+          if (Math.abs(k) > 1e-9 && Math.abs(k - 1) > 1e-9) P.label(ka.x, ka.y, `k a${VEC}`, { color: C.ochre, dx: 8, dy: 18 });
+        }
+        if (cSum.get()) {
+          if (st.mode === 'para') {
+            P.arrow(b.x, b.y, sum.x, sum.y, { color: C.ink, width: 1.5, dash: [5, 4], alpha: 0.7 });
+            P.arrow(a.x, a.y, sum.x, sum.y, { color: C.clay, width: 1.5, dash: [5, 4], alpha: 0.7 });
+          } else {
+            P.arrow(a.x, a.y, sum.x, sum.y, { color: C.clay, width: 2.2, alpha: 0.85 });
+          }
+          P.arrow(0, 0, sum.x, sum.y, { color: PURPLE, width: 2.6 });
+          P.label(sum.x, sum.y, `a${VEC}+b${VEC}`, { color: PURPLE, dx: 8, dy: -6 });
+        }
+        if (cDiff.get()) {
+          P.arrow(b.x, b.y, a.x, a.y, { color: C.sage, width: 2.4 });
+          P.arrow(0, 0, dif.x, dif.y, { color: C.sage, width: 1.6, dash: [6, 4] });
+          P.label(dif.x, dif.y, `a${VEC}−b${VEC}`, { color: C.sage, dx: 8, dy: 16 });
+          P.label((a.x + b.x) / 2, (a.y + b.y) / 2, `a${VEC}−b${VEC}`, { color: C.sage, dx: 6, dy: -4 });
+        }
+        P.arrow(0, 0, a.x, a.y, { color: C.ink, width: 2.8 });
+        P.arrow(0, 0, b.x, b.y, { color: C.clay, width: 2.8 });
+        P.point(0, 0, { color: C.text, r: 3 });
+      });
+      const row = (k, v, color) => `<span class="k">${k}</span><span class="v" style="color:${color}">${v}</span>`;
+      let rows = row('$|\\vec a|$', `√(${fmt(a.x)}² + ${fmt(a.y)}²) = √${fmt(a.x * a.x + a.y * a.y)} = ${fmt(norm(a), 3)}`, 'var(--ink-text)')
+        + row('$|\\vec b|$', `√(${fmt(b.x)}² + ${fmt(b.y)}²) = √${fmt(b.x * b.x + b.y * b.y)} = ${fmt(norm(b), 3)}`, 'var(--clay-text)');
+      if (cSum.get()) rows += row('$\\vec a+\\vec b$', `(${fmt(a.x)}+${fmt(b.x)}, ${fmt(a.y)}+${fmt(b.y)}) = (${fmt(sum.x)}, ${fmt(sum.y)})　|a+b| = ${fmt(norm(sum), 3)}`, PURPLE);
+      if (cDiff.get()) rows += row('$\\vec a-\\vec b$', `(${fmt(a.x)}−${fmt(b.x)}, ${fmt(a.y)}−${fmt(b.y)}) = (${fmt(dif.x)}, ${fmt(dif.y)})　|a−b| = ${fmt(norm(dif), 3)}`, 'var(--sage-text)');
+      if (cK.get()) rows += row(`$k\\vec a$ (k = ${fmt(k)})`, `(${fmt(k)}·${fmt(a.x)}, ${fmt(k)}·${fmt(a.y)}) = (${fmt(ka.x)}, ${fmt(ka.y)})　|ka| = ${fmt(norm(ka), 3)} = |k||a|`, 'var(--ochre-text)');
+      readout.innerHTML = `<div class="tex-block">$$${texVec('a', a)},\\qquad ${texVec('b', b)}$$</div><div class="kv">${rows}</div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 内積 ======================= */
+  (() => {
+    const ctl = $('#c-dot');
+    const st = { a: { x: 4, y: 1 }, b: { x: 1.5, y: 3 } };
+    const plot = new Plot('#cv-dot', { xmin: -7, xmax: 7, ymin: -5.5, ymax: 5.5 });
+    const hA = plot.addHandle({ x: st.a.x, y: st.a.y, color: C.ink, label: 'a' + VEC, onMove: (x, y) => { st.a = { x: snap(x), y: snap(y) }; if (norm(st.a) < 0.5) st.a = { x: 0.5, y: 0 }; return [st.a.x, st.a.y]; } });
+    const hB = plot.addHandle({ x: st.b.x, y: st.b.y, color: C.clay, label: 'b' + VEC, onMove: (x, y) => { st.b = { x: snap(x), y: snap(y) }; if (norm(st.b) < 0.5) st.b = { x: 0, y: 0.5 }; return [st.b.x, st.b.y]; } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, '操作');
+    UI.buttonRow(ctl, [
+      { label: '垂直にする', small: true, onClick: () => { const n = norm(st.a), m = norm(st.b); const perp = { x: -st.a.y / n, y: st.a.x / n }; const side = perp.x * st.b.x + perp.y * st.b.y >= 0 ? 1 : -1; st.b = { x: perp.x * m * side, y: perp.y * m * side }; draw(); } },
+      { label: '平行にする', small: true, onClick: () => { const n = norm(st.a), m = norm(st.b); const side = (st.a.x * st.b.x + st.a.y * st.b.y) >= 0 ? 1 : -1; st.b = { x: st.a.x / n * m * side, y: st.a.y / n * m * side }; draw(); } },
+    ]);
+    UI.divider(ctl);
+    const cProj = UI.checkbox(ctl, { label: '正射影 $|\\vec b|\\cos\\theta$ を表示', checked: true, onChange: draw });
+    UI.buttonRow(ctl, [{ label: 'リセット', small: true, onClick: () => { st.a = { x: 4, y: 1 }; st.b = { x: 1.5, y: 3 }; draw(); } }]);
+
+    const readout = $('#r-dot');
+    function draw() {
+      hA.x = st.a.x; hA.y = st.a.y; hB.x = st.b.x; hB.y = st.b.y;
+      const a = st.a, b = st.b;
+      const dot = a.x * b.x + a.y * b.y;
+      const na = norm(a), nb = norm(b);
+      const cos = Math.max(-1, Math.min(1, dot / (na * nb)));
+      const th = Math.acos(cos);
+      const proj = nb * cos;
+      const H = { x: a.x / na * proj, y: a.y / na * proj };
+      const sign = Math.abs(dot) < 1e-9 ? 0 : dot > 0 ? 1 : -1;
+      const tone = sign > 0 ? 'sage' : sign === 0 ? 'ochre' : 'clay';
+      plot.render((P) => {
+        if (cProj.get()) {
+          P.line(0, 0, a.x, a.y, { color: C.faint, width: 1, dash: [3, 5], alpha: 0.6 });
+          P.segment(b.x, b.y, H.x, H.y, { color: C.sage, width: 1.3, dash: [5, 4] });
+          P.segment(0, 0, H.x, H.y, { color: C.sage, width: 7, alpha: 0.55 });
+          P.point(H.x, H.y, { color: C.sage, r: 4, label: 'H', dx: 6, dy: 18 });
+          if (Math.abs(proj) > 0.05) P.angleMark(H.x, H.y, b.x, b.y, proj > 0 ? 0 : a.x, proj > 0 ? 0 : a.y, { r: 0.35, right: true, color: C.sage });
+        }
+        P.angleMark(0, 0, a.x, a.y, b.x, b.y, { r: 0.9, label: 'θ', color: sign === 0 ? C.ochre : C.muted, right: true, fill: Plot.rgba(sign === 0 ? C.ochre : C.faint, 0.12) });
+        P.arrow(0, 0, a.x, a.y, { color: C.ink, width: 2.8 });
+        P.arrow(0, 0, b.x, b.y, { color: C.clay, width: 2.8 });
+        P.point(0, 0, { color: C.text, r: 3 });
+        P.legend([{ label: `θ = ${fmt(UI.deg(th), 1)}°`, color: C.muted, width: 2 }, { label: `|b|cosθ = ${fmt(proj, 2)}`, color: C.sage, width: 6 }]);
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$${texVec('a', a)},\\quad ${texVec('b', b)},\\quad \\theta=${fmt(UI.deg(th), 1)}^\\circ$$</div>
+        <div class="tex-block">$$\\vec a\\cdot\\vec b=|\\vec a||\\vec b|\\cos\\theta=${fmt(na, 3)}\\times${fmt(nb, 3)}\\times(${fmt(cos, 3)})=${fmt(dot, 2)}$$</div>
+        <div class="tex-block">$$\\vec a\\cdot\\vec b=a_1b_1+a_2b_2=(${fmt(a.x)})(${fmt(b.x)})+(${fmt(a.y)})(${fmt(b.y)})=${fmt(dot, 2)}$$</div>`;
+      UI.stats(readout, [
+        { k: '$\\vec a\\cdot\\vec b$ の符号', v: sign > 0 ? '正（θ は鋭角）' : sign === 0 ? '0（垂直）' : '負（θ は鈍角）', tone },
+        { k: '$\\cos\\theta$', v: fmt(cos, 3), tone },
+        { k: '$|\\vec b|\\cos\\theta$（正射影）', v: fmt(proj, 3), tone: 'sage' },
+      ]);
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 一次独立と分解 ======================= */
+  (() => {
+    const ctl = $('#c-decomp');
+    const st = { a: { x: 2, y: 0.5 }, b: { x: 0.5, y: 1.5 }, p: { x: 3, y: 3.5 } };
+    const plot = new Plot('#cv-decomp', { xmin: -7, xmax: 7, ymin: -5.5, ymax: 5.5 });
+    const det = () => st.a.x * st.b.y - st.a.y * st.b.x;
+    const solve = () => { const d = det(); if (Math.abs(d) < 1e-9) return null; return { s: (st.p.x * st.b.y - st.p.y * st.b.x) / d, t: (st.a.x * st.p.y - st.a.y * st.p.x) / d }; };
+    const hA = plot.addHandle({ x: st.a.x, y: st.a.y, color: C.ink, label: 'a' + VEC, onMove: (x, y) => { st.a = { x: snap(x), y: snap(y) }; if (norm(st.a) < 0.5) st.a = { x: 0.5, y: 0 }; return [st.a.x, st.a.y]; } });
+    const hB = plot.addHandle({ x: st.b.x, y: st.b.y, color: C.clay, label: 'b' + VEC, onMove: (x, y) => { st.b = { x: snap(x), y: snap(y) }; if (norm(st.b) < 0.5) st.b = { x: 0, y: 0.5 }; return [st.b.x, st.b.y]; } });
+    const hP = plot.addHandle({ x: st.p.x, y: st.p.y, color: C.ochre, label: 'p' + VEC, onMove: (x, y) => {
+      if (cSnap.get() && Math.abs(det()) > 1e-9) {
+        st.p = { x, y };
+        const r = solve(); const s = Math.round(r.s), t = Math.round(r.t);
+        st.p = { x: s * st.a.x + t * st.b.x, y: s * st.a.y + t * st.b.y };
+      } else st.p = { x: snap(x), y: snap(y) };
+      return [st.p.x, st.p.y];
+    } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, '表示');
+    const cGrid = UI.checkbox(ctl, { label: '斜交格子（$s,t$ が整数の点）', checked: true, onChange: draw });
+    const cSnap = UI.checkbox(ctl, { label: '$\\vec p$ を整数 $s,t$ に吸着', checked: false, onChange: draw });
+    UI.divider(ctl);
+    UI.buttonRow(ctl, [
+      { label: 'b を a と平行に', small: true, onClick: () => { const n = norm(st.a), m = norm(st.b); st.b = { x: st.a.x / n * m, y: st.a.y / n * m }; draw(); } },
+      { label: '標準基底 (1,0),(0,1)', small: true, onClick: () => { st.a = { x: 1, y: 0 }; st.b = { x: 0, y: 1 }; draw(); } },
+      { label: 'リセット', small: true, onClick: () => { st.a = { x: 2, y: 0.5 }; st.b = { x: 0.5, y: 1.5 }; st.p = { x: 3, y: 3.5 }; draw(); } },
+    ]);
+
+    const readout = $('#r-decomp');
+    function draw() {
+      hA.x = st.a.x; hA.y = st.a.y; hB.x = st.b.x; hB.y = st.b.y; hP.x = st.p.x; hP.y = st.p.y;
+      const a = st.a, b = st.b, p = st.p, r = solve();
+      plot.render((P) => {
+        if (cGrid.get() && r) {
+          for (let k = -12; k <= 12; k++) {
+            P.line(k * a.x, k * a.y, b.x, b.y, { color: C.ink, width: 1, alpha: k === 0 ? 0.35 : 0.14 });
+            P.line(k * b.x, k * b.y, a.x, a.y, { color: C.clay, width: 1, alpha: k === 0 ? 0.35 : 0.14 });
+          }
+        }
+        if (r) {
+          const sa = { x: r.s * a.x, y: r.s * a.y };
+          P.polygon([[0, 0], [sa.x, sa.y], [p.x, p.y], [r.t * b.x, r.t * b.y]], { color: C.ochre, width: 1, dash: [4, 4], fill: Plot.rgba(C.ochre, 0.08) });
+          P.arrow(0, 0, sa.x, sa.y, { color: C.ink, width: 2, dash: [6, 4] });
+          P.arrow(sa.x, sa.y, p.x, p.y, { color: C.clay, width: 2, dash: [6, 4] });
+          if (Math.abs(r.s) > 0.05) P.label(sa.x / 2, sa.y / 2, `s a${VEC}`, { color: C.ink, dx: -4, dy: 18 });
+          if (Math.abs(r.t) > 0.05) P.label((sa.x + p.x) / 2, (sa.y + p.y) / 2, `t b${VEC}`, { color: C.clay, dx: 8, dy: 0 });
+        } else {
+          P.line(0, 0, a.x, a.y, { color: C.clay, width: 1.2, dash: [4, 4], alpha: 0.6 });
+        }
+        P.arrow(0, 0, a.x, a.y, { color: C.ink, width: 2.8 });
+        P.arrow(0, 0, b.x, b.y, { color: C.clay, width: 2.8 });
+        P.arrow(0, 0, p.x, p.y, { color: C.ochre, width: 2.8 });
+        P.point(0, 0, { color: C.text, r: 3 });
+      });
+      if (r) {
+        const sT = fmt(r.s, 2), tT = fmt(r.t, 2);
+        readout.innerHTML = `
+          <div class="tex-block">$$${texVec('a', a)},\\quad ${texVec('b', b)},\\quad ${texVec('p', p)}$$</div>
+          <div class="tex-block">$$\\vec p=s\\vec a+t\\vec b\\quad\\Longrightarrow\\quad \\vec p=${sT}\\,\\vec a${r.t < 0 ? '-' : '+'}${fmt(Math.abs(r.t), 2)}\\,\\vec b$$</div>
+          <p class="small">連立方程式 $\\begin{cases}${fmt(a.x)}s${b.x < 0 ? '-' : '+'}${fmt(Math.abs(b.x))}t=${fmt(p.x)}\\\\ ${fmt(a.y)}s${b.y < 0 ? '-' : '+'}${fmt(Math.abs(b.y))}t=${fmt(p.y)}\\end{cases}$ を解く。$a_1b_2-a_2b_1=${fmt(det(), 2)}\\ne0$ なので解はただ一組。</p>`;
+        UI.stats(readout, [{ k: '$s$', v: sT, tone: 'ink' }, { k: '$t$', v: tT, tone: 'clay' }, { k: '一次独立か', v: '一次独立（分解できる）', tone: 'sage' }]);
+      } else {
+        readout.innerHTML = `
+          <div class="tex-block">$$${texVec('a', a)},\\quad ${texVec('b', b)},\\quad ${texVec('p', p)}$$</div>
+          <div class="note clay"><div class="title">一次従属（$\\vec a\\parallel\\vec b$）</div>$a_1b_2-a_2b_1=0$ なので、$\\vec p=s\\vec a+t\\vec b$ の形に一通りには表せません。$\\vec p$ がこの直線上にないときは表せず、直線上にあるときは表し方が無数にあります。</div>`;
+      }
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 位置ベクトルと図形 ======================= */
+  (() => {
+    const ctl = $('#c-position');
+    const st = { A: { x: 4, y: 1 }, B: { x: 1, y: 3.5 }, s: 0.4, t: 0.3, m: 1, n: 2, k: 0.7, mode: 'free' };
+    const plot = new Plot('#cv-position', { xmin: -3, xmax: 8, ymin: -2.5, ymax: 6 });
+    const hA = plot.addHandle({ x: st.A.x, y: st.A.y, color: C.ink, label: 'A', onMove: (x, y) => { st.A = { x: snap(x), y: snap(y) }; return [st.A.x, st.A.y]; } });
+    const hB = plot.addHandle({ x: st.B.x, y: st.B.y, color: C.ink, label: 'B', onMove: (x, y) => { st.B = { x: snap(x), y: snap(y) }; return [st.B.x, st.B.y]; } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, '点 P の決め方');
+    UI.segmented(ctl, { options: [{ value: 'free', label: '自由' }, { value: 'div', label: '内分' }, { value: 'cent', label: '重心' }, { value: 'seg', label: 'AB 上' }, { value: 'locus', label: '軌跡' }], value: 'free', onChange: (v) => { st.mode = v; rebuild(); } });
+    const box = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    function rebuild() {
+      box.innerHTML = '';
+      if (st.mode === 'free') {
+        UI.slider(box, { label: '$s$', min: -0.5, max: 1.5, step: 0.05, value: st.s, onInput: (v) => { st.s = v; draw(); } });
+        UI.slider(box, { label: '$t$', min: -0.5, max: 1.5, step: 0.05, value: st.t, onInput: (v) => { st.t = v; draw(); } });
+      } else if (st.mode === 'div') {
+        UI.slider(box, { label: '$m$', min: 1, max: 5, step: 1, value: st.m, digits: 0, onInput: (v) => { st.m = v; draw(); } });
+        UI.slider(box, { label: '$n$', min: 1, max: 5, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+        UI.note(box, { tone: 'ochre', html: '線分 AB を $m:n$ に内分する点 P。$\\overrightarrow{OP}=\\dfrac{n\\vec a+m\\vec b}{m+n}$' });
+      } else if (st.mode === 'cent') {
+        UI.note(box, { tone: 'ochre', html: '三角形 OAB の重心 G。$\\overrightarrow{OG}=\\dfrac{\\vec 0+\\vec a+\\vec b}{3}$、すなわち $s=t=\\dfrac13$' });
+      } else if (st.mode === 'seg') {
+        UI.slider(box, { label: '$s$（$t=1-s$）', min: -0.5, max: 1.5, step: 0.05, value: st.s, onInput: (v) => { st.s = v; draw(); } });
+        UI.note(box, { tone: 'ochre', html: '$s+t=1$ を保つと P は直線 AB 上。$0\\le s\\le1$ なら線分 AB 上。' });
+      } else {
+        UI.slider(box, { label: '$k$（$s+t=k$）', min: -0.5, max: 2, step: 0.05, value: st.k, onInput: (v) => { st.k = v; draw(); } });
+        UI.slider(box, { label: '$s$（$t=k-s$）', min: -0.5, max: 1.5, step: 0.05, value: st.s, onInput: (v) => { st.s = v; draw(); } });
+        UI.note(box, { tone: 'ochre', html: '$s+t=k$ を固定すると、P の軌跡は AB に平行な直線。' });
+      }
+      UI.texAll(box);
+      draw();
+    }
+    UI.divider(ctl);
+    const cRegion = UI.checkbox(ctl, { label: '領域 $s\\ge0,\\ t\\ge0,\\ s+t\\le1$ を塗る', checked: true, onChange: draw });
+    const cParts = UI.checkbox(ctl, { label: '$s\\vec a$ と $t\\vec b$ を表示', checked: true, onChange: draw });
+
+    const readout = $('#r-position');
+    function current() {
+      const m = st.mode;
+      if (m === 'free') return { s: st.s, t: st.t };
+      if (m === 'div') return { s: st.n / (st.m + st.n), t: st.m / (st.m + st.n) };
+      if (m === 'cent') return { s: 1 / 3, t: 1 / 3 };
+      if (m === 'seg') return { s: st.s, t: 1 - st.s };
+      return { s: st.s, t: st.k - st.s };
+    }
+    function draw() {
+      hA.x = st.A.x; hA.y = st.A.y; hB.x = st.B.x; hB.y = st.B.y;
+      const A = st.A, B = st.B, { s, t } = current();
+      const Pt = { x: s * A.x + t * B.x, y: s * A.y + t * B.y };
+      const inside = s >= -1e-9 && t >= -1e-9 && s + t <= 1 + 1e-9;
+      const onLine = Math.abs(s + t - 1) < 1e-9;
+      plot.render((P) => {
+        if (cRegion.get()) P.polygon([[0, 0], [A.x, A.y], [B.x, B.y]], { color: 'none', fill: Plot.rgba(C.sage, 0.16) });
+        P.line(A.x, A.y, B.x - A.x, B.y - A.y, { color: C.sage, width: 1.2, dash: [6, 4] });
+        P.text((A.x + B.x) / 2, (A.y + B.y) / 2, 's+t=1', { color: C.sage, font: Plot.FONT_MATH, dx: 10, dy: -8, bg: true });
+        if (st.mode === 'locus') {
+          const k = st.k;
+          P.line(k * A.x, k * A.y, B.x - A.x, B.y - A.y, { color: C.ochre, width: 1.6, dash: [8, 4] });
+          P.text(k * A.x, k * A.y, `s+t=${fmt(k)}`, { color: C.ochre, font: Plot.FONT_MATH, dx: 10, dy: 16, bg: true });
+        }
+        P.segment(0, 0, A.x, A.y, { color: C.ink, width: 1.4 });
+        P.segment(0, 0, B.x, B.y, { color: C.ink, width: 1.4 });
+        P.segment(A.x, A.y, B.x, B.y, { color: C.ink, width: 1.4 });
+        if (cParts.get()) {
+          const sa = { x: s * A.x, y: s * A.y };
+          P.arrow(0, 0, sa.x, sa.y, { color: C.ink, width: 2, dash: [5, 4] });
+          P.arrow(sa.x, sa.y, Pt.x, Pt.y, { color: C.clay, width: 2, dash: [5, 4] });
+          P.segment(0, 0, t * B.x, t * B.y, { color: C.clay, width: 1, dash: [3, 4], alpha: 0.5 });
+          P.segment(t * B.x, t * B.y, Pt.x, Pt.y, { color: C.ink, width: 1, dash: [3, 4], alpha: 0.5 });
+          if (Math.abs(s) > 0.08) P.label(sa.x / 2, sa.y / 2, `s a${VEC}`, { color: C.ink, dx: 4, dy: 18 });
+          if (Math.abs(t) > 0.08) P.label((sa.x + Pt.x) / 2, (sa.y + Pt.y) / 2, `t b${VEC}`, { color: C.clay, dx: 8, dy: -4 });
+        }
+        P.arrow(0, 0, Pt.x, Pt.y, { color: C.ochre, width: 2.6 });
+        P.point(Pt.x, Pt.y, { color: C.ochre, r: 6, label: st.mode === 'cent' ? 'G' : 'P', dx: 10, dy: -8 });
+        P.point(0, 0, { color: C.text, r: 3.5, label: 'O', dx: -16, dy: 18 });
+      });
+      let head = '';
+      if (st.mode === 'div') head = `<div class="tex-block">$$\\overrightarrow{OP}=\\frac{${st.n}\\vec a+${st.m}\\vec b}{${st.m}+${st.n}}=\\frac{${st.n}}{${st.m + st.n}}\\vec a+\\frac{${st.m}}{${st.m + st.n}}\\vec b$$</div>`;
+      readout.innerHTML = head + `
+        <div class="tex-block">$$\\overrightarrow{OP}=s\\vec a+t\\vec b=${fmt(s, 2)}\\,(${fmt(A.x)},\\ ${fmt(A.y)})${t < 0 ? '-' : '+'}${fmt(Math.abs(t), 2)}\\,(${fmt(B.x)},\\ ${fmt(B.y)})=(${fmt(Pt.x, 2)},\\ ${fmt(Pt.y, 2)})$$</div>`;
+      UI.stats(readout, [
+        { k: '$(s,\\ t)$', v: `(${fmt(s, 3)}, ${fmt(t, 3)})`, tone: 'ochre' },
+        { k: '$s+t$', v: fmt(s + t, 3), tone: onLine ? 'sage' : '' },
+        { k: 'P の位置', v: onLine ? (s >= -1e-9 && t >= -1e-9 ? '線分 AB 上' : '直線 AB 上（線分の外）') : inside ? '三角形 OAB の内部' : '三角形 OAB の外部', tone: onLine || inside ? 'sage' : 'clay' },
+      ]);
+      UI.texAll(readout);
+    }
+    rebuild();
+  })();
+
+  /* ======================= 空間ベクトル ======================= */
+  (() => {
+    const ctl = $('#c-space');
+    const st = { a: [2, 1, 2], b: [-1, 2, 1], az: 35, el: 22 };
+    const plot = new Plot('#cv-space', { xmin: -5, xmax: 5, ymin: -4, ymax: 4, grid: false, axes: false, aspect: 0.7 });
+    const cv = plot.canvas;
+
+    UI.heading(ctl, '1 つ目のベクトル（青）');
+    const sA = [0, 1, 2].map((i) => UI.slider(ctl, { label: `$a_${i + 1}$`, min: -3, max: 3, step: 1, value: st.a[i], digits: 0, onInput: (v) => { st.a[i] = v; draw(); } }));
+    UI.heading(ctl, '2 つ目のベクトル（赤）');
+    const sB = [0, 1, 2].map((i) => UI.slider(ctl, { label: `$b_${i + 1}$`, min: -3, max: 3, step: 1, value: st.b[i], digits: 0, onInput: (v) => { st.b[i] = v; draw(); } }));
+    UI.heading(ctl, '視点');
+    const sAz = UI.slider(ctl, { label: '方位角', min: 0, max: 360, step: 1, value: st.az, unit: '°', digits: 0, onInput: (v) => { st.az = v; draw(); } });
+    const sEl = UI.slider(ctl, { label: '仰角', min: -89, max: 89, step: 1, value: st.el, unit: '°', digits: 0, onInput: (v) => { st.el = v; draw(); } });
+    const cSum = UI.checkbox(ctl, { label: '$\\vec a+\\vec b$ を表示', checked: false, onChange: draw });
+    const cBox = UI.checkbox(ctl, { label: '成分の直方体を表示', checked: true, onChange: draw });
+    UI.buttonRow(ctl, [
+      { label: '真上から', small: true, onClick: () => { st.az = 0; st.el = 89; sAz.set(st.az); sEl.set(st.el); draw(); } },
+      { label: '斜めから', small: true, onClick: () => { st.az = 35; st.el = 22; sAz.set(st.az); sEl.set(st.el); draw(); } },
+    ]);
+
+    let drag = null;
+    cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, az: st.az, el: st.el }; cv.setPointerCapture(e.pointerId); });
+    cv.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      st.az = ((drag.az - (e.clientX - drag.x) * 0.5) % 360 + 360) % 360;
+      st.el = Math.max(-89, Math.min(89, drag.el + (e.clientY - drag.y) * 0.5));
+      sAz.set(st.az); sEl.set(st.el); draw();
+    });
+    const end = () => { drag = null; };
+    cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+
+    function proj(v) {
+      const az = UI.rad(st.az), el = UI.rad(st.el);
+      const X = -v[0] * Math.sin(az) + v[1] * Math.cos(az);
+      const Y = -v[0] * Math.cos(az) * Math.sin(el) - v[1] * Math.sin(az) * Math.sin(el) + v[2] * Math.cos(el);
+      return [X, Y];
+    }
+    const seg3 = (P, p, q, o) => { const A = proj(p), B = proj(q); P.segment(A[0], A[1], B[0], B[1], o); };
+    const arrow3 = (P, p, q, o) => { const A = proj(p), B = proj(q); P.arrow(A[0], A[1], B[0], B[1], o); };
+    const box3 = (P, v, color) => {
+      const o = { color, width: 1, dash: [4, 4], alpha: 0.7 };
+      seg3(P, [0, 0, 0], [v[0], 0, 0], o); seg3(P, [v[0], 0, 0], [v[0], v[1], 0], o);
+      seg3(P, [0, 0, 0], [0, v[1], 0], o); seg3(P, [0, v[1], 0], [v[0], v[1], 0], o);
+      seg3(P, [v[0], v[1], 0], v, o);
+      seg3(P, [0, 0, v[2]], v, { color, width: 1, dash: [2, 4], alpha: 0.45 });
+      seg3(P, [0, 0, 0], [0, 0, v[2]], { color, width: 1, dash: [2, 4], alpha: 0.45 });
+    };
+
+    const readout = $('#r-space');
+    function draw() {
+      const a = st.a, b = st.b;
+      const na = Math.hypot(...a), nb = Math.hypot(...b);
+      const dot = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+      const cos = na > 0 && nb > 0 ? Math.max(-1, Math.min(1, dot / (na * nb))) : NaN;
+      const th = Math.acos(cos);
+      const sum = [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+      plot.render((P) => {
+        for (let i = -3; i <= 3; i++) {
+          seg3(P, [i, -3, 0], [i, 3, 0], { color: C.borderSubtle, width: 1 });
+          seg3(P, [-3, i, 0], [3, i, 0], { color: C.borderSubtle, width: 1 });
+        }
+        const L = 4.2;
+        const axes = [[[L, 0, 0], 'x'], [[0, L, 0], 'y'], [[0, 0, L], 'z']];
+        for (const [v, name] of axes) {
+          seg3(P, [-v[0] * 0.75, -v[1] * 0.75, -v[2] * 0.75], [0, 0, 0], { color: C.borderStrong, width: 1, alpha: 0.6 });
+          arrow3(P, [0, 0, 0], v, { color: C.borderStrong, width: 1.2 });
+          const t = proj(v);
+          P.text(t[0], t[1], name, { color: C.muted, font: Plot.FONT_MATH, dx: 8, dy: -6 });
+        }
+        if (cBox.get()) { if (na > 0) box3(P, a, C.ink); if (nb > 0) box3(P, b, C.clay); }
+        if (isFinite(th) && th > 0.02 && th < Math.PI - 0.02) {
+          const e1 = a.map((x) => x / na);
+          const bp = b.map((x, i) => x - dot / na * e1[i]);
+          const nbp = Math.hypot(...bp);
+          const e2 = bp.map((x) => x / nbp);
+          const pts = [];
+          const r = 0.9;
+          for (let i = 0; i <= 24; i++) { const u = th * i / 24; pts.push(proj(e1.map((x, j) => r * (x * Math.cos(u) + e2[j] * Math.sin(u))))); }
+          P.polygon([proj([0, 0, 0]), ...pts], { color: C.muted, width: 1.2, fill: Plot.rgba(C.faint, 0.12) });
+          const m = proj(e1.map((x, j) => r * 1.5 * (x * Math.cos(th / 2) + e2[j] * Math.sin(th / 2))));
+          P.text(m[0], m[1], 'θ', { color: C.muted, font: Plot.FONT_MATH, align: 'center', baseline: 'middle' });
+        }
+        if (cSum.get()) {
+          arrow3(P, a, sum, { color: C.clay, width: 1.5, dash: [5, 4], alpha: 0.7 });
+          arrow3(P, b, sum, { color: C.ink, width: 1.5, dash: [5, 4], alpha: 0.7 });
+          arrow3(P, [0, 0, 0], sum, { color: C.sage, width: 2.6 });
+          const t = proj(sum); P.label(t[0], t[1], `a${VEC}+b${VEC}`, { color: C.sage });
+        }
+        if (na > 0) { arrow3(P, [0, 0, 0], a, { color: C.ink, width: 3 }); const t = proj(a); P.label(t[0], t[1], `a${VEC} (${a.join(', ')})`, { color: C.ink }); }
+        if (nb > 0) { arrow3(P, [0, 0, 0], b, { color: C.clay, width: 3 }); const t = proj(b); P.label(t[0], t[1], `b${VEC} (${b.join(', ')})`, { color: C.clay, dy: 18 }); }
+        const o = proj([0, 0, 0]); P.point(o[0], o[1], { color: C.text, r: 3, label: 'O', dx: -16, dy: 16 });
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$\\vec a=(${a.join(',\\ ')}),\\quad \\vec b=(${b.join(',\\ ')}),\\quad \\vec a\\cdot\\vec b=${a.map((x, i) => `(${x})(${b[i]})`).join('+')}=${dot}$$</div>
+        <div class="tex-block">$$|\\vec a|=\\sqrt{${a.map((x) => x * x).join('+')}}=\\sqrt{${a[0] ** 2 + a[1] ** 2 + a[2] ** 2}}=${fmt(na, 3)},\\quad |\\vec b|=\\sqrt{${b[0] ** 2 + b[1] ** 2 + b[2] ** 2}}=${fmt(nb, 3)}$$</div>`;
+      UI.stats(readout, [
+        { k: '$\\cos\\theta=\\dfrac{\\vec a\\cdot\\vec b}{|\\vec a||\\vec b|}$', v: isFinite(cos) ? fmt(cos, 3) : '—（零ベクトル）', tone: 'ink' },
+        { k: 'なす角 $\\theta$', v: isFinite(th) ? fmt(UI.deg(th), 1) + '°' : '—', tone: Math.abs(dot) < 1e-9 && isFinite(th) ? 'ochre' : 'ink' },
+        { k: '$\\vec a+\\vec b$', v: `(${sum.join(', ')})`, tone: 'sage' },
+      ]);
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'addsub', label: '和・差・実数倍' },
+    { id: 'dot', label: '内積' },
+    { id: 'decomp', label: '一次独立と分解' },
+    { id: 'position', label: '位置ベクトルと図形' },
+    { id: 'space', label: '空間ベクトル' },
+  ]);
+});
+</script>
+</body>
+</html>

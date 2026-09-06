@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>データの分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>データの分析</h1>
+    <p class="lede">データを打ち込んだり点を動かしたりして、ヒストグラム・箱ひげ図・分散・相関係数がどう変わるかを見る。「散らばり」を面積や色として目で確かめられます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 度数分布とヒストグラム -->
+  <section class="tool-body" data-tab="hist">
+    <div class="layout">
+      <aside class="controls" id="c-hist"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-hist"></canvas></div>
+        <div class="readout" id="r-hist"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">度数分布表とヒストグラム</div>
+        データをいくつかの階級（区間）に分け、各階級に入る個数を<strong>度数</strong>という。階級は「以上・未満」で区切る。
+        度数を全体で割ったものが<strong>相対度数</strong>、下から足し上げたものが<strong>累積度数</strong>。度数が最も多い階級の階級値を<strong>最頻値</strong>とする。
+      </div>
+      <ul>
+        <li>階級の幅を変えると、同じデータでも山の形が変わる。細かすぎるとでこぼこ、粗すぎると形が見えない。</li>
+        <li>起点をずらすと、境界にあった値が隣の階級へ移る。最頻値の階級が変わることもある。</li>
+        <li>平均（赤）と中央値（緑）の位置を比べよう。極端に大きい値を一つ加えると平均は引っ張られるが、中央値はあまり動かない。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 箱ひげ図と四分位数 -->
+  <section class="tool-body" data-tab="box">
+    <div class="layout">
+      <aside class="controls" id="c-box"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-box"></canvas></div>
+        <div class="readout" id="r-box"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">四分位数と箱ひげ図</div>
+        データを小さい順に並べ、中央値 $Q_2$ で前半・後半に分ける（データが奇数個のとき中央値はどちらにも入れない）。
+        前半の中央値が第 1 四分位数 $Q_1$、後半の中央値が第 3 四分位数 $Q_3$。
+        箱は $Q_1$ から $Q_3$（<strong>四分位範囲</strong> $Q_3-Q_1$ の長さ）、ひげは最小値・最大値まで伸ばす。<strong>四分位偏差</strong>は $\dfrac{Q_3-Q_1}{2}$。
+      </div>
+      <ul>
+        <li>箱の中にデータの約半分（中央の 50%）が入る。上の点の並びと箱を見比べよう。</li>
+        <li>「外れ値」を有効にすると、$Q_1-1.5\times\text{IQR}$ より小さい値や $Q_3+1.5\times\text{IQR}$ より大きい値を外れ値（白抜き）とし、ひげはそれを除いた範囲までになる。</li>
+        <li>A と B の箱の位置・長さを比べると、「どちらが高いか」「どちらが散らばっているか」を平均を計算せずに言える。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 分散と標準偏差 -->
+  <section class="tool-body" data-tab="var">
+    <div class="layout">
+      <aside class="controls" id="c-var"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-var"></canvas><div class="caption">数直線上の点をドラッグできます</div></div>
+        <div class="readout" id="r-var"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">分散と標準偏差</div>
+        平均 $\bar{x}$ からのずれ $x_i-\bar{x}$ を<strong>偏差</strong>という。偏差の和は必ず 0 になるので、2 乗してから平均したものを<strong>分散</strong> $s^2$、その正の平方根を<strong>標準偏差</strong> $s$ とする。
+        $$s^2=\frac{1}{n}\sum_{i=1}^{n}(x_i-\bar{x})^2=\overline{x^2}-(\bar{x})^2$$
+      </div>
+      <ul>
+        <li>「偏差の 2 乗を正方形で表示」を入れると、各点の偏差を 1 辺とする正方形が現れる。分散はこれらの面積の平均、標準偏差は「平均の面積をもつ正方形（緑）の 1 辺」。</li>
+        <li>平均から遠い点の正方形は極端に大きい。一つの点だけを遠くへ動かして、分散がどれだけ増えるかを見よう。</li>
+        <li>「全部を近づける」で偏差を半分にすると分散は $\frac14$ 倍、標準偏差は $\frac12$ 倍になる。「広げる」なら 4 倍と 2 倍。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 散布図と相関係数 -->
+  <section class="tool-body" data-tab="scatter">
+    <div class="layout">
+      <aside class="controls" id="c-scatter"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-scatter"></canvas><div class="caption">クリックで点を追加、ドラッグで移動、右クリックで削除</div></div>
+        <div class="readout" id="r-scatter"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">共分散と相関係数</div>
+        $$s_{xy}=\frac1n\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y}),\qquad r=\frac{s_{xy}}{s_x\,s_y}\quad(-1\le r\le 1)$$
+        平均の線で 4 つに分けると、右上・左下（緑）の点は $(x_i-\bar{x})(y_i-\bar{y})>0$、左上・右下（赤）の点は負。緑の領域に点が多いほど共分散は正で、$r$ は 1 に近づく。
+      </div>
+      <ul>
+        <li>点を一つだけ動かして、平均の線と $r$ がどう変わるかを見よう。緑の領域から赤の領域へ点が移る瞬間に $r$ が下がる。</li>
+        <li>「直線」のプリセットでは $r=1$。点を少しずらすと $r$ は 1 より小さくなる。すべての点が一直線上にあるときだけ $r=\pm1$。</li>
+        <li>$r$ は「直線的な関係の強さ」を表す。相関があっても因果関係があるとは限らないことに注意。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$, rgba = Plot.rgba;
+  UI.header({ unit: '数学I', title: 'データの分析' });
+
+  const parse = (s) => s.split(/[\s,、，]+/).map(Number).filter((v) => s.trim() !== '' && isFinite(v));
+  const sum = (a) => a.reduce((p, q) => p + q, 0);
+  const mean = (a) => a.length ? sum(a) / a.length : NaN;
+  const median = (sorted) => { const n = sorted.length; if (!n) return NaN; return n % 2 ? sorted[(n - 1) / 2] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2; };
+  /** 教科書の定義: 中央値で前半・後半に分け (奇数個なら中央値を除く)、それぞれの中央値を Q1, Q3 とする */
+  const quartiles = (a) => {
+    const s = a.slice().sort((p, q) => p - q), n = s.length;
+    const half = Math.floor(n / 2);
+    return { min: s[0], q1: median(s.slice(0, half)), q2: median(s), q3: median(s.slice(n - half)), max: s[n - 1], sorted: s };
+  };
+  const textarea = (parent, label, value, rows, onInput) => {
+    const ta = UI.el('textarea', { rows: String(rows), spellcheck: 'false' });
+    ta.value = value;
+    ta.addEventListener('input', onInput);
+    parent.append(UI.el('div', { class: 'field' }, [UI.el('label', { text: label }), ta]));
+    return ta;
+  };
+  /** 数直線 (目盛付き) を高さ y に描く */
+  function numberAxis(P, y, from, to, step, o = {}) {
+    P.segment(from, y, to, y, { color: C.borderStrong, width: 1.2 });
+    const start = Math.ceil(from / step - 1e-9) * step;
+    for (let v = start; v <= to + 1e-9; v += step) {
+      const vv = Math.abs(v) < 1e-12 ? 0 : v;
+      if (P.X(vv) < 16 || P.X(vv) > P.W - 16) continue;
+      P.segment(vv, y, vv, y - (o.tick || 0.12), { color: C.borderStrong, width: 1 });
+      P.text(vv, y, fmt(vv, 2), { color: C.faint, align: 'center', baseline: 'top', dy: 6 });
+    }
+  }
+
+  /* ======================= 度数分布とヒストグラム ======================= */
+  (() => {
+    const ctl = $('#c-hist');
+    const DEFAULT = '62, 75, 48, 81, 55, 67, 73, 90, 58, 66\n71, 44, 79, 63, 85, 52, 69, 77, 60, 94\n57, 72, 65, 38, 83, 70, 61, 76, 68, 54';
+    const st = { w: 10, start: 30 };
+    const plot = new Plot('#cv-hist', { equal: false, aspect: 0.56, grid: false, axes: false });
+
+    UI.heading(ctl, 'データ');
+    const ta = textarea(ctl, 'コンマ・空白・改行で区切る', DEFAULT, 6, draw);
+    UI.buttonRow(ctl, [
+      { label: '例に戻す', small: true, onClick: () => { ta.value = DEFAULT; draw(); } },
+      { label: '100 を 1 つ足す', small: true, onClick: () => { ta.value = ta.value.trim() + ', 100'; draw(); } },
+    ]);
+    UI.heading(ctl, '階級');
+    UI.slider(ctl, { label: '階級の幅', min: 2, max: 20, step: 1, value: st.w, digits: 0, onInput: (v) => { st.w = v; draw(); } });
+    UI.slider(ctl, { label: '起点（最初の階級の下端）', min: 0, max: 60, step: 1, value: st.start, digits: 0, onInput: (v) => { st.start = v; draw(); } });
+
+    const readout = $('#r-hist');
+    function draw() {
+      const data = parse(ta.value);
+      const n = data.length;
+      if (n === 0) { plot.render(() => {}); readout.innerHTML = '<p class="small">データがありません。</p>'; return; }
+      const sorted = data.slice().sort((a, b) => a - b);
+      const w = st.w, mn = sorted[0], mx = sorted[n - 1];
+      const k0 = Math.floor((mn - st.start) / w), k1 = Math.floor((mx - st.start) / w);
+      const classes = [];
+      for (let k = k0; k <= k1; k++) classes.push({ lo: st.start + k * w, hi: st.start + (k + 1) * w, count: 0 });
+      for (const v of data) classes[Math.floor((v - st.start) / w) - k0].count++;
+      let cum = 0;
+      for (const c of classes) { cum += c.count; c.cum = cum; }
+      const maxC = Math.max(...classes.map((c) => c.count));
+      const avg = mean(data), med = median(sorted);
+      const modeClasses = classes.filter((c) => c.count === maxC);
+      const lo0 = classes[0].lo, hiN = classes[classes.length - 1].hi;
+      const span = hiN - lo0;
+      plot.setView(lo0 - span * 0.06, hiN + span * 0.06, -maxC * 0.16, maxC * 1.28);
+
+      plot.render((P) => {
+        const ystep = maxC > 12 ? 5 : maxC > 6 ? 2 : 1;
+        for (let y = ystep; y <= maxC * 1.2; y += ystep) {
+          P.segment(P.win.xmin, y, P.win.xmax, y, { color: C.borderSubtle, width: 1 });
+          P.text(P.win.xmin, y, String(y), { color: C.faint, dx: 6, baseline: 'middle' });
+        }
+        for (const c of classes) P.rect(c.lo, 0, w, c.count, { color: C.ink, width: 1.5, fill: rgba(C.ink, c.count === maxC ? 0.45 : 0.25) });
+        P.segment(P.win.xmin, 0, P.win.xmax, 0, { color: C.borderStrong, width: 1.2 });
+        const step = classes.length > 12 ? 2 : 1;
+        classes.forEach((c, i) => { if (i % step === 0) P.text(c.lo, 0, fmt(c.lo), { color: C.faint, align: 'center', baseline: 'top', dy: 6 }); });
+        if (classes.length % step === 0) P.text(hiN, 0, fmt(hiN), { color: C.faint, align: 'center', baseline: 'top', dy: 6 });
+        P.vline(avg, { color: C.clay, width: 2, dash: [6, 4] });
+        P.text(avg, P.win.ymax, `平均 ${fmt(avg, 2)}`, { color: C.clay, align: avg <= med ? 'right' : 'left', dx: avg <= med ? -6 : 6, dy: 18, bg: true });
+        P.vline(med, { color: C.sageSolid, width: 2, dash: [2, 4] });
+        P.text(med, P.win.ymax, `中央値 ${fmt(med, 2)}`, { color: C.sageSolid, align: avg <= med ? 'left' : 'right', dx: avg <= med ? 6 : -6, dy: 18, bg: true });
+        for (const c of classes) if (c.count > 0) P.text((c.lo + c.hi) / 2, c.count, String(c.count), { color: C.inkText, align: 'center', baseline: 'bottom', dy: -4, bg: true });
+        P.text(P.win.xmax, 0, '階級', { color: C.muted, align: 'right', baseline: 'bottom', dx: -6, dy: -6 });
+        P.text(P.win.xmin, P.win.ymax, '度数', { color: C.muted, dx: 6, dy: 18 });
+      });
+
+      const rows = classes.map((c) => `<tr>
+        <td style="text-align:left">${fmt(c.lo)} 以上 ${fmt(c.hi)} 未満</td><td>${fmt((c.lo + c.hi) / 2)}</td>
+        <td class="${c.count === maxC ? 'hl' : ''}">${c.count}</td><td>${fmt(c.count / n, 3)}</td><td>${c.cum}</td><td>${fmt(c.cum / n, 3)}</td></tr>`).join('');
+      readout.innerHTML = `
+        <div class="readout-grid">
+          <div class="stat"><div class="k">データの個数 n</div><div class="v">${n}</div></div>
+          <div class="stat clay"><div class="k">平均値</div><div class="v">${fmt(avg, 2)}</div></div>
+          <div class="stat sage"><div class="k">中央値</div><div class="v">${fmt(med, 2)}</div></div>
+          <div class="stat ink"><div class="k">最頻値（階級値）</div><div class="v">${modeClasses.map((c) => fmt((c.lo + c.hi) / 2)).join(', ')}</div></div>
+          <div class="stat"><div class="k">範囲（最大 − 最小）</div><div class="v">${fmt(mx)} − ${fmt(mn)} = ${fmt(mx - mn)}</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:0.6rem"><table class="data" style="width:100%">
+          <tr><th style="text-align:left">階級</th><th>階級値</th><th>度数</th><th>相対度数</th><th>累積度数</th><th>累積相対度数</th></tr>${rows}
+          <tr><th style="text-align:left">合計</th><th></th><th>${n}</th><th>1</th><th></th><th></th></tr>
+        </table></div>`;
+    }
+    draw();
+  })();
+
+  /* ======================= 箱ひげ図と四分位数 ======================= */
+  (() => {
+    const ctl = $('#c-box');
+    const DEF_A = '3, 5, 6, 7, 8, 8, 9, 11, 12, 20';
+    const DEF_B = '4, 6, 7, 7, 8, 9, 10, 10, 12, 13, 14';
+    const plot = new Plot('#cv-box', { equal: false, aspect: 0.5, grid: false, axes: false });
+
+    UI.heading(ctl, 'データ');
+    const taA = textarea(ctl, 'A（10 個の例）', DEF_A, 3, draw);
+    const taB = textarea(ctl, 'B（11 個の例）', DEF_B, 3, draw);
+    UI.buttonRow(ctl, [{ label: '例に戻す', small: true, onClick: () => { taA.value = DEF_A; taB.value = DEF_B; draw(); } }]);
+    UI.divider(ctl);
+    const chkOut = UI.checkbox(ctl, { label: '外れ値（1.5×IQR の規則）を使う', checked: false, onChange: draw });
+
+    const readout = $('#r-box');
+    function analyze(data) {
+      if (data.length === 0) return null;
+      const q = quartiles(data);
+      const iqr = q.q3 - q.q1;
+      const loF = q.q1 - 1.5 * iqr, hiF = q.q3 + 1.5 * iqr;
+      const outliers = chkOut.get() ? q.sorted.filter((v) => v < loF || v > hiF) : [];
+      const inside = q.sorted.filter((v) => !outliers.includes(v));
+      return Object.assign(q, { iqr, loF, hiF, outliers, wlo: inside.length ? inside[0] : q.min, whi: inside.length ? inside[inside.length - 1] : q.max, n: data.length });
+    }
+    function drawOne(P, r, y, color, name) {
+      P.text(P.win.xmin, y, name, { color, dx: 8, baseline: 'middle', font: 'bold 15px "Noto Sans JP", sans-serif' });
+      // ドットプロット (同じ値は積む)
+      const seen = {};
+      for (const v of r.sorted) {
+        const k = String(v); seen[k] = (seen[k] || 0);
+        const out = r.outliers.includes(v);
+        P.point(v, y + 0.62 + seen[k] * 0.16, { color: out ? C.clay : color, r: 4, hollow: out });
+        seen[k]++;
+      }
+      // 箱ひげ
+      const h = 0.36;
+      P.segment(r.wlo, y, r.q1, y, { color, width: 1.8 });
+      P.segment(r.q3, y, r.whi, y, { color, width: 1.8 });
+      P.segment(r.wlo, y - h * 0.6, r.wlo, y + h * 0.6, { color, width: 1.8 });
+      P.segment(r.whi, y - h * 0.6, r.whi, y + h * 0.6, { color, width: 1.8 });
+      P.rect(r.q1, y - h, r.q3 - r.q1, 2 * h, { color, width: 2, fill: rgba(color, 0.18) });
+      P.segment(r.q2, y - h, r.q2, y + h, { color: C.clay, width: 3 });
+      for (const v of r.outliers) P.point(v, y, { color: C.clay, r: 5, hollow: true });
+      const lab = (x, s, dy) => P.text(x, y - h, s, { color: C.muted, align: 'center', baseline: 'top', dy });
+      lab(r.q1, `Q1=${fmt(r.q1)}`, 6); lab(r.q3, `Q3=${fmt(r.q3)}`, 6);
+      P.text(r.q2, y + h, `Q2=${fmt(r.q2)}`, { color: C.clay, align: 'center', baseline: 'bottom', dy: -4 });
+    }
+    function draw() {
+      const A = analyze(parse(taA.value)), B = analyze(parse(taB.value));
+      const all = [A, B].filter(Boolean);
+      if (all.length === 0) { plot.render(() => {}); readout.innerHTML = '<p class="small">データがありません。</p>'; return; }
+      const lo = Math.min(...all.map((r) => r.min)), hi = Math.max(...all.map((r) => r.max));
+      const pad = Math.max(1, (hi - lo) * 0.12);
+      plot.setView(lo - pad, hi + pad, -0.75, 4.9);
+      plot.render((P) => {
+        const step = Plot.niceStep(hi - lo + 2 * pad, 10);
+        numberAxis(P, 0, lo - pad, hi + pad, step);
+        if (A) drawOne(P, A, 3.3, C.ink, 'A');
+        if (B) drawOne(P, B, 1.1, C.sageSolid, 'B');
+      });
+      const cell = (r, f) => r ? f(r) : '—';
+      const rows = [
+        ['データの個数 n', (r) => r.n], ['最小値', (r) => fmt(r.min)], ['第 1 四分位数 Q1', (r) => fmt(r.q1)], ['中央値 Q2', (r) => fmt(r.q2)],
+        ['第 3 四分位数 Q3', (r) => fmt(r.q3)], ['最大値', (r) => fmt(r.max)], ['範囲', (r) => fmt(r.max - r.min)],
+        ['四分位範囲 IQR = Q3 − Q1', (r) => fmt(r.iqr)], ['四分位偏差 IQR ÷ 2', (r) => fmt(r.iqr / 2)],
+      ];
+      if (chkOut.get()) rows.push(['外れ値の境界', (r) => `${fmt(r.loF)} 未満, ${fmt(r.hiF)} より大`], ['外れ値', (r) => r.outliers.length ? r.outliers.map((v) => fmt(v)).join(', ') : 'なし']);
+      readout.innerHTML = `
+        <div class="table-wrap"><table class="data" style="width:100%">
+          <tr><th style="text-align:left"></th><th style="color:var(--ink-text)">A</th><th style="color:var(--sage-text)">B</th></tr>
+          ${rows.map(([k, f]) => `<tr><td style="text-align:left;color:var(--text-muted)">${k}</td><td>${cell(A, f)}</td><td>${cell(B, f)}</td></tr>`).join('')}
+        </table></div>
+        <p class="small">並べ替え：A = ${A ? A.sorted.map((v) => fmt(v)).join(', ') : '—'}　／　B = ${B ? B.sorted.map((v) => fmt(v)).join(', ') : '—'}</p>`;
+    }
+    draw();
+  })();
+
+  /* ======================= 分散と標準偏差 ======================= */
+  (() => {
+    const ctl = $('#c-var');
+    const INIT = [1, 3, 4, 5, 6, 7, 8, 10];
+    const st = { x: INIT.slice() };
+    const XMAX = 11;
+    const plot = new Plot('#cv-var', { xmin: -0.8, xmax: 11.8, ymin: -1.5, ymax: 5.8, aspect: 0.58, grid: false, axes: false });
+    const hs = st.x.map((v, i) => plot.addHandle({ x: v, y: 0, color: C.ink, r: 6, onMove: (x) => {
+      st.x[i] = Math.max(0, Math.min(XMAX, Math.round(x * 2) / 2)); return [st.x[i], 0];
+    } }));
+
+    UI.heading(ctl, '表示');
+    const chkSq = UI.checkbox(ctl, { label: '偏差の 2 乗を正方形で表示', checked: true, onChange: draw });
+    UI.heading(ctl, '操作');
+    const setAll = (f) => { const m = mean(st.x); st.x = st.x.map((v) => Math.max(0, Math.min(XMAX, Math.round(f(v, m) * 2) / 2))); draw(); };
+    UI.buttonRow(ctl, [
+      { label: '全部を近づける（偏差 ×0.5）', small: true, onClick: () => setAll((v, m) => m + (v - m) * 0.5) },
+      { label: '広げる（偏差 ×2）', small: true, onClick: () => setAll((v, m) => m + (v - m) * 2) },
+    ]);
+    UI.buttonRow(ctl, [
+      { label: 'ランダム', small: true, onClick: () => { const r = UI.rng(); st.x = st.x.map(() => Math.round(r() * XMAX * 2) / 2); draw(); } },
+      { label: 'リセット', small: true, onClick: () => { st.x = INIT.slice(); draw(); } },
+    ]);
+
+    const readout = $('#r-var');
+    function draw() {
+      const x = st.x, n = x.length;
+      x.forEach((v, i) => { hs[i].x = v; });
+      const m = mean(x);
+      const dev = x.map((v) => v - m);
+      const sq = dev.map((d) => d * d);
+      const variance = mean(sq);
+      const meanSq = mean(x.map((v) => v * v));
+      const sd = Math.sqrt(variance);
+      plot.render((P) => {
+        if (chkSq.get()) {
+          dev.forEach((d, i) => {
+            if (Math.abs(d) < 1e-9) return;
+            P.rect(Math.min(x[i], m), 0, Math.abs(d), Math.abs(d), { color: C.ink, width: 1, fill: rgba(C.ink, 0.10) });
+          });
+          if (sd > 1e-9) {
+            P.rect(m, 0, sd, sd, { color: C.sageSolid, width: 2.5, fill: rgba(C.sage, 0.28) });
+            P.text(m + sd / 2, sd, `標準偏差 s = ${fmt(sd, 2)}`, { color: C.sageSolid, align: 'center', baseline: 'bottom', dy: -5, bg: true });
+          }
+        }
+        numberAxis(P, 0, 0, XMAX, 1, { tick: 0.12 });
+        P.vline(m, { color: C.clay, width: 2, dash: [6, 4] });
+        P.text(m, P.win.ymax, `平均 x̄ = ${fmt(m, 2)}`, { color: C.clay, align: 'center', dy: 18, bg: true });
+        x.forEach((v, i) => { P.text(v, 0, fmt(v, 1), { color: C.inkText, align: 'center', baseline: 'top', dy: 22 }); });
+      });
+      const rows = x.map((v, i) => `<tr><td>${fmt(v, 1)}</td><td>${UI.fmtSigned(dev[i], 2)}</td><td>${fmt(sq[i], 2)}</td></tr>`).join('');
+      readout.innerHTML = `
+        <div class="readout-grid">
+          <div class="stat clay"><div class="k">平均 x̄</div><div class="v">${fmt(m, 3)}</div></div>
+          <div class="stat ink"><div class="k">分散 s²</div><div class="v">${fmt(variance, 3)}</div></div>
+          <div class="stat sage"><div class="k">標準偏差 s = √(分散)</div><div class="v">${fmt(sd, 3)}</div></div>
+        </div>
+        <div class="tex-block">$$s^2=\\frac{1}{${n}}\\sum(x_i-\\bar{x})^2=\\frac{${fmt(sum(sq), 2)}}{${n}}=${fmt(variance, 3)},\\qquad
+          s^2=\\overline{x^2}-(\\bar{x})^2=${fmt(meanSq, 3)}-${fmt(m, 3)}^2=${fmt(meanSq - m * m, 3)}$$</div>
+        <div class="table-wrap"><table class="data" style="width:100%">
+          <tr><th>x</th><th>偏差 x − x̄</th><th>偏差²</th></tr>${rows}
+          <tr><th>合計 ${fmt(sum(x), 1)}</th><th>${fmt(sum(dev), 2)}</th><th>${fmt(sum(sq), 2)}</th></tr>
+        </table></div>
+        <p class="small">偏差の合計は必ず 0。だから 2 乗してから平均する。</p>`;
+      UI.texAll(readout);
+    }
+    plot.onChange = () => draw();
+    draw();
+  })();
+
+  /* ======================= 散布図と相関係数 ======================= */
+  (() => {
+    const ctl = $('#c-scatter');
+    const st = { pts: [] };
+    const plot = new Plot('#cv-scatter', { xmin: -0.6, xmax: 10.6, ymin: -0.6, ymax: 10.6, aspect: 0.8, xTick: 1, yTick: 1 });
+    const clamp = (v) => Math.max(0, Math.min(10, Math.round(v * 10) / 10));
+    function rebuildHandles() {
+      plot.clearHandles();
+      for (const p of st.pts) plot.addHandle({ x: p[0], y: p[1], color: C.ink, r: 6, onMove: (x, y) => { p[0] = clamp(x); p[1] = clamp(y); return [p[0], p[1]]; } });
+    }
+    plot.onClick = (x, y, e) => { if (e.button !== 0) return; if (x < -0.3 || x > 10.3 || y < -0.3 || y > 10.3) return; st.pts.push([clamp(x), clamp(y)]); rebuildHandles(); draw(); };
+    plot.canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      if (!st.pts.length) return;
+      const rect = plot.canvas.getBoundingClientRect();
+      const px = e.clientX - rect.left, py = e.clientY - rect.top;
+      let best = -1, bd = 16;
+      st.pts.forEach((p, i) => { const d = Math.hypot(plot.X(p[0]) - px, plot.Y(p[1]) - py); if (d < bd) { bd = d; best = i; } });
+      st.pts.splice(best >= 0 ? best : st.pts.length - 1, 1);
+      rebuildHandles(); draw();
+    });
+
+    const gen = (seed, f) => { const r = UI.rng(seed); const out = []; for (let i = 0; i < 16; i++) { const x = 1 + r() * 8; out.push([clamp(x), clamp(f(x, r))]); } return out; };
+    const PRESETS = {
+      pos: () => gen(11, (x, r) => x + (r() - 0.5) * 3.2),
+      neg: () => gen(12, (x, r) => 10 - x + (r() - 0.5) * 3.2),
+      none: () => gen(13, (x, r) => 1 + r() * 8),
+      line: () => [1, 2, 3, 4, 5, 6, 7, 8, 9].map((x) => [x, 0.8 * x + 1]),
+    };
+    UI.heading(ctl, 'プリセット');
+    UI.buttonRow(ctl, [
+      { label: '正の相関', small: true, onClick: () => load('pos') },
+      { label: '負の相関', small: true, onClick: () => load('neg') },
+      { label: '相関なし', small: true, onClick: () => load('none') },
+      { label: '直線 (r = 1)', small: true, onClick: () => load('line') },
+    ]);
+    UI.heading(ctl, '点の操作');
+    UI.buttonRow(ctl, [
+      { label: '最後の点を消す', small: true, onClick: () => { st.pts.pop(); rebuildHandles(); draw(); } },
+      { label: '全部消す', small: true, onClick: () => { st.pts = []; rebuildHandles(); draw(); } },
+    ]);
+    UI.divider(ctl);
+    const chkReg = UI.checkbox(ctl, { label: '回帰直線を表示（発展）', checked: false, onChange: draw });
+    function load(k) { st.pts = PRESETS[k](); rebuildHandles(); draw(); }
+
+    const readout = $('#r-scatter');
+    function draw() {
+      const pts = st.pts, n = pts.length;
+      const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+      const mx = mean(xs), my = mean(ys);
+      const sxx = n ? mean(xs.map((x) => (x - mx) ** 2)) : NaN, syy = n ? mean(ys.map((y) => (y - my) ** 2)) : NaN;
+      const sxy = n ? mean(pts.map((p) => (p[0] - mx) * (p[1] - my))) : NaN;
+      const sx = Math.sqrt(sxx), sy = Math.sqrt(syy);
+      const r = sx > 1e-9 && sy > 1e-9 ? sxy / (sx * sy) : NaN;
+      plot.render((P) => {
+        if (n >= 2) {
+          const w = P.win;
+          const g = rgba(C.sage, 0.10), c = rgba(C.clay, 0.10);
+          P.rect(mx, my, w.xmax - mx, w.ymax - my, { color: 'none', fill: g });
+          P.rect(w.xmin, w.ymin, mx - w.xmin, my - w.ymin, { color: 'none', fill: g });
+          P.rect(w.xmin, my, mx - w.xmin, w.ymax - my, { color: 'none', fill: c });
+          P.rect(mx, w.ymin, w.xmax - mx, my - w.ymin, { color: 'none', fill: c });
+          P.vline(mx, { color: C.clay, width: 1.5, dash: [6, 4] });
+          P.hline(my, { color: C.clay, width: 1.5, dash: [6, 4] });
+          P.text(mx, w.ymax, `x̄ = ${fmt(mx, 2)}`, { color: C.clay, dx: 6, dy: 18, bg: true });
+          P.text(w.xmax, my, `ȳ = ${fmt(my, 2)}`, { color: C.clay, align: 'right', dx: -6, dy: -6, bg: true });
+          P.text(w.xmax, w.ymax, '(x−x̄)(y−ȳ) > 0', { color: C.sageSolid, align: 'right', dx: -8, dy: 18, bg: true });
+          P.text(w.xmax, w.ymin, '(x−x̄)(y−ȳ) < 0', { color: C.clay, align: 'right', dx: -8, dy: -8, bg: true });
+          if (chkReg.get() && sxx > 1e-9) {
+            const b = sxy / sxx;
+            P.fn((x) => my + b * (x - mx), { color: C.ochre, width: 2, dash: [8, 5] });
+            P.text(w.xmax, my + b * (w.xmax - mx), `y = ${fmt(b, 2)}x ${UI.fmtSigned(my - b * mx, 2)}`, { color: C.ochre, align: 'right', dx: -8, dy: b >= 0 ? 18 : -8, bg: true });
+          }
+        } else if (n === 0) {
+          P.screenText(P.W / 2, P.H / 2, 'クリックして点を置くか、プリセットを選んでください', { align: 'center', baseline: 'middle', color: C.faint });
+        }
+      });
+      const judge = !isFinite(r) ? '—' : Math.abs(r) >= 0.7 ? `強い${r > 0 ? '正' : '負'}の相関` : Math.abs(r) >= 0.4 ? `${r > 0 ? '正' : '負'}の相関がある` : Math.abs(r) >= 0.2 ? `弱い${r > 0 ? '正' : '負'}の相関` : '相関はほとんどない';
+      const tone = !isFinite(r) ? '' : r > 0.2 ? 'sage' : r < -0.2 ? 'clay' : '';
+      readout.innerHTML = n < 2 ? `<p class="small">点が ${n} 個。2 個以上置くと平均・相関係数を計算します。</p>` : `
+        <div class="readout-grid">
+          <div class="stat"><div class="k">n</div><div class="v">${n}</div></div>
+          <div class="stat clay"><div class="k">x̄ , ȳ</div><div class="v">${fmt(mx, 2)} , ${fmt(my, 2)}</div></div>
+          <div class="stat"><div class="k">s<sub>x</sub> , s<sub>y</sub></div><div class="v">${fmt(sx, 3)} , ${fmt(sy, 3)}</div></div>
+          <div class="stat ink"><div class="k">共分散 s<sub>xy</sub></div><div class="v">${fmt(sxy, 3)}</div></div>
+          <div class="stat ${tone}"><div class="k">相関係数 r</div><div class="v">${fmt(r, 3)}</div></div>
+          <div class="stat ${tone}"><div class="k">判定</div><div class="v" style="font-family:var(--font-sans);font-size:1rem">${judge}</div></div>
+        </div>
+        <div class="tex-block">$$r=\\frac{s_{xy}}{s_x\\,s_y}=\\frac{${fmt(sxy, 3)}}{${fmt(sx, 3)}\\times${fmt(sy, 3)}}=${fmt(r, 3)}$$</div>
+        <p class="small">緑の領域の点は共分散にプラス、赤の領域の点はマイナスに寄与する。${chkReg.get() ? '回帰直線は $y-\\bar{y}=\\dfrac{s_{xy}}{s_x^2}(x-\\bar{x})$（数学Iの範囲外）。' : ''}</p>`;
+      UI.texAll(readout);
+    }
+    plot.onChange = () => draw();
+    load('pos');
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'hist', label: '度数分布とヒストグラム' },
+    { id: 'box', label: '箱ひげ図と四分位数' },
+    { id: 'var', label: '分散と標準偏差' },
+    { id: 'scatter', label: '散布図と相関係数' },
+  ]);
+});
+</script>
+</body>
+</html>

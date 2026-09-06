@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>場合の数</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+<style>
+.viz { padding: 0.8rem 1rem; min-height: 160px; }
+.ball { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; color: #fff; font-size: 12px; font-weight: 700; font-family: var(--font-mono); flex: none; }
+.ball.lg { width: 30px; height: 30px; font-size: 14px; }
+.perm { display: inline-flex; gap: 2px; padding: 3px 5px; border: 1px solid var(--border-subtle); border-radius: 4px; background: var(--surface); margin: 2px; }
+.perm-row { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem; align-items: center; padding: 0.3rem 0; border-bottom: 1px dashed var(--border-subtle); }
+.perm-row:last-child { border-bottom: 0; }
+.perm-row .combo { display: inline-flex; gap: 2px; padding: 4px 7px; background: var(--sage-subtle); border: 1px solid var(--sage-line); border-radius: 4px; }
+.perm-row .items, .perm-flow { display: flex; flex-wrap: wrap; align-items: center; }
+.perm-row .cnt { font-size: 0.8rem; color: var(--sage-text); margin-left: 0.4rem; white-space: nowrap; }
+.bars { display: flex; flex-wrap: wrap; gap: 6px; font-size: 1.5rem; line-height: 1; align-items: center; padding: 0.5rem 0; }
+.bars .o { font-weight: 700; }
+.bars .bar { color: var(--ink-text); font-weight: 700; }
+.kinds { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; align-items: center; margin: 0.3rem 0 0.6rem; }
+.kinds .kind { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.9rem; }
+.kinds .kind .cnt { font-family: var(--font-mono); color: var(--text-muted); }
+.list-small { display: flex; flex-wrap: wrap; gap: 4px 10px; font-family: var(--font-mono); font-size: 0.95rem; }
+.list-small span { padding: 1px 6px; border: 1px solid var(--border-subtle); border-radius: 4px; background: var(--surface); }
+.list-small span.hl { border-color: var(--ochre-solid); background: var(--ochre-subtle); color: var(--ochre-text); font-weight: 700; }
+</style>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>場合の数</h1>
+    <p class="lede">順列と組合せの関係、パスカルの三角形、最短経路の数え方、円順列と重複組合せ。「数える対象」を実際に並べて見ながら、公式がなぜそうなるかを確かめます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 順列と組合せ -->
+  <section class="tool-body" data-tab="perm">
+    <div class="layout">
+      <aside class="controls" id="c-perm"></aside>
+      <div class="stage">
+        <div class="canvas-wrap viz" id="v-perm"></div>
+        <div class="readout" id="r-perm"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">順列は「組を選んでから並べる」</div>
+        $n$ 個から $r$ 個を選んで並べる順列 ${}_n\mathrm{P}_r=n(n-1)\cdots(n-r+1)$ は、
+        まず組合せ ${}_n\mathrm{C}_r$ 通りの「組」を選び、次にその $r$ 個を $r!$ 通りに並べたものと同じです。
+        $${}_n\mathrm{P}_r={}_n\mathrm{C}_r\times r!\qquad\Longleftrightarrow\qquad {}_n\mathrm{C}_r=\frac{{}_n\mathrm{P}_r}{r!}$$
+      </div>
+      <ul>
+        <li>「同じ組をまとめる」を ON にすると、同じ玉の組（緑の枠）を使った並べ方が 1 行に集まる。行の数が ${}_n\mathrm{C}_r$、1 行の個数が $r!$。</li>
+        <li>$r$ を増やすと 1 行の個数 $r!$ が急に増える。$r=n$ のときは行が 1 つだけ（組は 1 通り）で、並べ方は $n!$ 個。</li>
+        <li>$n=6$ では一覧が多すぎるので数だけを表示する。式の値が $n\le5$ の場合と同じ規則で決まっていることを確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- パスカルの三角形 -->
+  <section class="tool-body" data-tab="pascal">
+    <div class="layout">
+      <aside class="controls" id="c-pascal"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-pascal"></canvas><div class="caption">セルをクリックすると、上の 2 つとの関係を表示します</div></div>
+        <div class="readout" id="r-pascal"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">上の 2 つを足すと下ができる</div>
+        $n$ 個から $r$ 個を選ぶとき、特定の 1 個（たとえば A）を「含む」選び方は残り $n-1$ 個から $r-1$ 個を選ぶ ${}_{n-1}\mathrm{C}_{r-1}$ 通り、
+        「含まない」選び方は ${}_{n-1}\mathrm{C}_{r}$ 通り。合わせて
+        $${}_n\mathrm{C}_r={}_{n-1}\mathrm{C}_{r-1}+{}_{n-1}\mathrm{C}_{r}$$
+        この関係だけで、端の 1 から三角形全体が作れます。
+      </div>
+      <ul>
+        <li>セルをクリックすると、そのセル（赤）と上の 2 つ（青）が光り、足し算が読み取れる。端の 1 は「上に片側しかない」から。</li>
+        <li>「各行の和」を ON にすると、$n$ 行目の和が $2^n$ になる。$n$ 個のものそれぞれを「入れる／入れない」と決める場合の数と同じ。</li>
+        <li>発展：「奇数を塗る」と自己相似の模様（シェルピンスキーのギャスケット）が現れる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 最短経路 -->
+  <section class="tool-body" data-tab="paths">
+    <div class="layout">
+      <aside class="controls" id="c-paths"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-paths"></canvas><div class="caption">格子点をクリック：必ず通る（緑）→ 通れない（赤）→ 解除。Shift+クリックで直接「通れない」</div></div>
+        <div class="readout" id="r-paths"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">「右」と「上」の並べ方</div>
+        右へ $m$ 回、上へ $n$ 回進む最短経路は、$m+n$ 回の移動のうち「右」にする $m$ 回を選ぶ ${}_{m+n}\mathrm{C}_m$ 通り。
+        各格子点に書いた数は「そこまでの経路の数」で、左と下の数の和になっています（パスカルの三角形と同じ仕組み）。
+      </div>
+      <ul>
+        <li>「必ず通る」点（緑）を置くと、経路数は「出発→その点」×「その点→到着」の積になる。積の形を読み取ろう。</li>
+        <li>「通れない」点（赤）を置くと、その点の数が 0 になって右上に伝わる。1 点のときは「全体 − その点を通る経路」で計算できる。</li>
+        <li>「経路の例」を押すと、条件を満たす経路の 1 つがランダムに描かれる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 円順列と重複組合せ -->
+  <section class="tool-body" data-tab="circular">
+    <div class="layout">
+      <aside class="controls" id="c-circular"></aside>
+      <div class="stage">
+        <div id="w-circ">
+          <div class="canvas-wrap"><canvas id="cv-circ"></canvas><div class="caption">回転して同じになる並びは、円順列では 1 通りと数えます</div></div>
+          <div class="readout" id="r-circ" style="margin-top:0.8rem"></div>
+        </div>
+        <div id="w-rep" hidden>
+          <div class="canvas-wrap viz" id="v-rep"></div>
+          <div class="readout" id="r-rep" style="margin-top:0.8rem"></div>
+        </div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">円順列：回転で重なるものは同じ</div>
+        $n$ 個を一列に並べる $n!$ 通りのうち、回転して重なる $n$ 通りずつが円順列としては同じになるので
+        $\dfrac{n!}{n}=(n-1)!$ 通り。「1 個を固定して残りを並べる」と考えても $(n-1)!$ です。
+      </div>
+      <div class="note sage">
+        <div class="title">重複組合せ：○ と仕切り | の並べ方</div>
+        $n$ 種類から重複を許して $r$ 個選ぶことは、$r$ 個の ○ と $n-1$ 本の仕切り | を一列に並べることと 1 対 1 に対応します。
+        $n+r-1$ 個の場所から ○ の場所 $r$ 個を選ぶので ${}_{n+r-1}\mathrm{C}_r$ 通り。
+      </div>
+      <ul>
+        <li>「回転」を押すと、右側に並んだ $n$ 個の回転がすべて同じ円順列であることが確かめられる。$n$ を変えて $(n-1)!$ を確認しよう。</li>
+        <li>重複組合せで「ランダム」を押し、○ と | の列と「各種類の個数」が 1 対 1 に対応していることを見よう。仕切りの本数は種類数 − 1。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学A', title: '場合の数' });
+
+  const COLORS = C.series;
+  const LET = 'ABCDEF';
+  const fact = (k) => { let f = 1; for (let i = 2; i <= k; i++) f *= i; return f; };
+  const nPr = (n, r) => { let v = 1; for (let i = 0; i < r; i++) v *= (n - i); return v; };
+  const nCr = (n, r) => (r < 0 || r > n) ? 0 : Math.round(nPr(n, r) / fact(r));
+  const texP = (n, r) => `{}_{${n}}\\mathrm{P}_{${r}}`;
+  const texC = (n, r) => `{}_{${n}}\\mathrm{C}_{${r}}`;
+  const ball = (i, lg) => `<span class="ball${lg ? ' lg' : ''}" style="background:${COLORS[i]}">${LET[i]}</span>`;
+
+  /* ======================= 順列と組合せ ======================= */
+  (() => {
+    const ctl = $('#c-perm');
+    const st = { n: 4, r: 2, group: true };
+    UI.heading(ctl, '設定');
+    const sN = UI.slider(ctl, { label: '$n$（玉の個数）', min: 2, max: 6, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; if (st.r > v) st.r = v; sR.setRange(1, v); sR.set(st.r); draw(); } });
+    const sR = UI.slider(ctl, { label: '$r$（取り出して並べる個数）', min: 1, max: st.n, step: 1, value: st.r, digits: 0, onInput: (v) => { st.r = v; draw(); } });
+    UI.checkbox(ctl, { label: '同じ組をまとめる', checked: true, onChange: (v) => { st.group = v; draw(); } });
+    UI.divider(ctl);
+    UI.buttonRow(ctl, [
+      { label: 'n=4, r=2', small: true, onClick: () => { st.n = 4; st.r = 2; sN.set(4); sR.setRange(1, 4); sR.set(2); draw(); } },
+      { label: 'n=5, r=3', small: true, onClick: () => { st.n = 5; st.r = 3; sN.set(5); sR.setRange(1, 5); sR.set(3); draw(); } },
+      { label: 'n=5, r=5', small: true, onClick: () => { st.n = 5; st.r = 5; sN.set(5); sR.setRange(1, 5); sR.set(5); draw(); } },
+    ]);
+
+    function combos(n, r) { const out = []; const rec = (s, cur) => { if (cur.length === r) { out.push(cur.slice()); return; } for (let i = s; i < n; i++) { cur.push(i); rec(i + 1, cur); cur.pop(); } }; rec(0, []); return out; }
+    function perms(arr) { if (arr.length <= 1) return [arr.slice()]; const out = []; arr.forEach((a, i) => { const rest = arr.slice(0, i).concat(arr.slice(i + 1)); for (const p of perms(rest)) out.push([a, ...p]); }); return out; }
+    function allPerms(n, r) { const out = []; const rec = (cur, used) => { if (cur.length === r) { out.push(cur.slice()); return; } for (let i = 0; i < n; i++) if (!used[i]) { used[i] = true; cur.push(i); rec(cur, used); cur.pop(); used[i] = false; } }; rec([], []); return out; }
+
+    const viz = $('#v-perm'), readout = $('#r-perm');
+    function draw() {
+      const { n, r } = st;
+      const P = nPr(n, r), F = fact(r), K = P / F;
+      const permHTML = (p) => `<span class="perm">${p.map((i) => ball(i)).join('')}</span>`;
+      let html = `<div class="small" style="margin-bottom:0.4rem">玉：${Array.from({ length: n }, (_, i) => ball(i, true)).join(' ')}　から ${r} 個を取り出して並べる</div>`;
+      if (n <= 5) {
+        if (st.group) {
+          html += `<div class="small">各行が 1 つの「組」（全部で <b>${K}</b> 行 = 組合せの数）、1 行に <b>${F}</b> 個（= ${r}! 通りの並べ方）</div>`;
+          html += combos(n, r).map((c) => `<div class="perm-row"><div><span class="combo">${c.map((i) => ball(i)).join('')}</span><span class="cnt">× ${F}</span></div><div class="items">${perms(c).map(permHTML).join('')}</div></div>`).join('');
+        } else {
+          html += `<div class="small">すべての並べ方（辞書順）：全部で <b>${P}</b> 個</div><div class="perm-flow">${allPerms(n, r).map(permHTML).join('')}</div>`;
+        }
+      } else {
+        html += `<p class="small">$n=6$ では並べ方が最大 720 個になるので一覧は省略します。</p>
+          <div class="readout-grid">
+            <div class="stat"><div class="k">組（組合せ）の数</div><div class="v">${K}</div></div>
+            <div class="stat"><div class="k">1 つの組の並べ方 ${r}!</div><div class="v">${F}</div></div>
+            <div class="stat ink"><div class="k">順列の総数</div><div class="v">${K} × ${F} = ${P}</div></div>
+          </div>`;
+      }
+      viz.innerHTML = html;
+      UI.texAll(viz);
+      const prod = Array.from({ length: r }, (_, i) => n - i).join('\\cdot');
+      const factStr = r >= 2 ? Array.from({ length: r }, (_, i) => r - i).join('\\cdot') : '1';
+      readout.innerHTML = `
+        <div class="tex-block">$$${texP(n, r)} = ${prod} = ${P}$$</div>
+        <div class="tex-block">$$${texC(n, r)} = \\frac{${texP(n, r)}}{${r}!} = \\frac{${P}}{${factStr}} = \\frac{${P}}{${F}} = ${K}$$</div>
+        <div class="tex-block">$$${texP(n, r)} = ${texC(n, r)}\\times ${r}! = ${K}\\times${F} = ${P}$$</div>
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">組合せ nCr（行の数）</div><div class="v">${K}</div></div>
+          <div class="stat"><div class="k">r!（1 行の個数）</div><div class="v">${F}</div></div>
+          <div class="stat ink"><div class="k">順列 nPr（全部）</div><div class="v">${P}</div></div>
+        </div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= パスカルの三角形 ======================= */
+  (() => {
+    const ctl = $('#c-pascal');
+    const ROWS = 12;
+    const st = { sel: [5, 2], hover: null };
+    const plot = new Plot('#cv-pascal', { xmin: -7.6, xmax: 8.9, ymin: -12.9, ymax: 0.9, aspect: 0.8, grid: false, axes: false });
+    UI.heading(ctl, '表示');
+    const cbOdd = UI.checkbox(ctl, { label: '奇数を塗る（シェルピンスキーのギャスケット・発展）', onChange: draw });
+    const cbSum = UI.checkbox(ctl, { label: '各行の和 $2^n$ を表示', onChange: draw });
+    UI.buttonRow(ctl, [{ label: '選択を解除', small: true, onClick: () => { st.sel = null; draw(); } }]);
+    UI.note(ctl, { tone: 'ink', html: '$n$ 行目の左から $r$ 番目（0 から数える）が ${}_n\\mathrm{C}_r$。マウスを乗せると値が読めます。' });
+
+    const cellAt = (x, y) => {
+      const n = Math.round(-y); if (n < 0 || n > ROWS) return null;
+      const r = Math.round(x + n / 2); if (r < 0 || r > n) return null;
+      if (Math.abs(x - (r - n / 2)) > 0.46 || Math.abs(y + n) > 0.46) return null;
+      return [n, r];
+    };
+    plot.onClick = (x, y) => { const c = cellAt(x, y); st.sel = c ? c : null; draw(); };
+    plot.onHover = (x, y) => {
+      const c = x == null ? null : cellAt(x, y);
+      const k = c ? c.join() : '', k0 = st.hover ? st.hover.join() : '';
+      if (k !== k0) { st.hover = c; draw(); }
+    };
+    const sup = (k) => String(k).replace(/\d/g, (d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]);
+    const readout = $('#r-pascal');
+
+    function draw() {
+      const odd = cbOdd.get(), sums = cbSum.get();
+      plot.render((P) => {
+        for (let n = 0; n <= ROWS; n++) {
+          P.text(-n / 2 - 0.85, -n, `n=${n}`, { color: C.faint, align: 'right', baseline: 'middle' });
+          for (let r = 0; r <= n; r++) {
+            const x = r - n / 2, y = -n, v = nCr(n, r);
+            const isSel = st.sel && st.sel[0] === n && st.sel[1] === r;
+            const isPar = st.sel && st.sel[0] - 1 === n && (st.sel[1] - 1 === r || st.sel[1] === r);
+            const isHov = st.hover && st.hover[0] === n && st.hover[1] === r;
+            let fill = C.surface, stroke = C.border, tcol = C.text, w = 1;
+            if (odd && v % 2 === 1) { fill = C.inkSubtle; stroke = C.inkLine; tcol = C.inkText; }
+            if (isPar) { fill = C.ink; stroke = C.ink; tcol = '#fff'; }
+            if (isSel) { fill = C.clay; stroke = C.clay; tcol = '#fff'; }
+            if (isHov) { stroke = C.ochre; w = 3; }
+            P.circle(x, y, 0.44, { fill, color: stroke, width: w });
+            P.text(x, y, String(v), { color: tcol, align: 'center', baseline: 'middle', font: (v >= 100 ? '12px' : '13px') + ' "Noto Sans JP", system-ui, sans-serif' });
+          }
+          if (sums) P.text(n / 2 + 0.75, -n, `和 2${sup(n)} = ${2 ** n}`, { color: C.sage, baseline: 'middle' });
+        }
+        if (st.sel && st.sel[0] >= 1) {
+          const [n, r] = st.sel;
+          const x = r - n / 2, y = -n;
+          if (r >= 1) P.arrow(x - 0.5 + 0.18, y + 1 - 0.36, x - 0.12, y + 0.42, { color: C.ink, width: 1.6, head: 8 });
+          if (r <= n - 1) P.arrow(x + 0.5 - 0.18, y + 1 - 0.36, x + 0.12, y + 0.42, { color: C.ink, width: 1.6, head: 8 });
+          if (r >= 1 && r <= n - 1) P.text(x, y + 1, '+', { color: C.ink, align: 'center', baseline: 'middle', font: 'bold 14px system-ui' });
+        }
+      });
+      let html = '';
+      if (st.sel) {
+        const [n, r] = st.sel, v = nCr(n, r);
+        if (n === 0) html += `<div class="tex-block">$$${texC(0, 0)}=1$$</div><p class="small">頂点は 1（何も選ばない選び方は 1 通り）。</p>`;
+        else if (r === 0 || r === n) html += `<div class="tex-block">$$${texC(n, r)} = ${texC(n - 1, r - 1)} + ${texC(n - 1, r)} = ${nCr(n - 1, r - 1)} + ${nCr(n - 1, r)} = ${v}$$</div><p class="small">端のセル：上の段には片側しかないので（もう片方は 0 通り）、常に 1 になる。</p>`;
+        else html += `<div class="tex-block">$$${texC(n, r)} = ${texC(n - 1, r - 1)} + ${texC(n - 1, r)} = ${nCr(n - 1, r - 1)} + ${nCr(n - 1, r)} = ${v}$$</div>
+          <p class="small">${n} 個から ${r} 個を選ぶ ${v} 通りは、「特定の 1 個を含む」${nCr(n - 1, r - 1)} 通りと「含まない」${nCr(n - 1, r)} 通りに分かれる。</p>`;
+        if (sums) html += `<div class="tex-block small">$$${Array.from({ length: n + 1 }, (_, k) => nCr(n, k)).join('+')} = ${2 ** n} = 2^{${n}}$$</div>`;
+      } else {
+        html += '<p class="small">セルをクリックすると、そのセルの値が上の 2 つの和であることを表示します。</p>';
+      }
+      if (st.hover) html += `<div class="kv"><span class="k">マウス位置</span><span class="v">${st.hover[0]}C${st.hover[1]} = ${nCr(st.hover[0], st.hover[1])}</span></div>`;
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 最短経路 ======================= */
+  (() => {
+    const ctl = $('#c-paths');
+    const st = { m: 4, n: 3, marks: new Map(), path: null };
+    const rnd = UI.rng();
+    const key = (i, j) => i + ',' + j;
+    const plot = new Plot('#cv-paths', { xmin: -0.8, xmax: 4.8, ymin: -0.8, ymax: 3.8, aspect: 0.72, grid: false, axes: false });
+    UI.heading(ctl, '格子の大きさ');
+    UI.slider(ctl, { label: '右へ $m$ 区画', min: 2, max: 7, step: 1, value: st.m, digits: 0, onInput: (v) => { st.m = v; reset(); } });
+    UI.slider(ctl, { label: '上へ $n$ 区画', min: 2, max: 7, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; reset(); } });
+    UI.divider(ctl);
+    UI.buttonRow(ctl, [
+      { label: '経路の例を表示', small: true, primary: true, onClick: () => { st.path = samplePath(); draw(); } },
+      { label: '印を消す', small: true, onClick: () => { st.marks.clear(); st.path = null; draw(); } },
+    ]);
+    UI.note(ctl, { tone: 'sage', html: '緑：必ず通る点<br>赤：通れない点<br>格子点の数字は、そこまでの経路数（左と下の和）。' });
+
+    function reset() { st.marks.clear(); st.path = null; plot.setView(-0.8, st.m + 0.8, -0.8, st.n + 0.8); draw(); }
+    const mark = (i, j) => st.marks.get(key(i, j));
+    function preds(i, j) {
+      const out = [];
+      if (mark(i, j) === 'cannot') return out;
+      if (i > 0) { let b = false; for (let jj = 0; jj < j; jj++) if (mark(i, jj) === 'must') b = true; if (!b) out.push([i - 1, j]); }
+      if (j > 0) { let b = false; for (let ii = 0; ii < i; ii++) if (mark(ii, j) === 'must') b = true; if (!b) out.push([i, j - 1]); }
+      return out;
+    }
+    function compute() {
+      const { m, n } = st;
+      const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+      dp[0][0] = 1;
+      for (let i = 0; i <= m; i++) for (let j = 0; j <= n; j++) {
+        if (i === 0 && j === 0) continue;
+        dp[i][j] = preds(i, j).reduce((s, [a, b]) => s + dp[a][b], 0);
+      }
+      return dp;
+    }
+    function samplePath() {
+      const dp = compute();
+      if (!dp[st.m][st.n]) return null;
+      let i = st.m, j = st.n; const pts = [[i, j]];
+      while (i > 0 || j > 0) {
+        const ps = preds(i, j).filter(([a, b]) => dp[a][b] > 0);
+        const tot = ps.reduce((s, [a, b]) => s + dp[a][b], 0);
+        let u = rnd() * tot, pick = ps[ps.length - 1];
+        for (const p of ps) { u -= dp[p[0]][p[1]]; if (u < 0) { pick = p; break; } }
+        [i, j] = pick; pts.push([i, j]);
+      }
+      return pts.reverse();
+    }
+    plot.onClick = (x, y, e) => {
+      const i = Math.round(x), j = Math.round(y);
+      if (i < 0 || i > st.m || j < 0 || j > st.n || Math.hypot(x - i, y - j) > 0.4) return;
+      if ((i === 0 && j === 0) || (i === st.m && j === st.n)) return;
+      const k = key(i, j), cur = st.marks.get(k);
+      if (e && e.shiftKey) { if (cur === 'cannot') st.marks.delete(k); else st.marks.set(k, 'cannot'); }
+      else if (!cur) st.marks.set(k, 'must'); else if (cur === 'must') st.marks.set(k, 'cannot'); else st.marks.delete(k);
+      st.path = null; draw();
+    };
+
+    const readout = $('#r-paths');
+    function draw() {
+      const { m, n } = st;
+      const dp = compute();
+      plot.render((P) => {
+        for (let i = 0; i <= m; i++) P.segment(i, 0, i, n, { color: C.border, width: 1.2 });
+        for (let j = 0; j <= n; j++) P.segment(0, j, m, j, { color: C.border, width: 1.2 });
+        if (st.path) P.polygon(st.path, { color: C.sage, width: 6, alpha: 0.55, open: true });
+        for (let i = 0; i <= m; i++) for (let j = 0; j <= n; j++) {
+          const mk = mark(i, j);
+          if (mk === 'must') P.point(i, j, { color: C.sage, r: 9 });
+          else if (mk === 'cannot') { P.point(i, j, { color: C.clay, r: 9 }); P.text(i, j, '×', { color: '#fff', align: 'center', baseline: 'middle', font: 'bold 14px system-ui' }); }
+          else P.point(i, j, { color: C.borderStrong, r: 3.5 });
+          const v = dp[i][j];
+          P.text(i, j, String(v), { color: v === 0 ? C.clay : mk === 'must' ? C.sageSolid : C.inkText, align: 'right', baseline: 'bottom', dx: -7, dy: -7, bg: true, font: 'bold 13px "Noto Sans JP", system-ui, sans-serif' });
+        }
+        P.text(0, 0, '出発', { color: C.muted, align: 'right', baseline: 'top', dx: -6, dy: 8 });
+        P.text(m, n, '到着', { color: C.muted, align: 'left', baseline: 'bottom', dx: 8, dy: -4 });
+      });
+      const total = nCr(m + n, m);
+      const musts = [...st.marks].filter(([, v]) => v === 'must').map(([k]) => k.split(',').map(Number)).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+      const cannots = [...st.marks].filter(([, v]) => v === 'cannot').map(([k]) => k.split(',').map(Number));
+      const ans = dp[m][n];
+      let html = `<div class="tex-block">$$\\text{条件なし：}\\ ${texC(m + n, m)} = ${total}\\quad(\\text{右 }${m}\\text{ 回・上 }${n}\\text{ 回の並べ方})$$</div>`;
+      if (musts.length) {
+        const chain = [[0, 0], ...musts, [m, n]];
+        let ok = true; const terms = [], vals = [];
+        for (let k = 0; k + 1 < chain.length; k++) {
+          const [a, b] = chain[k], [c, d] = chain[k + 1];
+          if (c < a || d < b) { ok = false; break; }
+          terms.push(texC((c - a) + (d - b), c - a)); vals.push(nCr((c - a) + (d - b), c - a));
+        }
+        const names = musts.map(([i, j]) => `(${i},${j})`).join('，');
+        if (ok) html += `<div class="tex-block">$$\\text{必ず }${names}\\text{ を通る：}\\ ${terms.join('\\times')} = ${vals.join('\\times')} = ${vals.reduce((s, v) => s * v, 1)}$$</div>`;
+        else html += `<div class="note clay">必ず通る点 ${names} を 1 本の最短経路で全部通ることはできない（右上の順に並んでいない）ので 0 通り。</div>`;
+      }
+      if (cannots.length === 1 && musts.length === 0) {
+        const [i, j] = cannots[0];
+        const via = nCr(i + j, i) * nCr((m - i) + (n - j), m - i);
+        html += `<div class="tex-block">$$\\text{点 }(${i},${j})\\text{ を通れない：}\\ ${total} - ${texC(i + j, i)}\\times${texC((m - i) + (n - j), m - i)} = ${total} - ${nCr(i + j, i)}\\times${nCr((m - i) + (n - j), m - i)} = ${total - via}$$</div>`;
+      } else if (cannots.length) {
+        html += `<p class="small">通れない点 ${cannots.map(([i, j]) => `(${i},${j})`).join('，')} の数を 0 にして、左と下の和を順に計算した結果。</p>`;
+      }
+      html += `<div class="readout-grid"><div class="stat sage"><div class="k">条件を満たす最短経路の数</div><div class="v">${ans}</div></div><div class="stat"><div class="k">格子</div><div class="v">${m} × ${n}</div></div></div>`;
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    reset();
+  })();
+
+  /* ======================= 円順列と重複組合せ ======================= */
+  (() => {
+    const ctl = $('#c-circular');
+    const seg = UI.segmented(ctl, { options: [{ value: 'circ', label: '円順列' }, { value: 'rep', label: '重複組合せ' }], value: 'circ', onChange: (v) => {
+      $('#w-circ').hidden = v !== 'circ'; $('#w-rep').hidden = v !== 'rep';
+      boxC.style.display = v === 'circ' ? '' : 'none'; boxR.style.display = v === 'rep' ? '' : 'none';
+      if (v === 'circ') plot.resize();
+    } });
+    const boxC = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    const boxR = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(boxC, boxR); boxR.style.display = 'none';
+
+    /* --- 円順列 --- */
+    const st = { n: 4, order: [0, 1, 2, 3], rot: 0 };
+    const plot = new Plot('#cv-circ', { xmin: -1.7, xmax: 8.6, ymin: -1.7, ymax: 1.7, aspect: 0.42, grid: false, axes: false });
+    UI.heading(boxC, '円順列');
+    UI.slider(boxC, { label: '$n$（玉の個数）', min: 3, max: 6, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; st.order = Array.from({ length: v }, (_, i) => i); st.rot = 0; drawC(); } });
+    const rnd = UI.rng();
+    UI.buttonRow(boxC, [
+      { label: '回転', primary: true, onClick: () => { st.rot = (st.rot + 1) % st.n; drawC(); } },
+      { label: 'シャッフル', onClick: () => { const a = st.order.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } st.order = a; st.rot = 0; drawC(); } },
+    ]);
+    const readC = $('#r-circ');
+    function beads(P, cx, cy, R, rot, big) {
+      const n = st.n;
+      P.circle(cx, cy, R, { color: C.borderSubtle, width: 1.5 });
+      for (let k = 0; k < n; k++) {
+        const idx = st.order[(k + rot) % n];
+        const a = Math.PI / 2 - 2 * Math.PI * k / n;
+        const x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
+        P.point(x, y, { color: COLORS[idx], r: big ? 15 : 7 });
+        if (big) P.text(x, y, LET[idx], { color: '#fff', align: 'center', baseline: 'middle', font: 'bold 14px system-ui' });
+      }
+    }
+    function drawC() {
+      const n = st.n;
+      plot.render((P) => {
+        for (let k = 0; k < n; k++) {
+          const a = Math.PI / 2 - 2 * Math.PI * k / n;
+          P.text(1.5 * Math.cos(a), 1.5 * Math.sin(a), `席${k + 1}`, { color: C.faint, align: 'center', baseline: 'middle' });
+        }
+        beads(P, 0, 0, 1.05, st.rot, true);
+        P.text(0, -1.75, `一列の並べ方 ${n}! = ${fact(n)} 通りのうち…`, { color: C.muted, align: 'center', baseline: 'top' });
+        const x0 = 2.75, gap = 1.12;
+        for (let t = 0; t < n; t++) {
+          const cx = x0 + t * gap;
+          if (t === st.rot) P.circle(cx, 0, 0.55, { color: C.ochre, width: 2.5, fill: Plot.rgba(C.ochre, 0.1) });
+          beads(P, cx, 0, 0.4, t, false);
+          P.text(cx, -0.62, `${t} 回転`, { color: t === st.rot ? C.ochre : C.faint, align: 'center', baseline: 'top' });
+        }
+        P.text(x0 + (n - 1) * gap / 2, 0.85, `回転して重なる ${n} 通りは同じ円順列`, { color: C.ochreDeep, align: 'center', baseline: 'bottom' });
+      });
+      readC.innerHTML = `
+        <div class="tex-block">$$\\frac{${n}!}{${n}} = \\frac{${fact(n)}}{${n}} = ${fact(n - 1)} = (${n}-1)!$$</div>
+        <div class="readout-grid">
+          <div class="stat"><div class="k">一列に並べる（順列）</div><div class="v">${n}! = ${fact(n)}</div></div>
+          <div class="stat ochre"><div class="k">同じとみなす回転</div><div class="v">${n} 通りずつ</div></div>
+          <div class="stat sage"><div class="k">円順列の数 (n−1)!</div><div class="v">${fact(n - 1)}</div></div>
+        </div>
+        <p class="small">A を席 1 に固定すると、残り ${n - 1} 個を席 2〜${n} に並べる ${n - 1}! = ${fact(n - 1)} 通り、と考えても同じ。</p>`;
+      UI.texAll(readC);
+    }
+    drawC();
+
+    /* --- 重複組合せ --- */
+    const sr = { n: 3, r: 4, pos: null };
+    UI.heading(boxR, '重複組合せ');
+    UI.slider(boxR, { label: '$n$（種類の数）', min: 2, max: 5, step: 1, value: sr.n, digits: 0, onInput: (v) => { sr.n = v; randomPick(); drawR(); } });
+    UI.slider(boxR, { label: '$r$（選ぶ個数）', min: 1, max: 6, step: 1, value: sr.r, digits: 0, onInput: (v) => { sr.r = v; randomPick(); drawR(); } });
+    UI.buttonRow(boxR, [{ label: 'ランダム', primary: true, onClick: () => { randomPick(); drawR(); } }]);
+    function randomPick() {
+      const slots = sr.n + sr.r - 1;
+      const idx = Array.from({ length: slots }, (_, i) => i);
+      for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+      sr.pos = new Set(idx.slice(0, sr.r));
+    }
+    const vizR = $('#v-rep'), readR = $('#r-rep');
+    function stringOf(posSet, n, r) {
+      const slots = n + r - 1; let kind = 0; const counts = Array(n).fill(0); const parts = [];
+      for (let s = 0; s < slots; s++) { if (posSet.has(s)) { counts[kind]++; parts.push(['o', kind]); } else { kind++; parts.push(['|', kind]); } }
+      return { counts, parts };
+    }
+    function drawR() {
+      const { n, r } = sr;
+      const { counts, parts } = stringOf(sr.pos, n, r);
+      const total = nCr(n + r - 1, r);
+      let html = `<div class="small">種類：${Array.from({ length: n }, (_, i) => ball(i, true)).join(' ')}　から重複を許して ${r} 個選ぶ</div>
+        <div class="bars">${parts.map(([t, k]) => t === 'o' ? `<span class="o" style="color:${COLORS[k]}">○</span>` : `<span class="bar">|</span>`).join('')}</div>
+        <div class="kinds">${counts.map((c, k) => `<span class="kind">${ball(k)}<span class="cnt">× ${c}</span>${'○'.repeat(c) ? `<span style="color:${COLORS[k]}">${'○'.repeat(c)}</span>` : '<span class="faint">なし</span>'}</span>`).join('')}</div>
+        <p class="small">○ ${r} 個と仕切り | ${n - 1} 本、合わせて ${n + r - 1} か所のうち ○ の場所を ${r} か所選ぶ。</p>`;
+      if (total <= 70) {
+        const all = [];
+        const rec = (s, cur) => { if (cur.length === r) { all.push(new Set(cur)); return; } for (let i = s; i < n + r - 1; i++) { cur.push(i); rec(i + 1, cur); cur.pop(); } };
+        rec(0, []);
+        const cur = [...sr.pos].sort((a, b) => a - b).join();
+        html += `<div class="small" style="margin-bottom:0.3rem">すべての並べ方（${total} 通り）：</div><div class="list-small">${all.map((s) => { const p = stringOf(s, n, r).parts.map(([t]) => t === 'o' ? '○' : '|').join(''); const hl = [...s].sort((a, b) => a - b).join() === cur; return `<span class="${hl ? 'hl' : ''}">${p}</span>`; }).join('')}</div>`;
+      } else {
+        html += `<p class="small">全部で ${total} 通り（多いので一覧は省略）。</p>`;
+      }
+      vizR.innerHTML = html;
+      readR.innerHTML = `
+        <div class="tex-block">$$${'{}_{' + n + '+' + r + '-1}\\mathrm{C}_{' + r + '}'} = ${texC(n + r - 1, r)} = \\frac{${Array.from({ length: r }, (_, i) => n + r - 1 - i).join('\\cdot')}}{${r}!} = ${total}$$</div>
+        <div class="readout-grid">
+          <div class="stat"><div class="k">○ の数 r</div><div class="v">${r}</div></div>
+          <div class="stat ink"><div class="k">仕切り | の数 n−1</div><div class="v">${n - 1}</div></div>
+          <div class="stat sage"><div class="k">重複組合せの数</div><div class="v">${total}</div></div>
+        </div>
+        <p class="small">仕切りの場所を選ぶと考えれば $${texC(n + r - 1, n - 1)} = ${nCr(n + r - 1, n - 1)}$ でも同じ。</p>`;
+      UI.texAll(readR);
+    }
+    randomPick(); drawR();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'perm', label: '順列と組合せ' },
+    { id: 'pascal', label: 'パスカルの三角形' },
+    { id: 'paths', label: '最短経路' },
+    { id: 'circular', label: '円順列と重複組合せ' },
+  ]);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>確率</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+<style>
+.lot-table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+.lot-table th { font-weight: 500; color: var(--text-faint); font-size: 0.78rem; text-align: left; padding: 0 0.2rem 0.2rem; }
+.lot-table td { padding: 0.15rem 0.2rem; }
+.lot-table input[type="number"] { width: 6em; }
+.lot-table .x { color: var(--clay-text); font-weight: 700; }
+table.data.cond td { min-width: 4.5em; }
+</style>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>確率</h1>
+    <p class="lede">試行を繰り返して相対度数が確率に近づくようす、反復試行の分布、条件付き確率の面積図、期待値のつり合い。「確率とは何か」を実験と図で確かめます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 試行と大数の法則 -->
+  <section class="tool-body" data-tab="sim">
+    <div class="layout">
+      <aside class="controls" id="c-sim"></aside>
+      <div class="stage">
+        <div class="canvas-row">
+          <div class="canvas-wrap"><canvas id="cv-sim-bar"></canvas><div class="caption">相対度数（青）と理論値（赤の点線）</div></div>
+          <div class="canvas-wrap"><canvas id="cv-sim-run"></canvas><div class="caption">試行回数と相対度数の推移</div></div>
+        </div>
+        <div class="readout" id="r-sim"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">大数の法則</div>
+        ある事象の起こる相対度数 $\dfrac{\text{起こった回数}}{\text{試行回数}}$ は、試行回数を増やすと一定の値（その事象の確率）に近づいていきます。
+        確率 $\dfrac{a}{N}$ は「同様に確からしい $N$ 通りのうち $a$ 通り」と定義しますが、実験の相対度数がそこに落ち着くことがこの定義の裏付けです。
+      </div>
+      <ul>
+        <li>「1回」を数回押して、最初のうちは相対度数が大きく揺れることを見る。次に「1000回」を押すと、赤い理論値の線に吸い寄せられるように落ち着く。</li>
+        <li>「2個のサイコロの和」では、和ごとの理論値が同じでない（7 が最も出やすい）。棒グラフの形が三角形に近づくことを確かめよう。</li>
+        <li>試行回数が 10 倍になっても、理論値からのずれは $\dfrac{1}{\sqrt{10}}$ 倍程度にしか縮まらない。ゆっくり近づくことにも注目。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 反復試行 -->
+  <section class="tool-body" data-tab="binom">
+    <div class="layout">
+      <aside class="controls" id="c-binom"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-binom"></canvas><div class="caption">n 回のうち r 回起こる確率 P(X=r)</div></div>
+        <div class="readout" id="r-binom"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">反復試行の確率</div>
+        1 回の試行で事象 A が起こる確率が $p$ のとき、この試行を $n$ 回繰り返して A がちょうど $r$ 回起こる確率は
+        $${}_n\mathrm{C}_r\,p^r(1-p)^{n-r}$$
+        「どの $r$ 回で起こるか」の選び方 ${}_n\mathrm{C}_r$ 通りそれぞれが、確率 $p^r(1-p)^{n-r}$ で起こるからです。
+      </div>
+      <ul>
+        <li>$p=0.5$ のとき分布は左右対称。$p$ を動かすと山が左右にずれ、山の位置はおよそ $np$（期待値）になる。</li>
+        <li>$r$ を動かして、式の中の ${}_n\mathrm{C}_r$ と $p^r(1-p)^{n-r}$ がそれぞれどう変わるかを読もう。組合せの数が大きい中央付近が最も起こりやすい。</li>
+        <li>「r 回以上」を ON にすると、緑の棒の和が $P(X\ge r)$。「少なくとも 1 回」の確率は $1-(1-p)^n$ で計算した方が速い。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 条件付き確率 -->
+  <section class="tool-body" data-tab="cond">
+    <div class="layout">
+      <aside class="controls" id="c-cond"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-cond"></canvas><div class="caption">面積 = 確率。境界の点をドラッグできます</div></div>
+        <div class="readout" id="r-cond"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">乗法定理と条件付き確率</div>
+        $P(A\cap B)=P(A)\,P(B\mid A)$。面積図では、幅 $P(A)$ の列のうち高さ $P(B\mid A)$ の部分が $A\cap B$ の面積です。
+        逆に $P(A\mid B)=\dfrac{P(A\cap B)}{P(B)}$ は、「$B$ の面積のうち $A$ が占める割合」です。
+      </div>
+      <div class="note clay">
+        <div class="title">検査の例（発展：ベイズの考え方）</div>
+        病気の人が 1% で、検査は病気の人の 90% を陽性、健康な人の 5% を（誤って）陽性とするとき、「陽性だった人が本当に病気である確率」$P(A\mid B)$ は意外に小さくなります。
+        健康な人が圧倒的に多いため、$B$（陽性）の面積の大部分は「健康なのに陽性」で占められるからです。
+      </div>
+      <ul>
+        <li>$P(A)$ の境界を左右に動かすと、$A\cap B$ と $\bar A\cap B$ の面積の比が変わり、$P(A\mid B)$ が大きく変わる。</li>
+        <li>$P(B\mid A)=P(B\mid\bar A)$ にすると $P(A\mid B)=P(A)$ となる（$A$ と $B$ は独立）。B が起きても A の確率は変わらない。</li>
+        <li>下の 2×2 表で「人数」として数えると、条件付き確率が「行（列）の中の割合」であることが実感できる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 期待値 -->
+  <section class="tool-body" data-tab="expect">
+    <div class="layout">
+      <aside class="controls" id="c-expect"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-expect"></canvas><div class="caption">棒の高さ = 確率。▲ は分布の「つり合いの点」= 期待値</div></div>
+        <div class="readout" id="r-expect"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">期待値は「確率で重みをつけた平均」</div>
+        値 $x_1,\dots,x_n$ をそれぞれ確率 $p_1,\dots,p_n$（$p_1+\cdots+p_n=1$）でとるとき、期待値は
+        $$E=x_1p_1+x_2p_2+\cdots+x_np_n$$
+        数直線上に確率を「おもり」として置いたとき、全体がつり合う支点の位置が期待値です。
+      </div>
+      <ul>
+        <li>くじの本数を書きかえると、確率が変わって ▲ が動く。1 等の本数を増やしても、はずれが多いと期待値はあまり動かない。</li>
+        <li>「サイコロの目」の期待値 3.5 は、実際には出ない値。期待値は「平均」であって「出やすい値」ではない。</li>
+        <li>くじ 1 本の値段と期待値を比べると、「買うと損か得か」の目安になる。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学A', title: '確率' });
+  const rnd = UI.rng();
+  const fact = (k) => { let f = 1; for (let i = 2; i <= k; i++) f *= i; return f; };
+  const nCr = (n, r) => { if (r < 0 || r > n) return 0; let v = 1; for (let i = 0; i < r; i++) v = v * (n - i) / (i + 1); return Math.round(v); };
+  const texC = (n, r) => `{}_{${n}}\\mathrm{C}_{${r}}`;
+  const BAR_FONT = '13px "Noto Sans JP", system-ui, sans-serif';
+
+  /* ======================= 試行と大数の法則 ======================= */
+  (() => {
+    const ctl = $('#c-sim');
+    const d6 = () => Math.floor(rnd() * 6) + 1;
+    const EXP = {
+      coin: { label: 'コイン（表が出る）', outcomes: ['表', '裏'], probs: [1 / 2, 1 / 2], event: () => [0], name: '表', sample: () => (rnd() < 0.5 ? 0 : 1) },
+      die: { label: 'サイコロ（1 の目）', outcomes: ['1', '2', '3', '4', '5', '6'], probs: Array(6).fill(1 / 6), event: () => [0], name: '1 の目', sample: () => d6() - 1 },
+      sum7: { label: '2 個のサイコロの和が 7', outcomes: ['和が 7', 'それ以外'], probs: [6 / 36, 30 / 36], event: () => [0], name: '和が 7', sample: () => (d6() + d6() === 7 ? 0 : 1) },
+      sumall: { label: '2 個のサイコロの和（全分布）', outcomes: Array.from({ length: 11 }, (_, i) => String(i + 2)), probs: [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1].map((k) => k / 36), event: () => [st.k - 2], name: () => `和が ${st.k}`, sample: () => d6() + d6() - 2 },
+    };
+    const st = { kind: 'coin', k: 7, counts: [], trials: 0, hist: [] };
+    const MAX = 20000;
+    UI.heading(ctl, '実験');
+    UI.select(ctl, { label: '試行の種類', options: Object.entries(EXP).map(([value, e]) => ({ value, label: e.label })), value: st.kind, onChange: (v) => { st.kind = v; sK.el.style.display = v === 'sumall' ? '' : 'none'; reset(); } });
+    const sK = UI.slider(ctl, { label: '注目する和', min: 2, max: 12, step: 1, value: 7, digits: 0, onInput: (v) => { st.k = v; rebuildHist(); draw(); } });
+    sK.el.style.display = 'none';
+    UI.heading(ctl, '試行する');
+    UI.buttonRow(ctl, [
+      { label: '1回', small: true, onClick: () => run(1) },
+      { label: '10回', small: true, onClick: () => run(10) },
+      { label: '100回', small: true, onClick: () => run(100) },
+      { label: '1000回', small: true, primary: true, onClick: () => run(1000) },
+    ]);
+    UI.buttonRow(ctl, [{ label: 'リセット', small: true, ghost: true, onClick: reset }]);
+    UI.note(ctl, { tone: 'ink', html: '右のグラフは「注目する事象」の相対度数の推移。赤い線が理論値。' });
+
+    const bar = new Plot('#cv-sim-bar', { xmin: -0.6, xmax: 1.6, ymin: -0.2, ymax: 1, equal: false, aspect: 0.8, grid: false, axes: false });
+    const run_ = new Plot('#cv-sim-run', { xmin: -4, xmax: 50, ymin: -0.1, ymax: 1, equal: false, aspect: 0.8, xLabel: '回数', yLabel: '' });
+    const readout = $('#r-sim');
+    const exp = () => EXP[st.kind];
+    const evIdx = () => exp().event();
+    const evName = () => { const n = exp().name; return typeof n === 'function' ? n() : n; };
+    const evProb = () => evIdx().reduce((s, i) => s + exp().probs[i], 0);
+    const evCount = () => evIdx().reduce((s, i) => s + st.counts[i], 0);
+
+    function reset() { st.counts = exp().outcomes.map(() => 0); st.trials = 0; st.hist = []; st.log = []; draw(); }
+    function rebuildHist() {
+      const ev = new Set(evIdx()); let c = 0; st.hist = [];
+      st.log.forEach((o, i) => { if (ev.has(o)) c++; st.hist.push(c / (i + 1)); });
+    }
+    function run(k) {
+      const ev = new Set(evIdx());
+      let c = evCount();
+      for (let i = 0; i < k && st.trials < MAX; i++) {
+        const o = exp().sample(); st.counts[o]++; st.trials++; st.log.push(o);
+        if (ev.has(o)) c++; st.hist.push(c / st.trials);
+      }
+      draw();
+    }
+    function draw() {
+      const e = exp(), K = e.outcomes.length, ev = new Set(evIdx());
+      const freq = st.counts.map((c) => st.trials ? c / st.trials : 0);
+      const ymax = Math.max(...e.probs, ...freq) * 1.5;
+      bar.setView(-0.6, K - 0.4, -ymax * 0.2, ymax);
+      bar.render((P) => {
+        P.hline(0, { color: C.borderStrong, width: 1.2 });
+        for (let i = 0; i < K; i++) {
+          P.rect(i - 0.36, 0, 0.72, freq[i], { color: 'none', fill: Plot.rgba(C.ink, ev.has(i) ? 0.85 : 0.5) });
+          P.rect(i - 0.36, 0, 0.72, e.probs[i], { color: C.clay, width: 2, dash: [5, 3] });
+          P.text(i, 0, e.outcomes[i], { color: ev.has(i) ? C.clay : C.muted, align: 'center', baseline: 'top', dy: 6, font: ev.has(i) ? 'bold 13px "Noto Sans JP", system-ui, sans-serif' : BAR_FONT });
+          if (st.trials) P.text(i, Math.max(freq[i], e.probs[i]), fmt(freq[i], K > 6 ? 2 : 3), { color: C.inkText, align: 'center', baseline: 'bottom', dy: -3, font: K > 6 ? '11px "Noto Sans JP", system-ui, sans-serif' : BAR_FONT });
+        }
+      });
+      const p = evProb();
+      const N = Math.max(50, st.trials);
+      const yTop = Math.min(1, Math.max(p * 2.5, 0.3));
+      run_.setView(-N * 0.1, N * 1.04, -yTop * 0.13, yTop);
+      run_.render((P) => {
+        P.hline(p, { color: C.clay, width: 2, dash: [6, 4] });
+        P.text(P.win.xmax, p, `理論値 ${fmt(p, 3)}`, { color: C.clay, align: 'right', baseline: 'bottom', dx: -6, dy: -4, bg: true });
+        if (st.hist.length) {
+          const step = Math.max(1, Math.floor(st.hist.length / 1500));
+          const pts = [];
+          for (let i = 0; i < st.hist.length; i += step) pts.push([i + 1, st.hist[i]]);
+          if ((st.hist.length - 1) % step) pts.push([st.hist.length, st.hist[st.hist.length - 1]]);
+          P.polygon(pts, { color: C.ink, width: 2, open: true });
+          P.point(st.hist.length, st.hist[st.hist.length - 1], { color: C.ink, r: 5 });
+        }
+      });
+      const cnt = evCount();
+      const rf = st.trials ? cnt / st.trials : NaN;
+      readout.innerHTML = `
+        <div class="readout-grid">
+          <div class="stat"><div class="k">試行回数</div><div class="v">${st.trials}</div></div>
+          <div class="stat"><div class="k">「${evName()}」の回数</div><div class="v">${cnt}</div></div>
+          <div class="stat ink"><div class="k">相対度数</div><div class="v">${st.trials ? fmt(rf, 4) : '—'}</div></div>
+          <div class="stat clay"><div class="k">理論値（確率）</div><div class="v">${fmt(p, 4)}</div></div>
+        </div>
+        <p class="legend" style="margin:0.5rem 0 0"><span><span class="sw" style="background:${C.ink}"></span>相対度数（実験）</span><span><span class="sw" style="background:${C.clay}"></span>理論値（確率）</span></p>
+        <p class="small">${st.trials ? `理論値とのずれ ${fmt(Math.abs(rf - p), 4)}。` : 'ボタンを押して試行を始めよう。'}${st.trials >= MAX ? '（上限 ' + MAX + ' 回に達しました）' : ''}</p>`;
+    }
+    reset();
+  })();
+
+  /* ======================= 反復試行 ======================= */
+  (() => {
+    const ctl = $('#c-binom');
+    const st = { n: 10, p: 0.5, r: 3, cum: false };
+    UI.heading(ctl, '設定');
+    UI.slider(ctl, { label: '$n$（試行回数）', min: 1, max: 20, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; if (st.r > v) st.r = v; sR.setRange(0, v); sR.set(st.r); draw(); } });
+    UI.slider(ctl, { label: '$p$（1 回で起こる確率）', min: 0, max: 1, step: 0.05, value: st.p, digits: 2, onInput: (v) => { st.p = v; draw(); } });
+    const sR = UI.slider(ctl, { label: '$r$（起こる回数）', min: 0, max: st.n, step: 1, value: st.r, digits: 0, onInput: (v) => { st.r = v; draw(); } });
+    UI.checkbox(ctl, { label: '$r$ 回以上の確率を合計する', onChange: (v) => { st.cum = v; draw(); } });
+    UI.buttonRow(ctl, [
+      { label: 'コイン 10 回', small: true, onClick: () => set(10, 0.5, 5) },
+      { label: 'サイコロ 6 回で 1 の目', small: true, onClick: () => set(6, 0.2, 1) },
+    ]);
+    const sl = ctl.querySelectorAll('input[type=range]');
+    function set(n, p, r) { st.n = n; st.p = p; st.r = r; sl[0].value = n; sl[0].dispatchEvent(new Event('input')); sl[1].value = p; sl[1].dispatchEvent(new Event('input')); sR.setRange(0, n); sR.set(r); st.r = r; draw(); }
+
+    const plot = new Plot('#cv-binom', { xmin: -0.7, xmax: 10.7, ymin: -0.05, ymax: 0.3, equal: false, aspect: 0.6, grid: false, axes: false });
+    const readout = $('#r-binom');
+    function draw() {
+      const { n, p, r } = st;
+      const P_ = Array.from({ length: n + 1 }, (_, k) => nCr(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k));
+      const mx = Math.max(...P_, 1e-9);
+      const ymax = mx * 1.32;
+      plot.setView(-0.9, n + 0.7, -ymax * 0.16, ymax);
+      plot.render((P) => {
+        const step = Plot.niceStep(mx, 4);
+        for (let y = step; y <= mx * 1.1; y += step) { P.hline(y, { color: C.borderSubtle, width: 1 }); P.text(-0.85, y, fmt(y, 3), { color: C.faint, align: 'left', baseline: 'bottom', dy: -2, font: '11px "Noto Sans JP", system-ui, sans-serif' }); }
+        P.hline(0, { color: C.borderStrong, width: 1.2 });
+        for (let k = 0; k <= n; k++) {
+          const inCum = st.cum && k >= r;
+          const col = k === r ? C.clay : inCum ? C.sage : C.ink;
+          P.rect(k - 0.38, 0, 0.76, P_[k], { color: 'none', fill: Plot.rgba(col, k === r ? 0.9 : inCum ? 0.7 : 0.55) });
+          if (k === r) P.rect(k - 0.38, 0, 0.76, P_[k], { color: C.clay, width: 2 });
+          P.text(k, 0, String(k), { color: k === r ? C.clay : C.muted, align: 'center', baseline: 'top', dy: 6, font: k === r ? 'bold 13px "Noto Sans JP", system-ui, sans-serif' : BAR_FONT });
+          if (n <= 14 || k === r || P_[k] > mx * 0.3) P.text(k, P_[k], fmt(P_[k], 3), { color: col, align: 'center', baseline: 'bottom', dy: -3, font: '11px "Noto Sans JP", system-ui, sans-serif' });
+        }
+        P.text(n + 0.6, 0, 'r', { color: C.muted, align: 'right', baseline: 'top', dy: 22, font: Plot.FONT_MATH });
+        P.segment(n * p, 0, n * p, mx * 1.08, { color: C.ochre, width: 1.2, dash: [4, 4] });
+        P.text(n * p, mx * 1.08, `期待値 np = ${fmt(n * p, 2)}`, { color: C.ochre, align: 'center', baseline: 'bottom', dy: -2, bg: true });
+      });
+      const q = 1 - p;
+      const cum = P_.slice(r).reduce((s, v) => s + v, 0);
+      let html = `<div class="tex-block">$$P(X=${r}) = ${texC(n, r)}\\,(${fmt(p, 2)})^{${r}}(${fmt(q, 2)})^{${n - r}} = ${nCr(n, r)}\\times${fmt(Math.pow(p, r), 5)}\\times${fmt(Math.pow(q, n - r), 5)} = ${fmt(P_[r], 4)}$$</div>`;
+      if (st.cum) html += `<div class="tex-block">$$P(X\\ge ${r}) = ${P_.slice(r).map((_, i) => `P(X=${r + i})`).slice(0, 4).join('+')}${n - r >= 4 ? '+\\cdots' : ''} = ${fmt(cum, 4)}$$</div>`;
+      html += `<div class="readout-grid">
+          <div class="stat clay"><div class="k">P(X = ${r})</div><div class="v">${fmt(P_[r], 4)}</div></div>
+          ${st.cum ? `<div class="stat sage"><div class="k">P(X ≥ ${r})</div><div class="v">${fmt(cum, 4)}</div></div>` : ''}
+          <div class="stat ochre"><div class="k">期待値 np</div><div class="v">${fmt(n * p, 2)}</div></div>
+          <div class="stat"><div class="k">組合せ nCr</div><div class="v">${nCr(n, r)}</div></div>
+        </div>`;
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 条件付き確率 ======================= */
+  (() => {
+    const ctl = $('#c-cond');
+    const st = { pA: 0.4, pBA: 0.6, pBnA: 0.3, N: 100 };
+    const plot = new Plot('#cv-cond', { xmin: -0.1, xmax: 1.62, ymin: -0.16, ymax: 1.22, aspect: 0.72, grid: false, axes: false });
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    plot.addHandle({ x: st.pA, y: 1.1, color: C.ochre, label: 'P(A)', dy: -12, onMove: (x) => { st.pA = clamp(Math.round(x * 100) / 100, 0.01, 0.99); sync(); draw(); return [st.pA, 1.1]; } });
+    plot.addHandle({ x: st.pA / 2, y: st.pBA, color: C.ochre, label: 'P(B|A)', dx: 10, dy: 18, onMove: (x, y) => { st.pBA = clamp(Math.round(y * 100) / 100, 0, 1); sync(); draw(); return [st.pA / 2, st.pBA]; } });
+    plot.addHandle({ x: (1 + st.pA) / 2, y: st.pBnA, color: C.ochre, label: 'P(B|Ā)', dx: 10, dy: 18, onMove: (x, y) => { st.pBnA = clamp(Math.round(y * 100) / 100, 0, 1); sync(); draw(); return [(1 + st.pA) / 2, st.pBnA]; } });
+    UI.heading(ctl, '確率');
+    const sA = UI.slider(ctl, { label: '$P(A)$', min: 0.01, max: 0.99, step: 0.01, value: st.pA, digits: 2, onInput: (v) => { st.pA = v; draw(); } });
+    const sBA = UI.slider(ctl, { label: '$P(B\\mid A)$（A のとき B）', min: 0, max: 1, step: 0.01, value: st.pBA, digits: 2, onInput: (v) => { st.pBA = v; draw(); } });
+    const sBnA = UI.slider(ctl, { label: '$P(B\\mid \\bar A)$（A でないとき B）', min: 0, max: 1, step: 0.01, value: st.pBnA, digits: 2, onInput: (v) => { st.pBnA = v; draw(); } });
+    function sync() { sA.set(st.pA); sBA.set(st.pBA); sBnA.set(st.pBnA); }
+    UI.divider(ctl);
+    UI.buttonRow(ctl, [
+      { label: '検査の例', small: true, primary: true, onClick: () => { st.pA = 0.01; st.pBA = 0.9; st.pBnA = 0.05; st.N = 10000; selN.set('10000'); sync(); draw(); } },
+      { label: '独立な例', small: true, onClick: () => { st.pA = 0.4; st.pBA = 0.5; st.pBnA = 0.5; sync(); draw(); } },
+      { label: '標準', small: true, onClick: () => { st.pA = 0.4; st.pBA = 0.6; st.pBnA = 0.3; sync(); draw(); } },
+    ]);
+    const selN = UI.select(ctl, { label: '表の人数', options: [{ value: '100', label: '100 人' }, { value: '1000', label: '1000 人' }, { value: '10000', label: '10000 人' }], value: '100', onChange: (v) => { st.N = +v; draw(); } });
+    UI.note(ctl, { tone: 'ochre', html: '検査の例：A = 病気（1%）、B = 陽性。病気なら 90% 陽性、健康でも 5% 陽性。' });
+
+    const readout = $('#r-cond');
+    function draw() {
+      const { pA, pBA, pBnA } = st;
+      const pnA = 1 - pA, pAB = pA * pBA, pnAB = pnA * pBnA, pB = pAB + pnAB;
+      const pAgB = pB > 0 ? pAB / pB : NaN;
+      plot.handles[0].x = pA; plot.handles[1].x = pA / 2; plot.handles[1].y = pBA; plot.handles[2].x = (1 + pA) / 2; plot.handles[2].y = pBnA;
+      plot.render((P) => {
+        P.rect(0, 0, 1, 1, { color: 'none', fill: C.sunken });
+        P.rect(0, 0, pA, pBA, { color: 'none', fill: Plot.rgba(C.ink, 0.7) });
+        P.rect(0, pBA, pA, 1 - pBA, { color: 'none', fill: Plot.rgba(C.ink, 0.18) });
+        P.rect(pA, 0, pnA, pBnA, { color: 'none', fill: Plot.rgba(C.clay, 0.45) });
+        P.rect(0, 0, 1, 1, { color: C.borderStrong, width: 1.2 });
+        P.segment(pA, 0, pA, 1, { color: C.ochre, width: 2 });
+        P.segment(0, pBA, pA, pBA, { color: C.ochre, width: 1.5 });
+        P.segment(pA, pBnA, 1, pBnA, { color: C.ochre, width: 1.5 });
+        P.text(pA / 2, 1.0, `A  (${fmt(pA, 2)})`, { color: C.inkText, align: 'center', baseline: 'bottom', dy: -4, font: 'bold 13px "Noto Sans JP", system-ui, sans-serif' });
+        P.text((1 + pA) / 2, 1.0, `Ā  (${fmt(pnA, 2)})`, { color: C.muted, align: 'center', baseline: 'bottom', dy: -4, font: 'bold 13px "Noto Sans JP", system-ui, sans-serif' });
+        if (pA > 0.12 && pBA > 0.08) P.text(pA / 2, pBA / 2, 'A∩B', { color: '#fff', align: 'center', baseline: 'middle', dy: -8, font: 'bold 13px "Noto Sans JP", system-ui, sans-serif' });
+        if (pnA > 0.12 && pBnA > 0.08) P.text((1 + pA) / 2, pBnA / 2, 'Ā∩B', { color: C.clayText || '#fff', align: 'center', baseline: 'middle', dy: -8, font: 'bold 13px "Noto Sans JP", system-ui, sans-serif' });
+        P.text(-0.02, pBA / 2, 'B', { color: C.inkText, align: 'right', baseline: 'middle', font: Plot.FONT_MATH });
+        P.text(-0.02, (1 + pBA) / 2, 'B̄', { color: C.faint, align: 'right', baseline: 'middle', font: Plot.FONT_MATH });
+        P.text(1.02, pBnA / 2, 'B', { color: C.clay, align: 'left', baseline: 'middle', font: Plot.FONT_MATH });
+        P.text(1.02, (1 + pBnA) / 2, 'B̄', { color: C.faint, align: 'left', baseline: 'middle', font: Plot.FONT_MATH });
+        const lx = 1.14; let ly = 0.95;
+        const line = (sw, txt, col) => { if (sw) P.rect(lx, ly - 0.03, 0.05, 0.06, { color: 'none', fill: sw }); P.text(lx + (sw ? 0.08 : 0), ly, txt, { color: col || C.text, baseline: 'middle' }); ly -= 0.11; };
+        line(Plot.rgba(C.ink, 0.7), `P(A∩B) = ${fmt(pA, 2)} × ${fmt(pBA, 2)}`, C.inkText); line(null, `= ${fmt(pAB, 4)}`, C.inkText);
+        line(Plot.rgba(C.clay, 0.45), `P(Ā∩B) = ${fmt(pnA, 2)} × ${fmt(pBnA, 2)}`, C.clay); line(null, `= ${fmt(pnAB, 4)}`, C.clay);
+        line(null, `P(B) = ${fmt(pB, 4)}`, C.text);
+        line(null, `P(A|B) = ${fmt(pAB, 4)} / ${fmt(pB, 4)}`, C.text); line(null, `= ${fmt(pAgB, 3)}`, C.clay);
+      });
+      const N = st.N, R = (v) => Math.round(v * N);
+      const nAB = R(pAB), nAnB = R(pA * (1 - pBA)), nnAB = R(pnAB), nnAnB = R(pnA * (1 - pBnA));
+      readout.innerHTML = `
+        <div class="tex-block">$$P(A\\cap B)=P(A)P(B\\mid A)=${fmt(pA, 2)}\\times${fmt(pBA, 2)}=${fmt(pAB, 4)}\\qquad P(B)=P(A\\cap B)+P(\\bar A\\cap B)=${fmt(pAB, 4)}+${fmt(pnAB, 4)}=${fmt(pB, 4)}$$</div>
+        <div class="tex-block">$$P(A\\mid B)=\\frac{P(A\\cap B)}{P(B)}=\\frac{${fmt(pAB, 4)}}{${fmt(pB, 4)}}=${fmt(pAgB, 4)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">P(A∩B)（乗法定理）</div><div class="v">${fmt(pAB, 4)}</div></div>
+          <div class="stat"><div class="k">P(B)</div><div class="v">${fmt(pB, 4)}</div></div>
+          <div class="stat clay"><div class="k">P(A | B)（B が起きたとき A）</div><div class="v">${fmt(pAgB, 4)}</div></div>
+          <div class="stat"><div class="k">P(A) との比較</div><div class="v">${fmt(pA, 2)} → ${fmt(pAgB, 3)}</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:0.6rem"><table class="data cond">
+          <tr><th></th><th>B</th><th>B̄</th><th>計</th></tr>
+          <tr><th>A</th><td class="hl">${nAB}</td><td>${nAnB}</td><td>${nAB + nAnB}</td></tr>
+          <tr><th>Ā</th><td class="hl-clay">${nnAB}</td><td>${nnAnB}</td><td>${nnAB + nnAnB}</td></tr>
+          <tr><th>計</th><td class="hl-sage">${nAB + nnAB}</td><td>${nAnB + nnAnB}</td><td>${nAB + nAnB + nnAB + nnAnB}</td></tr>
+        </table></div>
+        <p class="small">${N} 人で数えると（四捨五入）：B の列 ${nAB + nnAB} 人のうち A は ${nAB} 人なので P(A|B) ≈ ${nAB + nnAB ? fmt(nAB / (nAB + nnAB), 3) : '—'}。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 期待値 ======================= */
+  (() => {
+    const ctl = $('#c-expect');
+    const PRESETS = {
+      lot: { label: 'くじ', unit: '円', rows: [[10000, 1], [1000, 5], [100, 20], [0, 74]] },
+      die: { label: 'サイコロの目', unit: '', rows: [[1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1]] },
+      coin: { label: '2 枚のコインの表の枚数', unit: '枚', rows: [[0, 1], [1, 2], [2, 1]] },
+    };
+    const st = { rows: PRESETS.lot.rows.map((r) => r.slice()), unit: '円' };
+    UI.heading(ctl, '例');
+    UI.buttonRow(ctl, Object.entries(PRESETS).map(([k, p]) => ({ label: p.label, small: true, onClick: () => { st.rows = p.rows.map((r) => r.slice()); st.unit = p.unit; buildTable(); draw(); } })));
+    UI.heading(ctl, '値と本数（書きかえられます）');
+    const tbl = UI.el('table', { class: 'lot-table' });
+    ctl.append(tbl);
+    UI.buttonRow(ctl, [
+      { label: '＋ 行を追加', small: true, onClick: () => { if (st.rows.length < 8) { st.rows.push([0, 1]); buildTable(); draw(); } } },
+    ]);
+    function buildTable() {
+      tbl.innerHTML = '';
+      tbl.append(UI.el('tr', {}, [UI.el('th', { text: '値 x' }), UI.el('th', { text: '本数' }), UI.el('th')]));
+      st.rows.forEach((row, i) => {
+        const ix = UI.el('input', { type: 'number', value: row[0], step: 'any', oninput: () => { const v = parseFloat(ix.value); if (isFinite(v)) { row[0] = v; draw(); } } });
+        const ik = UI.el('input', { type: 'number', value: row[1], min: 0, step: 1, oninput: () => { const v = parseInt(ik.value, 10); if (isFinite(v) && v >= 0) { row[1] = v; draw(); } } });
+        const rm = UI.el('button', { type: 'button', class: 'btn btn-ghost btn-sm', text: '×', title: 'この行を削除', onclick: () => { if (st.rows.length > 2) { st.rows.splice(i, 1); buildTable(); draw(); } } });
+        tbl.append(UI.el('tr', {}, [UI.el('td', {}, ix), UI.el('td', {}, ik), UI.el('td', {}, rm)]));
+      });
+    }
+    const plot = new Plot('#cv-expect', { xmin: -1, xmax: 11, ymin: -0.5, ymax: 1, equal: false, aspect: 0.55, grid: false, axes: false });
+    const readout = $('#r-expect');
+    function draw() {
+      const total = st.rows.reduce((s, r) => s + r[1], 0);
+      const agg = new Map();
+      for (const [x, k] of st.rows) if (k > 0) agg.set(x, (agg.get(x) || 0) + k);
+      const xs = [...agg.keys()].sort((a, b) => a - b);
+      const ps = xs.map((x) => agg.get(x) / total);
+      const E = total ? xs.reduce((s, x, i) => s + x * ps[i], 0) : NaN;
+      const lo = xs.length ? Math.min(...xs) : 0, hi = xs.length ? Math.max(...xs) : 1;
+      const span = Math.max(hi - lo, 1e-9) || 1;
+      const pad = span * 0.12 + (hi === lo ? 1 : 0);
+      const pmax = Math.max(...ps, 0.1);
+      plot.setView(lo - pad, hi + pad, -pmax * 0.55, pmax * 1.3);
+      plot.render((P) => {
+        const w = (P.win.xmax - P.win.xmin) * 0.025;
+        P.hline(0, { color: C.borderStrong, width: 2.5 });
+        xs.forEach((x, i) => {
+          P.rect(x - w / 2, 0, w, ps[i], { color: 'none', fill: Plot.rgba(C.ink, 0.75) });
+          P.text(x, ps[i], `${agg.get(x)}/${total}`, { color: C.inkText, align: 'center', baseline: 'bottom', dy: -3, font: '12px "Noto Sans JP", system-ui, sans-serif' });
+          P.text(x, 0, fmt(x, 2) + st.unit, { color: C.text, align: 'center', baseline: 'top', dy: 6 });
+        });
+        if (isFinite(E)) {
+          const h = pmax * 0.16, hw = (P.win.xmax - P.win.xmin) * 0.014;
+          P.polygon([[E, 0], [E - hw, -h], [E + hw, -h]], { color: C.clay, width: 1.5, fill: C.clay });
+          P.text(E, -h, `期待値 E = ${fmt(E, 3)}${st.unit}`, { color: C.clay, align: 'center', baseline: 'top', dy: 18, font: 'bold 13px "Noto Sans JP", system-ui, sans-serif', bg: true });
+        }
+      });
+      const terms = xs.map((x, i) => `${fmt(x, 2)}\\cdot\\frac{${agg.get(x)}}{${total}}`).join('+');
+      const vals = xs.map((x, i) => fmt(x * ps[i], 3)).join('+');
+      readout.innerHTML = total ? `
+        <div class="tex-block">$$E = ${terms}$$</div>
+        <div class="tex-block">$$= ${vals} = ${fmt(E, 4)}$$</div>
+        <div class="readout-grid">
+          <div class="stat clay"><div class="k">期待値 E</div><div class="v">${fmt(E, 4)}${st.unit}</div></div>
+          <div class="stat"><div class="k">全体の本数（分母）</div><div class="v">${total}</div></div>
+          <div class="stat"><div class="k">確率の和</div><div class="v">${fmt(ps.reduce((s, p) => s + p, 0), 4)}</div></div>
+        </div>` : '<p class="small">本数を 1 以上にしてください。</p>';
+      UI.texAll(readout);
+    }
+    buildTable();
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'sim', label: '試行と大数の法則' },
+    { id: 'binom', label: '反復試行' },
+    { id: 'cond', label: '条件付き確率' },
+    { id: 'expect', label: '期待値' },
+  ]);
+});
+</script>
+</body>
+</html>

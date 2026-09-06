@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>指数関数・対数関数</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>指数関数・対数関数</h1>
+    <p class="lede">底 $a$ を動かして $y=a^x$ の形を見る。指数関数と対数関数が $y=x$ について対称であること、対数の性質「掛け算が足し算になる」こと、方程式・不等式の解き方、桁数の求め方までを一つの画面で確かめられます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 指数関数 -->
+  <section class="tool-body" data-tab="exp">
+    <div class="layout">
+      <aside class="controls" id="c-exp"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-exp"></canvas></div>
+        <div class="readout" id="r-exp"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">指数関数 $y=a^x$（$a>0,\ a\ne1$）</div>
+        グラフは必ず点 $(0,\,1)$ と $(1,\,a)$ を通り、$x$ 軸（直線 $y=0$）が漸近線。$a\gt1$ なら増加、$0\lt a\lt1$ なら減少します。値域は $y>0$ で、負の値はとりません。
+      </div>
+      <ul>
+        <li>$a$ を $1$ より大きくしたり小さくしたりして、増加と減少が切り替わる瞬間を見よう。$a=1$ のときは $y=1$ の定数関数になり、指数関数とは呼ばない。</li>
+        <li>「$y=(1/a)^x$ も描く」をオンにすると、$y=a^x$ と $y$ 軸について対称なグラフが現れる。$(1/a)^x=a^{-x}$ だから。</li>
+        <li>「指数法則を確かめる」で $p,\ q$ を動かし、$a^p\cdot a^q=a^{p+q}$ が数値として成り立つことを表で確認しよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 対数関数と逆関数 -->
+  <section class="tool-body" data-tab="log">
+    <div class="layout">
+      <aside class="controls" id="c-log"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-log"></canvas><div class="caption">点 P をドラッグすると曲線の上を動きます</div></div>
+        <div class="readout" id="r-log"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">対数は指数の「逆」</div>
+        $a^p=x \iff p=\log_a x$。つまり $\log_a x$ とは「$a$ を何乗すると $x$ になるか」という数です。$y=\log_a x$ のグラフは $y=a^x$ のグラフを直線 $y=x$ について折り返したもので、定義域は $x>0$、$y$ 軸（直線 $x=0$）が漸近線になります。
+      </div>
+      <ul>
+        <li>点 P $(p,\ a^p)$ を動かすと、鏡像の点 Q $(a^p,\ p)$ が対数のグラフの上を動く。$x$ 座標と $y$ 座標が入れ替わっていることを読み取ろう。</li>
+        <li>$a$ を $0\lt a\lt1$ にすると、指数も対数もどちらも減少関数になる。</li>
+        <li>$\log_a 1=0$、$\log_a a=1$ が、点 $(1,\,0)$、$(a,\,1)$ を通ることに対応している。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 対数の性質 -->
+  <section class="tool-body" data-tab="props">
+    <div class="layout">
+      <aside class="controls" id="c-props"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-props"></canvas><div class="caption">対数目盛の数直線。M, N をドラッグできます</div></div>
+        <div class="readout" id="r-props"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage">
+        <div class="title">対数の性質</div>
+        $$\log_a MN=\log_a M+\log_a N,\qquad \log_a\frac{M}{N}=\log_a M-\log_a N,\qquad \log_a M^k=k\log_a M$$
+        対数目盛の数直線では「$1$ からの距離」が $\log M$ です。掛け算は「距離をつなぐ（足す）」、割り算は「距離を戻す（引く）」、累乗は「同じ距離を $k$ 回並べる」ことに対応します。
+      </div>
+      <ul>
+        <li>M と N を動かして、$\log M$ の矢印の先に $\log N$ の矢印をつなぐと、ちょうど $MN$ の位置に届くことを見よう。</li>
+        <li>対数目盛では $1, 10, 100$ が等間隔。$2$ と $20$、$3$ と $30$ の距離も同じ（どちらも $\log 10=1$ だけ離れている）。</li>
+        <li>底の変換公式 $\log_a b=\dfrac{\log_c b}{\log_c a}$ は、どの底 $c$ で計算しても同じ値になることを数値で確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 方程式・不等式と桁数 -->
+  <section class="tool-body" data-tab="solve">
+    <div class="layout">
+      <aside class="controls" id="c-solve"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-solve"></canvas></div>
+        <div class="readout" id="r-solve"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note clay">
+        <div class="title">不等式は底の大きさで向きが変わる</div>
+        $a^x\lt k$ を解くとき、両辺の対数をとって $x\log a\lt\log k$。$a\gt1$ なら $\log a\gt0$ なので $x\lt\log_a k$、$0\lt a\lt1$ なら $\log a\lt0$ なので割ると不等号が逆転して $x\gt\log_a k$ になります。グラフで見れば、減少関数では「$k$ より下」が右側にあるということです。
+      </div>
+      <div class="note ochre">
+        <div class="title">桁数は常用対数で分かる</div>
+        $N$ が $n$ 桁 $\iff 10^{n-1}\le N\lt10^{n} \iff n-1\le\log_{10}N\lt n$。したがって桁数は $\lfloor\log_{10}N\rfloor+1$。$\log_{10}2=0.3010$、$\log_{10}3=0.4771$ を使うと $2^{100}$ のような巨大な数の桁数も計算できます。
+      </div>
+      <ul>
+        <li>「方程式」で $k$ を動かし、交点の $x$ 座標が $\log_a k$ であることを確かめよう。$k\le0$ では交点がない（$a^x>0$ だから）。</li>
+        <li>「不等式」で $a$ を $1$ より小さくすると、解の範囲が反対側に移る。</li>
+        <li>「桁数」で $2^{100}$ を選ぶと $\log_{10}2^{100}=100\times0.3010=30.10$、これが $30$ と $31$ の間にあるので $31$ 桁。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学II', title: '指数関数・対数関数' });
+
+  const isOne = (a) => Math.abs(a - 1) < 1e-9;
+  const logBase = (a, x) => Math.log(x) / Math.log(a);
+  const texA = (a) => { const f = UI.toFrac(a, 20); return f && f[1] !== 1 ? `\\left(\\tfrac{${f[0]}}{${f[1]}}\\right)` : fmt(a); };
+  const SUP = { '-': '⁻', 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
+  const sup = (n) => String(n).split('').map((c) => SUP[c] || c).join('');
+  /** 対数目盛の値を表示用に */
+  const fmtLogVal = (d, m) => d >= 0 ? String(m * Math.pow(10, d)) : fmt(m * Math.pow(10, d), -d);
+
+  /* ======================= 指数関数 ======================= */
+  (() => {
+    const ctl = $('#c-exp');
+    const st = { a: 2, p: 1, q: 2 };
+    const plot = new Plot('#cv-exp', { xmin: -4, xmax: 4, ymin: -1.5, ymax: 9, equal: false, aspect: 0.6 });
+
+    UI.heading(ctl, '底 a');
+    const sA = UI.slider(ctl, { label: '$a$（底）', min: 0.25, max: 4, step: 0.05, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+    UI.buttonRow(ctl, [
+      { label: 'a = 1/4', small: true, onClick: () => { st.a = 0.25; sA.set(st.a); draw(); } },
+      { label: 'a = 1/2', small: true, onClick: () => { st.a = 0.5; sA.set(st.a); draw(); } },
+      { label: 'a = 2', small: true, onClick: () => { st.a = 2; sA.set(st.a); draw(); } },
+      { label: 'a = 3', small: true, onClick: () => { st.a = 3; sA.set(st.a); draw(); } },
+    ]);
+    UI.divider(ctl);
+    const cbMirror = UI.checkbox(ctl, { label: '$y=\\left(\\tfrac{1}{a}\\right)^x$ も描く（$y$ 軸対称）', checked: false, onChange: draw });
+    const cbRef = UI.checkbox(ctl, { label: '基準 $y=2^x$ を破線で描く', checked: true, onChange: draw });
+    UI.divider(ctl);
+    const lawBox = UI.el('div', { style: 'display:none;flex-direction:column;gap:0.55rem' });
+    const cbLaw = UI.checkbox(ctl, { label: '指数法則 $a^p\\cdot a^q=a^{p+q}$ を確かめる', checked: false, onChange: (v) => { lawBox.style.display = v ? 'flex' : 'none'; draw(); } });
+    ctl.append(lawBox);
+    UI.slider(lawBox, { label: '$p$', min: -3, max: 3, step: 0.5, value: st.p, onInput: (v) => { st.p = v; draw(); } });
+    UI.slider(lawBox, { label: '$q$', min: -3, max: 3, step: 0.5, value: st.q, onInput: (v) => { st.q = v; draw(); } });
+
+    const readout = $('#r-exp');
+    function draw() {
+      const a = st.a, one = isOne(a);
+      const f = (x) => Math.pow(a, x);
+      const law = cbLaw.get();
+      plot.render((P) => {
+        if (cbRef.get()) P.fn((x) => Math.pow(2, x), { color: C.faint, width: 1.5, dash: [5, 5] });
+        if (cbMirror.get()) P.fn((x) => Math.pow(1 / a, x), { color: C.clay, width: 2, dash: [7, 4] });
+        P.fn(f, { color: C.ink, width: 2.8 });
+        P.text(P.win.xmax, 0, '漸近線 y = 0', { color: C.faint, align: 'right', baseline: 'bottom', dx: -30, dy: -4 });
+        if (law) {
+          for (const [x, name, col] of [[st.p, 'p', C.ochre], [st.q, 'q', C.ochre], [st.p + st.q, 'p+q', C.sage]]) {
+            P.dropLines(x, f(x), { color: col });
+            P.point(x, f(x), { color: col, r: 5, label: `x = ${name}`, dx: 8, dy: -8 });
+          }
+        }
+        P.point(0, 1, { color: C.clay, r: 5.5, label: '(0, 1)', dx: 8, dy: -8 });
+        P.point(1, a, { color: C.clay, r: 5.5, label: `(1, ${fmt(a)})`, dx: 8, dy: a >= 1 ? -6 : 16 });
+        if (cbMirror.get()) P.point(-1, a, { color: C.clay, r: 5.5, hollow: true, label: `(−1, ${fmt(a)})`, dx: -8, dy: a >= 1 ? -6 : 16, align: 'right' });
+        const items = [{ label: `y = ${fmt(a)}^x`, color: C.ink }];
+        if (cbMirror.get()) items.push({ label: `y = (1/${fmt(a)})^x`, color: C.clay, dash: [7, 4] });
+        if (cbRef.get()) items.push({ label: 'y = 2^x（基準）', color: C.faint, dash: [5, 5] });
+        P.legend(items, a >= 1 ? { left: 12, top: 10 } : {});
+      });
+
+      const xs = [-2, -1, 0, 1, 2, 3];
+      const rows = xs.map((x) => `<td>${fmt(f(x), 3)}</td>`).join('');
+      const kind = one ? '定数関数（$y=1$）' : a > 1 ? '増加関数' : '減少関数';
+      readout.innerHTML = `
+        <div class="tex-block">$$y=${texA(a)}^{x}$$</div>
+        <div class="readout-grid">
+          <div class="stat ${one ? 'clay' : a > 1 ? 'sage' : 'ochre'}"><div class="k">増減</div><div class="v">${kind}</div></div>
+          <div class="stat"><div class="k">通る点</div><div class="v">(0, 1), (1, ${fmt(a)})</div></div>
+          <div class="stat"><div class="k">値域</div><div class="v">${one ? 'y = 1' : 'y > 0'}</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:0.6rem"><table class="data">
+          <tr><th>$x$</th>${xs.map((x) => `<th>${x}</th>`).join('')}</tr>
+          <tr><th>$a^x$</th>${rows}</tr>
+        </table></div>
+        ${one ? '<p class="small">$a=1$ のときは $1^x=1$ でつねに一定になるので、指数関数の底としては除外します。</p>' : ''}
+        ${law ? `<div class="tex-block">$$a^{p}\\cdot a^{q}=${fmt(f(st.p), 4)}\\times${fmt(f(st.q), 4)}=${fmt(f(st.p) * f(st.q), 4)},\\qquad a^{p+q}=${fmt(a)}^{${fmt(st.p + st.q)}}=${fmt(f(st.p + st.q), 4)}$$</div>
+          <p class="small">$p=${fmt(st.p)},\\ q=${fmt(st.q)}$：左辺と右辺が一致（誤差は表示桁の丸めによる）。同様に $(a^p)^q=a^{pq}$ も成り立つ。</p>` : ''}`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 対数関数と逆関数 ======================= */
+  (() => {
+    const ctl = $('#c-log');
+    const st = { a: 2, x: 1 };
+    const plot = new Plot('#cv-log', { xmin: -5, xmax: 5, ymin: -5, ymax: 5, aspect: 0.7 });
+    const hP = plot.addHandle({ x: st.x, y: 2, color: C.ochre, label: 'P', onMove: (x) => {
+      const a = st.a;
+      let lo = plot.win.xmin + 0.2, hi = plot.win.xmax - 0.2;
+      if (!isOne(a)) {
+        const xb1 = logBase(a, plot.win.ymax - 0.2), xb2 = logBase(a, 0.02);
+        lo = Math.max(lo, Math.min(xb1, xb2)); hi = Math.min(hi, Math.max(xb1, xb2));
+      }
+      st.x = Math.max(lo, Math.min(hi, Math.round(x * 4) / 4));
+      draw();
+      return [st.x, Math.pow(a, st.x)];
+    } });
+
+    UI.heading(ctl, '底 a');
+    const sA = UI.slider(ctl, { label: '$a$（底）', min: 0.25, max: 4, step: 0.05, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+    UI.buttonRow(ctl, [
+      { label: 'a = 1/2', small: true, onClick: () => { st.a = 0.5; sA.set(st.a); draw(); } },
+      { label: 'a = 2', small: true, onClick: () => { st.a = 2; sA.set(st.a); draw(); } },
+      { label: 'a = 3', small: true, onClick: () => { st.a = 3; sA.set(st.a); draw(); } },
+    ]);
+    UI.heading(ctl, '点 P の x 座標');
+    const sX = UI.slider(ctl, { label: '$p$', min: -3, max: 3, step: 0.25, value: st.x, onInput: (v) => { st.x = v; draw(); } });
+    UI.divider(ctl);
+    const cbDiag = UI.checkbox(ctl, { label: '直線 $y=x$ と鏡像を表示', checked: true, onChange: draw });
+    const cbDom = UI.checkbox(ctl, { label: '定義域 $x>0$ を塗る', checked: true, onChange: draw });
+
+    const readout = $('#r-log');
+    function draw() {
+      const a = st.a, one = isOne(a), p = st.x, X = Math.pow(a, p);
+      hP.x = p; hP.y = X; sX.set(p);
+      hP.label = `P (${fmt(p)}, ${fmt(X, 2)})`;
+      plot.render((P) => {
+        if (cbDom.get()) P.rect(0, P.win.ymin, P.win.xmax, P.win.ymax - P.win.ymin, { color: 'none', fill: Plot.rgba(C.sage, 0.07) });
+        if (cbDiag.get()) P.fn((x) => x, { color: C.faint, width: 1.2, dash: [6, 5] });
+        P.fn((x) => Math.pow(a, x), { color: C.ink, width: 2.6 });
+        if (!one) {
+          P.fn((x) => logBase(a, x), { color: C.sage, width: 2.6, domain: [1e-6, P.win.xmax] });
+          P.vline(0, { color: C.sage, width: 1.4, dash: [3, 4] });
+          P.text(0, P.win.ymin, '漸近線 x = 0', { color: C.sage, align: 'left', baseline: 'bottom', dx: 6, dy: -6 });
+          P.point(1, 0, { color: C.sage, r: 4, hollow: true, label: Math.abs(p) < 1e-9 ? null : '(1, 0)', dx: 8, dy: 22 });
+          P.point(a, 1, { color: C.sage, r: 4, hollow: true, label: Math.abs(p - 1) < 1e-9 ? null : `(${fmt(a)}, 1)`, dx: 6, dy: 16 });
+        }
+        P.point(0, 1, { color: C.ink, r: 4, hollow: true, label: Math.abs(p) < 1e-9 ? null : '(0, 1)', dx: -8, dy: -6, align: 'right' });
+        P.dropLines(p, X, { color: C.ochre });
+        if (cbDiag.get() && !one) {
+          P.segment(p, X, X, p, { color: C.faint, width: 1, dash: [3, 4] });
+          P.dropLines(X, p, { color: C.sage });
+          P.point(X, p, { color: C.sage, r: 6, label: `Q (${fmt(X, 2)}, ${fmt(p)})`, dx: -10, dy: -10, align: 'right' });
+        }
+        P.legend([{ label: `y = ${fmt(a)}^x`, color: C.ink }].concat(one ? [] : [{ label: `y = log_${fmt(a)} x`, color: C.sage }]).concat(cbDiag.get() ? [{ label: 'y = x', color: C.faint, dash: [6, 5] }] : []), { left: 12, top: 36 });
+      });
+      readout.innerHTML = one
+        ? `<div class="tex-block">$$a=1 \\text{ のとき } y=1^x=1$$</div><p class="small">$1^p$ はつねに $1$ なので、$\\log_1 x$ は定義できません。対数の底は $a>0,\\ a\\ne1$ が条件です。</p>`
+        : `<div class="tex-block">$$\\log_{${fmt(a)}} ${fmt(X, 3)} = ${fmt(p)}\\quad\\Longleftrightarrow\\quad ${texA(a)}^{${fmt(p)}}=${fmt(X, 3)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ochre"><div class="k">P（指数関数上）</div><div class="v">(${fmt(p)}, ${fmt(X, 3)})</div></div>
+          <div class="stat sage"><div class="k">Q（対数関数上・鏡像）</div><div class="v">(${fmt(X, 3)}, ${fmt(p)})</div></div>
+          <div class="stat ${a > 1 ? 'sage' : 'ochre'}"><div class="k">増減</div><div class="v">${a > 1 ? 'ともに増加' : 'ともに減少'}</div></div>
+        </div>
+        <p class="small">$y=\\log_a x$ の定義域は $x>0$、値域は実数全体。$y=a^x$ とは定義域と値域が入れ替わっている。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 対数の性質 ======================= */
+  (() => {
+    const ctl = $('#c-props');
+    const st = { M: 4, N: 5, mode: 'prod', k: 2, ca: 2, cb: 8 };
+    const VIEW = { prod: [-0.3, 4.3], quot: [-2.3, 2.3], pow: [-0.3, 6.3] };
+    const plot = new Plot('#cv-props', { xmin: -0.3, xmax: 4.3, ymin: -1.0, ymax: 2.6, equal: false, height: 300, grid: false, axes: false, ticks: false });
+    const snapM = (x) => Math.max(1, Math.min(100, Math.round(Math.pow(10, x))));
+    const hM = plot.addHandle({ x: Math.log10(st.M), y: 0, color: C.ochre, dx: -8, dy: 30, onMove: (x) => { st.M = snapM(x); sM.set(st.M); draw(); return [Math.log10(st.M), 0]; } });
+    const hN = plot.addHandle({ x: Math.log10(st.N), y: 0, color: C.ochre, dx: -8, dy: 48, visible: () => st.mode !== 'pow', onMove: (x) => { st.N = snapM(x); sN.set(st.N); draw(); return [Math.log10(st.N), 0]; } });
+
+    UI.heading(ctl, '性質');
+    UI.segmented(ctl, { options: [{ value: 'prod', label: 'log MN' }, { value: 'quot', label: 'log M/N' }, { value: 'pow', label: 'log M^k' }], value: 'prod', onChange: (v) => { st.mode = v; kBox.style.display = v === 'pow' ? 'flex' : 'none'; sN.el.style.display = v === 'pow' ? 'none' : ''; plot.setView(VIEW[v][0], VIEW[v][1], -1.0, 2.6); draw(); } });
+    const sM = UI.slider(ctl, { label: '$M$', min: 1, max: 100, step: 1, value: st.M, digits: 0, onInput: (v) => { st.M = v; draw(); } });
+    const sN = UI.slider(ctl, { label: '$N$', min: 1, max: 100, step: 1, value: st.N, digits: 0, onInput: (v) => { st.N = v; draw(); } });
+    const kBox = UI.el('div', { style: 'display:none;flex-direction:column;gap:0.55rem' });
+    ctl.append(kBox);
+    UI.slider(kBox, { label: '$k$', min: 1, max: 3, step: 1, value: st.k, digits: 0, onInput: (v) => { st.k = v; draw(); } });
+    UI.divider(ctl);
+    UI.heading(ctl, '底の変換公式');
+    UI.slider(ctl, { label: '$a$（もとの底）', min: 2, max: 10, step: 1, value: st.ca, digits: 0, onInput: (v) => { st.ca = v; draw(); } });
+    UI.slider(ctl, { label: '$b$（真数）', min: 2, max: 100, step: 1, value: st.cb, digits: 0, onInput: (v) => { st.cb = v; draw(); } });
+
+    function logAxis(P, y0) {
+      const lo = P.win.xmin, hi = P.win.xmax;
+      P.segment(lo, y0, hi, y0, { color: C.borderStrong, width: 1.3 });
+      const decadePx = P.px(1);
+      for (let d = Math.floor(lo); d <= Math.ceil(hi); d++) {
+        for (let m = 1; m <= 9; m++) {
+          const v = d + Math.log10(m);
+          if (v < lo + 0.05 || v > hi - 0.05) continue;
+          const major = m === 1;
+          P.segment(v, y0, v, y0 - (major ? 0.22 : 0.12), { color: major ? C.text : C.borderStrong, width: major ? 1.5 : 1 });
+          const show = major || (decadePx > 110 && Math.abs(d) < 3 && (m === 2 || m === 5)) || (decadePx > 260 && m <= 5) || decadePx > 420;
+          if (show) P.text(v, y0, major && d >= 4 ? `10${sup(d)}` : fmtLogVal(d, m), { color: major ? C.text : C.faint, align: 'center', baseline: 'top', dy: 8, font: major ? 'bold 13px "Noto Sans JP", system-ui, sans-serif' : Plot.FONT });
+        }
+      }
+    }
+    function brace(P, x1, x2, y, color, label, labelBelow) {
+      if (Math.abs(x2 - x1) < 1e-9) { P.point(x1, y, { color, r: 3 }); }
+      else P.arrow(x1, y, x2, y, { color, width: 2.2 });
+      P.segment(x1, y - 0.1, x1, y + 0.1, { color, width: 1.5 });
+      P.text((x1 + x2) / 2, y, label, { color, align: 'center', baseline: labelBelow ? 'top' : 'bottom', dy: labelBelow ? 6 : -6, bg: true, font: Plot.FONT_MATH });
+    }
+
+    const readout = $('#r-props');
+    function draw() {
+      const { M, N, k, mode } = st;
+      const lM = Math.log10(M), lN = Math.log10(N);
+      hM.x = lM; hN.x = lN;
+      hM.label = `M = ${M}`; hN.label = `N = ${N}`;
+      plot.render((P) => {
+        logAxis(P, 0);
+        if (mode === 'prod') {
+          brace(P, 0, lM, 0.75, C.ink, `log M = ${fmt(lM, 3)}`);
+          brace(P, lM, lM + lN, 0.75, C.sage, `log N = ${fmt(lN, 3)}`);
+          brace(P, 0, lM + lN, 1.7, C.clay, `log MN = ${fmt(lM + lN, 3)}`);
+          P.segment(lM + lN, 0, lM + lN, 1.7, { color: C.clay, width: 1, dash: [3, 4] });
+          P.point(lM + lN, 0, { color: C.clay, r: 6, label: `MN = ${M * N}`, dx: -8, dy: 30 });
+        } else if (mode === 'quot') {
+          brace(P, 0, lM, 0.75, C.ink, `log M = ${fmt(lM, 3)}`);
+          brace(P, lM, lM - lN, 0.75, C.sage, `− log N = −${fmt(lN, 3)}`, true);
+          brace(P, 0, lM - lN, 1.7, C.clay, `log (M/N) = ${fmt(lM - lN, 3)}`);
+          P.segment(lM - lN, 0, lM - lN, 1.7, { color: C.clay, width: 1, dash: [3, 4] });
+          P.point(lM - lN, 0, { color: C.clay, r: 6, label: `M/N = ${fmt(M / N, 3)}`, dx: -8, dy: 30 });
+        } else {
+          for (let i = 0; i < k; i++) brace(P, i * lM, (i + 1) * lM, 0.75, i % 2 ? C.sage : C.ink, `log M`);
+          brace(P, 0, k * lM, 1.7, C.clay, `log M${sup(k)} = ${k} log M = ${fmt(k * lM, 3)}`);
+          P.segment(k * lM, 0, k * lM, 1.7, { color: C.clay, width: 1, dash: [3, 4] });
+          P.point(k * lM, 0, { color: C.clay, r: 6, label: `M${sup(k)} = ${Math.pow(M, k)}`, dx: -8, dy: 30 });
+        }
+        P.segment(0, 0, 0, 1.7, { color: C.faint, width: 1, dash: [3, 4] });
+      });
+
+      let main;
+      if (mode === 'prod') main = `$$\\log_{10}${M}+\\log_{10}${N}=${fmt(lM, 4)}+${fmt(lN, 4)}=${fmt(lM + lN, 4)}=\\log_{10}${M * N}$$`;
+      else if (mode === 'quot') main = `$$\\log_{10}${M}-\\log_{10}${N}=${fmt(lM, 4)}-${fmt(lN, 4)}=${fmt(lM - lN, 4)}=\\log_{10}\\frac{${M}}{${N}}$$`;
+      else main = `$$${k}\\log_{10}${M}=${k}\\times${fmt(lM, 4)}=${fmt(k * lM, 4)}=\\log_{10}${M}^{${k}}=\\log_{10}${Math.pow(M, k)}$$`;
+      const { ca, cb } = st;
+      const v = Math.log(cb) / Math.log(ca);
+      readout.innerHTML = `
+        <div class="tex-block">${main}</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">log₁₀ M</div><div class="v">${fmt(lM, 4)}</div></div>
+          ${mode !== 'pow' ? `<div class="stat sage"><div class="k">log₁₀ N</div><div class="v">${fmt(lN, 4)}</div></div>` : ''}
+          <div class="stat clay"><div class="k">${mode === 'prod' ? 'log₁₀ MN' : mode === 'quot' ? 'log₁₀ (M/N)' : `log₁₀ M${sup(k)}`}</div><div class="v">${fmt(mode === 'prod' ? lM + lN : mode === 'quot' ? lM - lN : k * lM, 4)}</div></div>
+        </div>
+        <hr>
+        <div class="tex-block">$$\\log_{${ca}}${cb}=\\frac{\\log_{10}${cb}}{\\log_{10}${ca}}=\\frac{${fmt(Math.log10(cb), 4)}}{${fmt(Math.log10(ca), 4)}}=${fmt(v, 4)},\\qquad \\frac{\\log_{2}${cb}}{\\log_{2}${ca}}=\\frac{${fmt(Math.log2(cb), 4)}}{${fmt(Math.log2(ca), 4)}}=${fmt(v, 4)}$$</div>
+        <p class="small">底の変換公式：底 $c$ を $10$ にしても $2$ にしても同じ値。検算： $${ca}^{${fmt(v, 4)}}=${fmt(Math.pow(ca, v), 3)}$ ${Math.abs(Math.pow(ca, v) - cb) < 0.01 ? '$= b$ で成立。' : '$\\approx b$（丸め誤差）。'}</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 方程式・不等式と桁数 ======================= */
+  (() => {
+    const ctl = $('#c-solve');
+    const st = { mode: 'eq', a: 2, k: 3, op: '<', m: 1.26, p: 30, preset: 'free' };
+    const plot = new Plot('#cv-solve', { xmin: -4, xmax: 4, ymin: -1.5, ymax: 9, equal: false, aspect: 0.6 });
+
+    UI.heading(ctl, 'テーマ');
+    UI.segmented(ctl, { options: [{ value: 'eq', label: '方程式' }, { value: 'ineq', label: '不等式' }, { value: 'digits', label: '桁数' }], value: 'eq', onChange: (v) => { st.mode = v; setup(); draw(); } });
+    const eqBox = UI.el('div', { style: 'display:flex;flex-direction:column;gap:0.55rem' });
+    const digBox = UI.el('div', { style: 'display:none;flex-direction:column;gap:0.55rem' });
+    ctl.append(eqBox, digBox);
+
+    UI.heading(eqBox, 'a^x と k');
+    const sA = UI.slider(eqBox, { label: '$a$（底）', min: 0.25, max: 4, step: 0.05, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+    UI.slider(eqBox, { label: '$k$', min: -1, max: 8, step: 0.1, value: st.k, onInput: (v) => { st.k = v; draw(); } });
+    const segOp = UI.segmented(eqBox, { label: '不等号', options: [{ value: '<', label: 'a^x < k' }, { value: '>', label: 'a^x > k' }], value: '<', onChange: (v) => { st.op = v; draw(); } });
+    UI.buttonRow(eqBox, [
+      { label: 'a = 1/2', small: true, onClick: () => { st.a = 0.5; sA.set(st.a); draw(); } },
+      { label: 'a = 2', small: true, onClick: () => { st.a = 2; sA.set(st.a); draw(); } },
+      { label: 'a = 3', small: true, onClick: () => { st.a = 3; sA.set(st.a); draw(); } },
+    ]);
+
+    UI.heading(digBox, 'N = m × 10^p');
+    const PRESETS = {
+      '2^100': { base: 2, exp: 100, tex: '2^{100}', logv: 100 * 0.3010, how: '100\\log_{10}2=100\\times0.3010' },
+      '3^50': { base: 3, exp: 50, tex: '3^{50}', logv: 50 * 0.4771, how: '50\\log_{10}3=50\\times0.4771' },
+      '6^30': { base: 6, exp: 30, tex: '6^{30}', logv: 30 * (0.3010 + 0.4771), how: '30(\\log_{10}2+\\log_{10}3)=30\\times0.7781' },
+    };
+    const sM = UI.slider(digBox, { label: '$m$（$1\\le m<10$）', min: 1, max: 9.99, step: 0.01, value: st.m, onInput: (v) => { st.m = v; st.preset = 'free'; draw(); } });
+    const sP = UI.slider(digBox, { label: '$p$', min: 0, max: 30, step: 1, value: st.p, digits: 0, onInput: (v) => { st.p = v; st.preset = 'free'; draw(); } });
+    UI.buttonRow(digBox, Object.keys(PRESETS).map((key) => ({ label: `${key.split('^')[0]}${sup(key.split('^')[1])}`, small: true, onClick: () => {
+      const pr = PRESETS[key]; st.preset = key; st.p = Math.floor(pr.logv); st.m = Math.pow(10, pr.logv - st.p); sM.set(st.m); sP.set(st.p); draw();
+    } })));
+    UI.note(digBox, { tone: 'ink', html: '$\\log_{10}2=0.3010,\\ \\log_{10}3=0.4771$ とする。' });
+
+    function setup() {
+      const dig = st.mode === 'digits';
+      eqBox.style.display = dig ? 'none' : 'flex';
+      digBox.style.display = dig ? 'flex' : 'none';
+      segOp.el.style.display = st.mode === 'ineq' ? '' : 'none';
+      plot.opts.grid = plot.opts.axes = plot.opts.ticks = !dig;
+      plot.opts.height = dig ? 260 : null;
+      plot.resize();
+      if (dig) plot.setView(-1.5, 33.5, -1.2, 2.2); else plot.setView(-4, 4, -1.5, 9);
+    }
+
+    const readout = $('#r-solve');
+    function drawEq(P) {
+      const { a, k, mode, op } = st, one = isOne(a);
+      const x0 = (!one && k > 0) ? logBase(a, k) : NaN;
+      const f = (x) => Math.pow(a, x);
+      if (mode === 'ineq' && !one && k > 0) {
+        const lessSide = op === '<';
+        const left = (a > 1) === lessSide;
+        const L = left ? P.win.xmin : x0, R = left ? x0 : P.win.xmax;
+        P.rect(L, P.win.ymin, R - L, P.win.ymax - P.win.ymin, { color: 'none', fill: Plot.rgba(C.sage, 0.10) });
+        P.segment(L, 0, R, 0, { color: C.sage, width: 7, alpha: 0.75 });
+      } else if (mode === 'ineq' && !one && k <= 0) {
+        if (op === '>') P.segment(P.win.xmin, 0, P.win.xmax, 0, { color: C.sage, width: 7, alpha: 0.75 });
+      }
+      P.fn(f, { color: C.ink, width: 2.8 });
+      P.hline(k, { color: C.clay, width: 1.6, dash: [7, 4] });
+      P.text(P.win.xmin, k, `y = k = ${fmt(k)}`, { color: C.clay, dx: 10, dy: -6, bg: true });
+      if (isFinite(x0)) {
+        P.dropLines(x0, k, { color: C.sage });
+        P.point(x0, k, { color: C.sage, r: 6, label: `x = log_${fmt(a)} ${fmt(k)} = ${fmt(x0, 3)}`, dx: 10, dy: -10 });
+        P.point(x0, 0, { color: C.sage, r: 5, hollow: mode === 'ineq' });
+      }
+      P.legend([{ label: `y = ${fmt(a)}^x`, color: C.ink }, { label: `y = ${fmt(k)}`, color: C.clay, dash: [7, 4] }], a >= 1 ? { left: 12, top: 10 } : {});
+    }
+    function drawDigits(P) {
+      const { m, p } = st;
+      const lg = p + Math.log10(m);
+      const y0 = 0;
+      P.segment(P.win.xmin, y0, P.win.xmax, y0, { color: C.borderStrong, width: 1.3 });
+      P.rect(p, -0.35, 1, 0.7, { color: C.sage, width: 1, fill: Plot.rgba(C.sage, 0.22) });
+      const every = P.px(1) > 34 ? 1 : P.px(1) > 18 ? 2 : 5;
+      for (let d = 0; d <= 33; d++) {
+        P.segment(d, y0, d, y0 - 0.16, { color: C.borderStrong, width: 1 });
+        const hot = d === p || d === p + 1;
+        if (hot || (d % every === 0 && (d <= p - 2 || d >= p + 3))) P.text(d, y0, `10${sup(d)}`, { color: hot ? C.sageSolid : C.faint, align: hot ? (d === p ? 'right' : 'left') : 'center', dx: hot ? (d === p ? -3 : 3) : 0, baseline: 'top', dy: 8, font: hot ? 'bold 13px "Noto Sans JP", system-ui, sans-serif' : Plot.FONT });
+      }
+      P.text(P.win.xmin, y0, '常用対数の目盛（log₁₀ N）', { color: C.faint, align: 'left', baseline: 'bottom', dx: 4, dy: -36 });
+      P.segment(lg, 0, lg, 1.2, { color: C.clay, width: 1.5, dash: [3, 4] });
+      P.point(lg, 0, { color: C.clay, r: 6 });
+      P.text(lg, 1.2, `log₁₀ N = ${fmt(lg, 3)}`, { color: C.clay, align: 'center', baseline: 'bottom', dy: -4, bg: true });
+      P.text(p + 0.5, -0.4, `${p + 1} 桁`, { color: C.sageSolid, align: 'center', baseline: 'top', dy: 22, font: 'bold 14px "Noto Sans JP", system-ui, sans-serif' });
+    }
+    function draw() {
+      plot.render((P) => { if (st.mode === 'digits') drawDigits(P); else drawEq(P); });
+      const { a, k, mode, op, m, p } = st, one = isOne(a);
+      if (mode === 'digits') {
+        const lg = p + Math.log10(m), n = Math.floor(lg) + 1;
+        const pr = PRESETS[st.preset];
+        const head = pr ? `$$\\log_{10}${pr.tex}=${pr.how}=${fmt(pr.logv, 4)}$$` : `$$N=${fmt(m, 2)}\\times10^{${p}},\\qquad \\log_{10}N=${p}+\\log_{10}${fmt(m, 2)}=${p}+${fmt(Math.log10(m), 4)}=${fmt(lg, 4)}$$`;
+        readout.innerHTML = `
+          <div class="tex-block">${head}</div>
+          <div class="tex-block">$$${p}\\le\\log_{10}N<${p + 1}\\quad\\Longrightarrow\\quad 10^{${p}}\\le N<10^{${p + 1}}$$</div>
+          <div class="readout-grid">
+            <div class="stat clay"><div class="k">log₁₀ N</div><div class="v">${fmt(lg, 4)}</div></div>
+            <div class="stat"><div class="k">整数部分 ⌊log₁₀ N⌋</div><div class="v">${Math.floor(lg)}</div></div>
+            <div class="stat sage"><div class="k">桁数 ⌊log₁₀ N⌋ + 1</div><div class="v">${n} 桁</div></div>
+          </div>
+          ${pr ? `<p class="small">$${pr.tex}=10^{${fmt(pr.logv, 4)}}=10^{${fmt(pr.logv - p, 4)}}\\times10^{${p}}\\approx${fmt(Math.pow(10, pr.logv - p), 2)}\\times10^{${p}}$。最高位の数字は $${Math.floor(Math.pow(10, pr.logv - p))}$。</p>` : `<p class="small">$1\\le m<10$ だから $0\\le\\log_{10}m<1$。したがって $\\log_{10}N$ の整数部分は $p$ に一致し、桁数は $p+1$。</p>`}`;
+      } else {
+        const x0 = (!one && k > 0) ? logBase(a, k) : NaN;
+        let sol, tone = 'sage';
+        if (one) { sol = '\\text{（}a=1\\text{ は除外）}'; tone = 'clay'; }
+        else if (mode === 'eq') sol = k > 0 ? `x=\\log_{${fmt(a)}}${fmt(k)}=${fmt(x0, 4)}` : '\\text{解なし}\\ (a^x>0)';
+        else if (k <= 0) sol = op === '<' ? '\\text{解なし}' : '\\text{すべての実数}';
+        else {
+          const lessSide = op === '<';
+          const left = (a > 1) === lessSide;
+          sol = left ? `x<${fmt(x0, 4)}` : `x>${fmt(x0, 4)}`;
+        }
+        const eqTex = mode === 'eq' ? `${texA(a)}^{x}=${fmt(k)}` : `${texA(a)}^{x}${op}${fmt(k)}`;
+        readout.innerHTML = `
+          <div class="tex-block">$$${eqTex}\\quad\\Longrightarrow\\quad ${sol}$$</div>
+          ${isFinite(x0) ? `<div class="readout-grid">
+            <div class="stat sage"><div class="k">交点の x 座標 log_a k</div><div class="v">${fmt(x0, 4)}</div></div>
+            <div class="stat"><div class="k">検算 a^x</div><div class="v">${fmt(Math.pow(a, x0), 4)}</div></div>
+            <div class="stat ${a > 1 ? '' : 'clay'}"><div class="k">底</div><div class="v">${a > 1 ? 'a > 1（増加）' : '0 < a < 1（減少）'}</div></div>
+          </div>` : ''}
+          ${mode === 'ineq' && isFinite(x0) ? `<p class="small">両辺の対数をとると $x\\log_{10}a ${op === '<' ? '\\lt' : '\\gt'} \\log_{10}k$。$\\log_{10}${fmt(a)}=${fmt(Math.log10(a), 4)}$ は${a > 1 ? '正なので不等号はそのまま' : '<span style="color:var(--clay-text);font-weight:700">負なので割ると不等号が逆転</span>'}。</p>` : ''}
+          ${mode === 'eq' && k <= 0 && !one ? '<p class="small">$a^x$ はつねに正なので、$k\\le0$ では交点がありません。</p>' : ''}`;
+      }
+      UI.texAll(readout);
+    }
+    setup();
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'exp', label: '指数関数' },
+    { id: 'log', label: '対数関数と逆関数' },
+    { id: 'props', label: '対数の性質' },
+    { id: 'solve', label: '方程式・不等式と桁数' },
+  ]);
+});
+</script>
+</body>
+</html>

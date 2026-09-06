@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数と式</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>数と式</h1>
+    <p class="lede">展開・因数分解を長方形の面積で、絶対値を数直線上の距離で、集合をベン図で、命題を数直線上の範囲の包含で見る。式の操作が「絵」としてどう見えるかを確かめられます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 展開と因数分解の面積モデル -->
+  <section class="tool-body" data-tab="area">
+    <div class="layout">
+      <aside class="controls" id="c-area"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-area"></canvas></div>
+        <div class="readout" id="r-area"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">展開は「面積を分ける」、因数分解は「面積をまとめる」</div>
+        縦 $x+b$、横 $x+a$ の長方形の面積は $(x+a)(x+b)$。これを 4 つの部分に分けて足すと
+        $$(x+a)(x+b)=x^2+(a+b)x+ab$$
+        逆に 4 つの部分をひとつの長方形に並べ直すことが因数分解です。
+      </div>
+      <ul>
+        <li>$a$ や $b$ を動かすと、細長い部分 $ax,\ bx$ と小さな角 $ab$ の大きさが変わる。$x$ の係数が $a+b$ になる理由が、2 本の帯の合計として見える。</li>
+        <li>$(x+a)^2$ では帯が 2 本とも同じ幅になり、$2ax$ が現れる。$2ax$ を $ax$ と書き間違えると面積が合わない。</li>
+        <li>$(x+a)(x-a)$ では、正方形から角の $a\times a$ を取り除いた L 字形を切って並べ直すと、横 $x+a$・縦 $x-a$ の長方形になる。だから $x^2-a^2$。</li>
+        <li>たすき掛けでは、$x$ の係数 $ad+bc$ が「斜めにかけて足す」で出る理由を、2 本の帯 $adx,\ bcx$ として確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 絶対値と数直線 -->
+  <section class="tool-body" data-tab="abs">
+    <div class="layout">
+      <aside class="controls" id="c-abs"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-abs"></canvas><div class="caption">点 a と右端の点（距離 b）をドラッグできます</div></div>
+        <div class="readout" id="r-abs"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">絶対値は距離</div>
+        $|x-a|$ は数直線上での $x$ と $a$ の距離。だから
+        $$|x-a|=b \iff x=a\pm b,\qquad |x-a|&lt;b \iff a-b&lt;x&lt;a+b,\qquad |x-a|&gt;b \iff x&lt;a-b\ \text{または}\ a+b&lt;x$$
+        「$a$ からの距離が $b$ 未満の点」「$b$ より遠い点」と読めば、場合分けをしなくても答えの形が見えます。
+      </div>
+      <ul>
+        <li>$a$ を動かすと解の範囲が平行移動し、$b$ を変えると範囲の幅が変わる。幅はいつも $2b$。</li>
+        <li>$&lt;$ のときは内側、$&gt;$ のときは外側。境界の点（白丸）が含まれないことに注意。$\le,\ \ge$ なら黒丸になる。</li>
+        <li>$b=0$ にすると、$&lt;$ は解なし、$=$ は $x=a$ だけ、$&gt;$ は $a$ 以外のすべての実数になる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 集合とベン図 -->
+  <section class="tool-body" data-tab="sets">
+    <div class="layout">
+      <aside class="controls" id="c-sets"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-sets"></canvas></div>
+        <div class="readout" id="r-sets"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">集合の要素の個数とド・モルガンの法則</div>
+        全体集合 $U=\{1,2,\dots,20\}$ の部分集合 $A,\ B$ について
+        $$n(A\cup B)=n(A)+n(B)-n(A\cap B),\qquad \overline{A\cap B}=\overline{A}\cup\overline{B},\qquad \overline{A\cup B}=\overline{A}\cap\overline{B}$$
+      </div>
+      <ul>
+        <li>$A\cup B$ を数えるとき、$A\cap B$ の要素は $A$ と $B$ の両方で数えられているので 1 回引く。ベン図の中央の要素を見て確かめよう。</li>
+        <li>$\overline{A}\cap\overline{B}$（どちらにも入らない）は、円の外の要素。$\overline{A\cup B}$ と同じ要素になる。</li>
+        <li>$\overline{A}\cup\overline{B}$（少なくとも一方に入らない）は、中央の $A\cap B$ 以外の全部。$\overline{A\cap B}$ と同じ要素になる。</li>
+        <li>$A$ と $B$ を入れ替えたり、同じ条件にしたりして、極端な場合も試してみよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 命題と条件 -->
+  <section class="tool-body" data-tab="logic">
+    <div class="layout">
+      <aside class="controls" id="c-logic"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-logic"></canvas><div class="caption">範囲の端の点をドラッグできます</div></div>
+        <div class="readout" id="r-logic"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">条件と集合の包含</div>
+        条件 $p,\ q$ を満たす $x$ の集合を $P,\ Q$ とすると、$p\Rightarrow q$ が真であることは $P\subset Q$ と同じ。
+        $p\Rightarrow q$ が真のとき、$p$ は $q$ であるための<strong>十分条件</strong>、$q$ は $p$ であるための<strong>必要条件</strong>。両方向とも真なら<strong>必要十分条件</strong>。
+      </div>
+      <ul>
+        <li>$p$ の範囲（茶）が $q$ の範囲（青）にすっぽり入っていれば $p\Rightarrow q$ は真。はみ出した部分にある値が<strong>反例</strong>。</li>
+        <li>「十分」は小さい方、「必要」は大きい方。範囲を広げたり狭めたりして、判定がどこで切り替わるかを見よう。</li>
+        <li>逆 $q\Rightarrow p$ と裏 $\overline{p}\Rightarrow\overline{q}$ はいつも真偽が一致し、対偶 $\overline{q}\Rightarrow\overline{p}$ はもとの命題と一致する。表で確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$, rgba = Plot.rgba;
+  UI.header({ unit: '数学I', title: '数と式' });
+
+  /** 数直線 (目盛付き) を高さ y に描く */
+  function numberAxis(P, y, from, to, step, o = {}) {
+    P.arrow(from, y, to, y, { color: C.borderStrong, width: 1.2, head: 9 });
+    const start = Math.ceil(from / step - 1e-9) * step;
+    for (let v = start; v <= to + 1e-9; v += step) {
+      const vv = Math.abs(v) < 1e-12 ? 0 : v;
+      if (P.X(vv) < 16 || P.X(vv) > P.W - 16) continue;
+      P.segment(vv, y - (o.tick || 0.06), vv, y + (o.tick || 0.06), { color: C.borderStrong, width: 1 });
+      P.text(vv, y, fmt(vv, 2), { color: C.faint, align: 'center', baseline: 'top', dy: 8 });
+    }
+  }
+  /** innerHTML に入れる TeX 中の < > をタグと誤読されないようにする */
+  const esc = (s) => s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  /* ======================= 展開と因数分解の面積モデル ======================= */
+  (() => {
+    const ctl = $('#c-area');
+    const st = { mode: 'ab', x: 3, a: 2, b: 1, c: 1, d: 3 };
+    const plot = new Plot('#cv-area', { xmin: -1.2, xmax: 7, ymin: -1, ymax: 6, aspect: 0.66, grid: false, axes: false });
+
+    UI.heading(ctl, '公式');
+    const segMode = UI.segmented(ctl, { options: [
+      { value: 'ab', label: '(x+a)(x+b)' }, { value: 'sq', label: '(x+a)²' }, { value: 'diff', label: '(x+a)(x−a)' }, { value: 'tasuki', label: 'たすき掛け' },
+    ], value: st.mode, onChange: (v) => { st.mode = v; rebuild(); } });
+    segMode.el.querySelector('.segmented').style.flexWrap = 'wrap';
+    for (const b of segMode.el.querySelectorAll('button')) b.style.whiteSpace = 'nowrap';
+    const box = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    function rebuild() {
+      box.innerHTML = '';
+      UI.slider(box, { label: '$x$', min: 2, max: 6, step: 1, value: st.x, digits: 0, onInput: (v) => { st.x = v; draw(); } });
+      if (st.mode === 'tasuki') {
+        UI.slider(box, { label: '$a$（$ax+b$ の $a$）', min: 1, max: 3, step: 1, value: st.a, digits: 0, onInput: (v) => { st.a = v; draw(); } });
+        UI.slider(box, { label: '$b$', min: 1, max: 5, step: 1, value: st.b, digits: 0, onInput: (v) => { st.b = v; draw(); } });
+        UI.slider(box, { label: '$c$（$cx+d$ の $c$）', min: 1, max: 3, step: 1, value: st.c, digits: 0, onInput: (v) => { st.c = v; draw(); } });
+        UI.slider(box, { label: '$d$', min: 1, max: 5, step: 1, value: st.d, digits: 0, onInput: (v) => { st.d = v; draw(); } });
+      } else {
+        UI.slider(box, { label: '$a$', min: 0, max: 5, step: 1, value: st.a, digits: 0, onInput: (v) => { st.a = v; draw(); } });
+        if (st.mode === 'ab') UI.slider(box, { label: '$b$', min: 0, max: 5, step: 1, value: st.b, digits: 0, onInput: (v) => { st.b = v; draw(); } });
+      }
+      UI.texAll(box);
+      draw();
+    }
+
+    const readout = $('#r-area');
+    const region = (P, x, y, w, h, color, alpha, sym, val) => {
+      if (w <= 0 || h <= 0) return;
+      P.rect(x, y, w, h, { color, width: 1.5, fill: rgba(color, alpha) });
+      const big = Math.min(w, h) >= 0.9;
+      P.text(x + w / 2, y + h / 2, sym, { color, align: 'center', baseline: big ? 'bottom' : 'middle', font: 'italic 15px "Times New Roman", serif', dy: big ? -2 : 0 });
+      if (big) P.text(x + w / 2, y + h / 2, `= ${val}`, { color, align: 'center', baseline: 'top', dy: 3 });
+    };
+    const dim = (P, x1, y1, x2, y2, label, color, side) => {
+      P.segment(x1, y1, x2, y2, { color, width: 1, dash: [3, 3] });
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      if (side === 'bottom') P.text(mx, my, label, { color, align: 'center', baseline: 'top', dy: 5, font: Plot.FONT_MATH });
+      else if (side === 'left') P.text(mx, my, label, { color, align: 'right', baseline: 'middle', dx: -6, font: Plot.FONT_MATH });
+      else if (side === 'top') P.text(mx, my, label, { color, align: 'center', baseline: 'bottom', dy: -4, font: Plot.FONT_MATH });
+      else P.text(mx, my, label, { color, align: 'left', baseline: 'middle', dx: 6, font: Plot.FONT_MATH });
+    };
+
+    function draw() {
+      const { mode } = st, x = st.x;
+      if (mode === 'ab' || mode === 'sq') {
+        const a = st.a, b = mode === 'sq' ? st.a : st.b;
+        const W = x + a, H = x + b;
+        plot.setView(-1.3, W + 1.4, -1.1, H + 1.1);
+        plot.render((P) => {
+          region(P, 0, 0, x, x, C.ink, 0.22, 'x²', x * x);
+          region(P, x, 0, a, x, C.sageSolid, 0.22, 'ax', a * x);
+          region(P, 0, x, x, b, C.sageSolid, 0.22, 'bx', b * x);
+          region(P, x, x, a, b, C.ochre, 0.28, 'ab', a * b);
+          dim(P, 0, -0.35, x, -0.35, `x = ${x}`, C.text, 'bottom');
+          if (a > 0) dim(P, x, -0.35, W, -0.35, `a = ${a}`, C.text, 'bottom');
+          dim(P, -0.35, 0, -0.35, x, `x = ${x}`, C.text, 'left');
+          if (b > 0) dim(P, -0.35, x, -0.35, H, `${mode === 'sq' ? 'a' : 'b'} = ${b}`, C.text, 'left');
+          dim(P, 0, H + 0.4, W, H + 0.4, `x + a = ${W}`, C.inkText, 'top');
+          dim(P, W + 0.4, 0, W + 0.4, H, `x + ${mode === 'sq' ? 'a' : 'b'} = ${H}`, C.inkText, 'right');
+        });
+        const total = W * H;
+        readout.innerHTML = mode === 'ab' ? `
+          <div class="tex-block">$$(x+a)(x+b)=x^2+(a+b)x+ab$$
+            $$(${x}+${a})(${x}+${b})=${x}^2+(${a}+${b})\\cdot${x}+${a}\\cdot${b}=${x * x}+${(a + b) * x}+${a * b}=${total}$$</div>
+          <div class="readout-grid">
+            <div class="stat ink"><div class="k">全体の面積 (x+a)(x+b)</div><div class="v">${W} × ${H} = ${total}</div></div>
+            <div class="stat sage"><div class="k">4 つの部分の和</div><div class="v">${x * x} + ${a * x} + ${b * x} + ${a * b} = ${x * x + a * x + b * x + a * b}</div></div>
+            <div class="stat ochre"><div class="k">x の係数 a + b</div><div class="v">${a} + ${b} = ${a + b}</div></div>
+          </div>` : `
+          <div class="tex-block">$$(x+a)^2=x^2+2ax+a^2$$
+            $$(${x}+${a})^2=${x}^2+2\\cdot${a}\\cdot${x}+${a}^2=${x * x}+${2 * a * x}+${a * a}=${total}$$</div>
+          <div class="readout-grid">
+            <div class="stat ink"><div class="k">全体の面積 (x+a)²</div><div class="v">${W}² = ${total}</div></div>
+            <div class="stat sage"><div class="k">帯 2 本の和 2ax</div><div class="v">${a * x} + ${a * x} = ${2 * a * x}</div></div>
+            <div class="stat ochre"><div class="k">角の正方形 a²</div><div class="v">${a * a}</div></div>
+          </div>`;
+      } else if (mode === 'diff') {
+        const a = Math.min(st.a, x - 1);
+        const X0 = x + 1.8;
+        plot.setView(-1.3, X0 + x + a + 1.4, -1.1, x + 1.3);
+        plot.render((P) => {
+          // 左: x² から a² を取り除いた L 字形
+          region(P, 0, 0, x, x - a, C.ink, 0.22, 'x(x−a)', x * (x - a));
+          region(P, 0, x - a, x - a, a, C.sageSolid, 0.22, 'a(x−a)', a * (x - a));
+          if (a > 0) {
+            P.rect(x - a, x - a, a, a, { color: C.clay, width: 1.5, dash: [5, 4], fill: rgba(C.clay, 0.10) });
+            P.text(x - a / 2, x - a / 2, 'a²', { color: C.clay, align: 'center', baseline: 'middle', font: 'italic 15px "Times New Roman", serif' });
+            P.text(x - a / 2, x, '取り除く', { color: C.clay, align: 'center', baseline: 'bottom', dy: -4 });
+          }
+          dim(P, 0, -0.35, x, -0.35, `x = ${x}`, C.text, 'bottom');
+          dim(P, -0.35, 0, -0.35, x - a, `x − a = ${x - a}`, C.text, 'left');
+          if (a > 0) dim(P, -0.35, x - a, -0.35, x, `a = ${a}`, C.text, 'left');
+          // 矢印
+          P.arrow(x + 0.35, x / 2, X0 - 0.35, x / 2, { color: C.faint, width: 1.5 });
+          P.text((x + X0) / 2, x / 2, '並べ直す', { color: C.faint, align: 'center', baseline: 'bottom', dy: -6 });
+          // 右: (x+a)(x−a) の長方形
+          region(P, X0, 0, x, x - a, C.ink, 0.22, 'x(x−a)', x * (x - a));
+          region(P, X0 + x, 0, a, x - a, C.sageSolid, 0.22, 'a(x−a)', a * (x - a));
+          dim(P, X0, -0.35, X0 + x + a, -0.35, `x + a = ${x + a}`, C.inkText, 'bottom');
+          dim(P, X0 + x + a + 0.4, 0, X0 + x + a + 0.4, x - a, `x − a = ${x - a}`, C.inkText, 'right');
+        });
+        readout.innerHTML = `
+          <div class="tex-block">$$(x+a)(x-a)=x^2-a^2$$
+            $$(${x}+${a})(${x}-${a})=${x + a}\\cdot${x - a}=${(x + a) * (x - a)},\\qquad ${x}^2-${a}^2=${x * x}-${a * a}=${x * x - a * a}$$</div>
+          <div class="readout-grid">
+            <div class="stat ink"><div class="k">L 字形の面積 x² − a²</div><div class="v">${x * x} − ${a * a} = ${x * x - a * a}</div></div>
+            <div class="stat sage"><div class="k">並べ直した長方形 (x+a)(x−a)</div><div class="v">${x + a} × ${x - a} = ${(x + a) * (x - a)}</div></div>
+          </div>
+          ${st.a !== a ? `<p class="small">$a$ は $x$ より小さくする必要があるので、$a=${a}$ として描いています。</p>` : ''}`;
+      } else {
+        const { a, b, c, d } = st;
+        const W = a * x + b, H = c * x + d;
+        plot.setView(-1.5, W + 1.6, -1.1, H + 1.1);
+        plot.render((P) => {
+          region(P, 0, 0, a * x, c * x, C.ink, 0.22, 'acx²', a * c * x * x);
+          region(P, a * x, 0, b, c * x, C.sageSolid, 0.22, 'bcx', b * c * x);
+          region(P, 0, c * x, a * x, d, C.sageSolid, 0.22, 'adx', a * d * x);
+          region(P, a * x, c * x, b, d, C.ochre, 0.28, 'bd', b * d);
+          dim(P, 0, -0.35, a * x, -0.35, `ax = ${a * x}`, C.text, 'bottom');
+          dim(P, a * x, -0.35, W, -0.35, `b = ${b}`, C.text, 'bottom');
+          dim(P, -0.35, 0, -0.35, c * x, `cx = ${c * x}`, C.text, 'left');
+          dim(P, -0.35, c * x, -0.35, H, `d = ${d}`, C.text, 'left');
+          dim(P, 0, H + 0.4, W, H + 0.4, `ax + b = ${W}`, C.inkText, 'top');
+          dim(P, W + 0.4, 0, W + 0.4, H, `cx + d = ${H}`, C.inkText, 'right');
+        });
+        const lin = (k) => k === 1 ? '' : String(k);
+        readout.innerHTML = `
+          <div class="tex-block">$$(ax+b)(cx+d)=acx^2+(ad+bc)x+bd$$
+            $$(${lin(a)}x+${b})(${lin(c)}x+${d})=${lin(a * c)}x^2+(${a}\\cdot${d}+${b}\\cdot${c})x+${b * d}=${lin(a * c)}x^2+${a * d + b * c}x+${b * d}$$</div>
+          <div style="display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center;justify-content:center">
+            <table class="data">
+              <tr><th></th><th>x の係数</th><th>定数</th><th></th><th>斜めにかける</th></tr>
+              <tr><td style="text-align:left">${lin(a)}x + ${b}</td><td class="hl">${a}</td><td class="hl-sage">${b}</td><td style="font-size:1.2em;color:var(--text-faint)">⤡</td><td>a·d = ${a}·${d} = ${a * d}</td></tr>
+              <tr><td style="text-align:left">${lin(c)}x + ${d}</td><td class="hl">${c}</td><td class="hl-sage">${d}</td><td></td><td>b·c = ${b}·${c} = ${b * c}</td></tr>
+              <tr><th style="text-align:left">積</th><th>ac = ${a * c}</th><th>bd = ${b * d}</th><th></th><th>和 ${a * d + b * c}</th></tr>
+            </table>
+            <div class="readout-grid" style="flex:1;min-width:220px">
+              <div class="stat ink"><div class="k">全体 (${W})×(${H})</div><div class="v">${W * H}</div></div>
+              <div class="stat sage"><div class="k">acx² + (ad+bc)x + bd で x=${x}</div><div class="v">${a * c * x * x} + ${(a * d + b * c) * x} + ${b * d} = ${a * c * x * x + (a * d + b * c) * x + b * d}</div></div>
+            </div>
+          </div>`;
+      }
+      UI.texAll(readout);
+    }
+    rebuild();
+  })();
+
+  /* ======================= 絶対値と数直線 ======================= */
+  (() => {
+    const ctl = $('#c-abs');
+    const st = { a: 2, b: 3, op: '<' };
+    const plot = new Plot('#cv-abs', { equal: false, xmin: -8.8, xmax: 8.8, ymin: -1.1, ymax: 1.7, aspect: 0.34, grid: false, axes: false });
+    const hA = plot.addHandle({ x: st.a, y: 0, color: C.clay, r: 7, onMove: (x) => { st.a = Math.max(-8, Math.min(8, Math.round(x * 2) / 2)); sA.set(st.a); return [st.a, 0]; } });
+    const hB = plot.addHandle({ x: st.a + st.b, y: 0.75, color: C.ochre, r: 6, onMove: (x) => { st.b = Math.max(0, Math.min(8, Math.round((x - st.a) * 2) / 2)); sB.set(st.b); return [st.a + st.b, 0.75]; } });
+
+    UI.heading(ctl, '不等式 |x − a| ⋚ b');
+    const sA = UI.slider(ctl, { label: '$a$（中心）', min: -5, max: 5, step: 0.5, value: st.a, digits: 1, onInput: (v) => { st.a = v; draw(); } });
+    const sB = UI.slider(ctl, { label: '$b$（距離）', min: 0, max: 6, step: 0.5, value: st.b, digits: 1, onInput: (v) => { st.b = v; draw(); } });
+    UI.segmented(ctl, { label: '記号', options: [{ value: '=', label: '=' }, { value: '<', label: '<' }, { value: '<=', label: '≤' }, { value: '>', label: '>' }, { value: '>=', label: '≥' }], value: st.op, onChange: (v) => { st.op = v; draw(); } });
+
+    const readout = $('#r-abs');
+    const absTex = (a) => a === 0 ? '|x|' : a > 0 ? `|x-${fmt(a)}|` : `|x+${fmt(-a)}|`;
+    const OP = { '=': '=', '<': '<', '<=': '\\le', '>': '>', '>=': '\\ge' };
+    function draw() {
+      const { a, b, op } = st;
+      hA.x = a; hB.x = a + b;
+      const L = a - b, R = a + b;
+      const incl = op === '<=' || op === '>=' || op === '=';
+      const inner = op === '<' || op === '<=', outer = op === '>' || op === '>=';
+      plot.render((P) => {
+        const w = P.win;
+        numberAxis(P, 0, w.xmin, w.xmax, 1, { tick: 0.07 });
+        // 解の集合
+        if (inner && b > 0) P.segment(L, 0, R, 0, { color: C.sage, width: 8, alpha: 0.8 });
+        if (outer) { P.segment(w.xmin, 0, L, 0, { color: C.sage, width: 8, alpha: 0.8 }); P.segment(R, 0, w.xmax, 0, { color: C.sage, width: 8, alpha: 0.8 }); }
+        if (b > 0 || op === '=') {
+          P.point(L, 0, { color: C.sage, r: 6, hollow: !incl });
+          P.point(R, 0, { color: C.sage, r: 6, hollow: !incl });
+        } else if (outer) {
+          P.point(a, 0, { color: C.sage, r: 6, hollow: true });
+        }
+        // 距離 b
+        if (b > 0) {
+          P.arrow(a, 0.75, R, 0.75, { color: C.ochre, width: 1.6, head: 9 });
+          P.arrow(a, 0.75, L, 0.75, { color: C.ochre, width: 1.6, head: 9 });
+          P.segment(L, 0.15, L, 0.9, { color: C.ochre, width: 1, dash: [3, 3] });
+          P.segment(R, 0.15, R, 0.9, { color: C.ochre, width: 1, dash: [3, 3] });
+          P.text(a + b / 2, 0.75, `b = ${fmt(b)}`, { color: C.ochre, align: 'center', baseline: 'bottom', dy: -6, bg: true });
+          P.text(a - b / 2, 0.75, `b = ${fmt(b)}`, { color: C.ochre, align: 'center', baseline: 'bottom', dy: -6, bg: true });
+        }
+        P.text(a, 0, `a = ${fmt(a)}`, { color: C.clay, align: 'center', baseline: 'top', dy: 26, bg: true });
+        if (b > 0) {
+          P.text(L, 0, fmt(L), { color: C.sageSolid, align: 'center', baseline: 'top', dy: 26, bg: true });
+          P.text(R, 0, fmt(R), { color: C.sageSolid, align: 'center', baseline: 'top', dy: 26, bg: true });
+        }
+      });
+      let sol, step;
+      const A = absTex(a);
+      if (op === '=') {
+        step = `x-${fmt(a)}=\\pm ${fmt(b)}`;
+        sol = b === 0 ? `x=${fmt(a)}` : `x=${fmt(L)},\\ ${fmt(R)}`;
+      } else if (inner) {
+        step = `-${fmt(b)} ${OP[op]} x-${fmt(a)} ${OP[op]} ${fmt(b)}`;
+        sol = b === 0 ? (incl ? `x=${fmt(a)}` : '\\text{解なし}') : `${fmt(L)} ${OP[op]} x ${OP[op]} ${fmt(R)}`;
+      } else {
+        const o = op === '>' ? '<' : '\\le', o2 = op === '>' ? '>' : '\\ge';
+        step = `x-${fmt(a)} ${o} -${fmt(b)}\\ \\text{または}\\ x-${fmt(a)} ${o2} ${fmt(b)}`;
+        sol = b === 0 ? (incl ? '\\text{すべての実数}' : `x\\ne ${fmt(a)}`) : `x ${o} ${fmt(L)},\\ ${fmt(R)} ${o} x`;
+      }
+      const words = op === '=' ? `${fmt(a)} からの距離がちょうど ${fmt(b)} の点` : inner ? `${fmt(a)} からの距離が ${fmt(b)} ${op === '<' ? '未満' : '以下'}の点` : `${fmt(a)} からの距離が ${fmt(b)} ${op === '>' ? 'より大きい' : '以上の'}点`;
+      readout.innerHTML = `
+        <div class="tex-block">$$${A} ${OP[op]} ${fmt(b)}\\quad\\Longleftrightarrow\\quad ${esc(step)}\\quad\\Longleftrightarrow\\quad ${esc(sol)}$$</div>
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">解</div><div class="v">$${esc(sol)}$</div></div>
+          <div class="stat clay"><div class="k">距離で読む</div><div class="v" style="font-family:var(--font-sans);font-size:0.98rem">$${A}$ は $x$ と $${fmt(a)}$ の距離。解は「${words}」</div></div>
+        </div>`;
+      UI.texAll(readout);
+    }
+    plot.onChange = () => draw();
+    draw();
+  })();
+
+  /* ======================= 集合とベン図 ======================= */
+  (() => {
+    const ctl = $('#c-sets');
+    const U = Array.from({ length: 20 }, (_, i) => i + 1);
+    const isPrime = (n) => n >= 2 && U.every((d) => d < 2 || d * d > n || n % d !== 0);
+    const PROPS = {
+      even: { label: '偶数', test: (n) => n % 2 === 0, tex: '2 の倍数' },
+      mul3: { label: '3 の倍数', test: (n) => n % 3 === 0, tex: '3 の倍数' },
+      mul4: { label: '4 の倍数', test: (n) => n % 4 === 0, tex: '4 の倍数' },
+      prime: { label: '素数', test: isPrime, tex: '素数' },
+      le5: { label: '5 以下', test: (n) => n <= 5, tex: '5 以下の数' },
+      ge10: { label: '10 以上', test: (n) => n >= 10, tex: '10 以上の数' },
+      square: { label: '平方数', test: (n) => Number.isInteger(Math.sqrt(n)), tex: '平方数' },
+    };
+    const opts = Object.entries(PROPS).map(([value, p]) => ({ value, label: p.label }));
+    const st = { A: 'even', B: 'mul3', sel: 'none' };
+    const plot = new Plot('#cv-sets', { xmin: -3.9, xmax: 3.9, ymin: -2.7, ymax: 2.7, aspect: 0.66, grid: false, axes: false });
+    const CA = [-0.85, 0.2], CB = [0.85, 0.2], RC = 1.65;
+    const RECT = { x: -3.7, y: -2.5, w: 7.4, h: 5 };
+    const inA = (x, y) => Math.hypot(x - CA[0], y - CA[1]) < RC, inB = (x, y) => Math.hypot(x - CB[0], y - CB[1]) < RC;
+    const inU = (x, y) => x > RECT.x && x < RECT.x + RECT.w && y > RECT.y && y < RECT.y + RECT.h;
+
+    const ov = (s) => `<span style="text-decoration:overline">${s}</span>`;
+    UI.heading(ctl, '集合');
+    UI.select(ctl, { label: 'A の条件', options: opts, value: st.A, onChange: (v) => { st.A = v; draw(); } });
+    UI.select(ctl, { label: 'B の条件', options: opts, value: st.B, onChange: (v) => { st.B = v; draw(); } });
+    UI.heading(ctl, '強調する集合');
+    const seg = UI.segmented(ctl, { options: [
+      { value: 'none', label: 'なし' }, { value: 'cap', label: 'A∩B' }, { value: 'cup', label: 'A∪B' }, { value: 'nA', label: ov('A') }, { value: 'nB', label: ov('B') },
+      { value: 'nAnB', label: ov('A') + '∩' + ov('B') }, { value: 'nAuB', label: ov('A') + '∪' + ov('B') }, { value: 'ncap', label: ov('A∩B') }, { value: 'ncup', label: ov('A∪B') },
+    ], value: 'none', onChange: (v) => { st.sel = v; draw(); } });
+    seg.el.querySelector('.segmented').style.flexWrap = 'wrap';
+
+    const readout = $('#r-sets');
+    const SETS = {
+      none: { name: '', f: () => false, region: () => false },
+      cap: { name: 'A\\cap B', f: (a, b) => a && b, region: (x, y) => inA(x, y) && inB(x, y) },
+      cup: { name: 'A\\cup B', f: (a, b) => a || b, region: (x, y) => inA(x, y) || inB(x, y) },
+      nA: { name: '\\overline{A}', f: (a) => !a, region: (x, y) => inU(x, y) && !inA(x, y) },
+      nB: { name: '\\overline{B}', f: (a, b) => !b, region: (x, y) => inU(x, y) && !inB(x, y) },
+      nAnB: { name: '\\overline{A}\\cap\\overline{B}', f: (a, b) => !a && !b, region: (x, y) => inU(x, y) && !inA(x, y) && !inB(x, y) },
+      nAuB: { name: '\\overline{A}\\cup\\overline{B}', f: (a, b) => !a || !b, region: (x, y) => inU(x, y) && !(inA(x, y) && inB(x, y)) },
+      ncap: { name: '\\overline{A\\cap B}', f: (a, b) => !(a && b), region: (x, y) => inU(x, y) && !(inA(x, y) && inB(x, y)) },
+      ncup: { name: '\\overline{A\\cup B}', f: (a, b) => !(a || b), region: (x, y) => inU(x, y) && !(inA(x, y) || inB(x, y)) },
+    };
+    const list = (arr) => arr.length ? `\\{${arr.join(',\\ ')}\\}` : '\\varnothing';
+    function draw() {
+      const tA = PROPS[st.A].test, tB = PROPS[st.B].test;
+      const A = U.filter(tA), B = U.filter(tB);
+      const both = U.filter((n) => tA(n) && tB(n)), onlyA = U.filter((n) => tA(n) && !tB(n)), onlyB = U.filter((n) => !tA(n) && tB(n)), neither = U.filter((n) => !tA(n) && !tB(n));
+      const S = SETS[st.sel];
+      const chosen = U.filter((n) => S.f(tA(n), tB(n)));
+      plot.render((P) => {
+        P.rect(RECT.x, RECT.y, RECT.w, RECT.h, { color: C.border, width: 1.5, fill: rgba(C.sunken, 0.5) });
+        if (st.sel !== 'none') P.region(S.region, { fill: rgba(C.sage, 0.28), step: 3 });
+        P.circle(CA[0], CA[1], RC, { color: C.ochre, width: 2.2 });
+        P.circle(CB[0], CB[1], RC, { color: C.ink, width: 2.2 });
+        P.text(RECT.x, RECT.y + RECT.h, 'U', { color: C.muted, dx: 8, dy: 20, font: 'italic bold 16px "Times New Roman", serif' });
+        P.text(CA[0] - RC * 0.55, CA[1] + RC * 0.9, 'A', { color: C.ochre, align: 'center', font: 'italic bold 17px "Times New Roman", serif', bg: true });
+        P.text(CB[0] + RC * 0.55, CB[1] + RC * 0.9, 'B', { color: C.inkText, align: 'center', font: 'italic bold 17px "Times New Roman", serif', bg: true });
+        const put = (arr, cx, cy, perRow, dx) => {
+          const rows = Math.ceil(arr.length / perRow);
+          arr.forEach((n, i) => {
+            const r = Math.floor(i / perRow), k = i % perRow, cnt = Math.min(perRow, arr.length - r * perRow);
+            const x = cx + (k - (cnt - 1) / 2) * dx, y = cy + ((rows - 1) / 2 - r) * 0.42;
+            const hl = S.f(tA(n), tB(n)) && st.sel !== 'none';
+            P.text(x, y, String(n), { color: hl ? C.sageSolid : C.text, align: 'center', baseline: 'middle', font: (hl ? 'bold ' : '') + '14px "Noto Sans JP", sans-serif' });
+          });
+        };
+        put(onlyA, -1.72, 0.2, 3, 0.42);
+        put(both, 0, 0.2, 3, 0.42);
+        put(onlyB, 1.72, 0.2, 3, 0.42);
+        put(neither, 0, -2.05, 10, 0.55);
+      });
+      const nU = 20, nA = A.length, nB = B.length, nCap = both.length, nCup = nA + nB - nCap;
+      readout.innerHTML = `
+        <div class="kv">
+          <span class="k">A（${PROPS[st.A].label}）</span><span class="v">$A=${list(A)}$，$n(A)=${nA}$</span>
+          <span class="k">B（${PROPS[st.B].label}）</span><span class="v">$B=${list(B)}$，$n(B)=${nB}$</span>
+          <span class="k">A∩B</span><span class="v">$${list(both)}$，$n(A\\cap B)=${nCap}$</span>
+          ${st.sel !== 'none' ? `<span class="k" style="color:var(--sage-text);font-weight:700">強調</span><span class="v">$${S.name}=${list(chosen)}$，$n(${S.name})=${chosen.length}$</span>` : ''}
+        </div>
+        <div class="tex-block">$$n(A\\cup B)=n(A)+n(B)-n(A\\cap B)=${nA}+${nB}-${nCap}=${nCup}$$
+          $$n(\\overline{A}\\cap\\overline{B})=n(U)-n(A\\cup B)=${nU}-${nCup}=${neither.length}\\ \\text{（円の外の個数 ${neither.length} と一致）}$$</div>
+        <p class="small">ド・モルガン：$\\overline{A}\\cap\\overline{B}=\\overline{A\\cup B}=${list(neither)}$，
+          $\\overline{A}\\cup\\overline{B}=\\overline{A\\cap B}=${list(U.filter((n) => !(tA(n) && tB(n))))}$（個数 ${nU - nCap}）</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 命題と条件 ======================= */
+  (() => {
+    const ctl = $('#c-logic');
+    const st = { p: { type: 'between', lo: 1, hi: 4 }, q: { type: 'between', lo: 0, hi: 6 } };
+    const YP = 1.7, YQ = 0.85;
+    const plot = new Plot('#cv-logic', { equal: false, xmin: -8.8, xmax: 8.8, ymin: -0.9, ymax: 2.5, aspect: 0.36, grid: false, axes: false });
+    const snap = (x) => Math.max(-8, Math.min(8, Math.round(x * 2) / 2));
+    const mk = (cond, key, y, color) => plot.addHandle({ x: cond[key], y, color, r: 6, visible: () => cond.type === 'between' || (key === 'lo' ? cond.type === 'gt' : cond.type === 'lt'), onMove: (x) => {
+      let v = snap(x);
+      if (cond.type === 'between') v = key === 'lo' ? Math.min(v, cond.hi - 0.5) : Math.max(v, cond.lo + 0.5);
+      cond[key] = v; return [v, y];
+    } });
+    const H = { pLo: mk(st.p, 'lo', YP, C.ochre), pHi: mk(st.p, 'hi', YP, C.ochre), qLo: mk(st.q, 'lo', YQ, C.ink), qHi: mk(st.q, 'hi', YQ, C.ink) };
+
+    const TYPES = [{ value: 'between', label: 'a < x < b' }, { value: 'gt', label: 'x > a' }, { value: 'lt', label: 'x < b' }];
+    UI.heading(ctl, '条件 p（茶）');
+    const selP = UI.select(ctl, { label: '形', options: TYPES, value: st.p.type, onChange: (v) => { st.p.type = v; draw(); } });
+    UI.heading(ctl, '条件 q（青）');
+    const selQ = UI.select(ctl, { label: '形', options: TYPES, value: st.q.type, onChange: (v) => { st.q.type = v; draw(); } });
+    UI.heading(ctl, 'プリセット');
+    const preset = (p, q) => () => { Object.assign(st.p, p); Object.assign(st.q, q); selP.set(st.p.type); selQ.set(st.q.type); draw(); };
+    UI.buttonRow(ctl, [
+      { label: 'x&gt;2 と x&gt;0', small: true, onClick: preset({ type: 'gt', lo: 2, hi: 8 }, { type: 'gt', lo: 0, hi: 8 }) },
+      { label: '0&lt;x&lt;5 と 1&lt;x&lt;3', small: true, onClick: preset({ type: 'between', lo: 0, hi: 5 }, { type: 'between', lo: 1, hi: 3 }) },
+    ]);
+    UI.buttonRow(ctl, [
+      { label: '同じ範囲', small: true, onClick: preset({ type: 'between', lo: -2, hi: 3 }, { type: 'between', lo: -2, hi: 3 }) },
+      { label: 'ずれた範囲', small: true, onClick: preset({ type: 'between', lo: -3, hi: 2 }, { type: 'between', lo: 0, hi: 5 }) },
+      { label: 'x&lt;1 と x&gt;3', small: true, onClick: preset({ type: 'lt', lo: -8, hi: 1 }, { type: 'gt', lo: 3, hi: 8 }) },
+    ]);
+
+    const readout = $('#r-logic');
+    const bounds = (c) => ({ lo: c.type === 'lt' ? -Infinity : c.lo, hi: c.type === 'gt' ? Infinity : c.hi });
+    const condTex = (c) => c.type === 'between' ? `${fmt(c.lo)}<x<${fmt(c.hi)}` : c.type === 'gt' ? `x>${fmt(c.lo)}` : `x<${fmt(c.hi)}`;
+    const negTex = (c) => c.type === 'between' ? `x\\le ${fmt(c.lo)}\\ \\text{または}\\ x\\ge ${fmt(c.hi)}` : c.type === 'gt' ? `x\\le ${fmt(c.lo)}` : `x\\ge ${fmt(c.hi)}`;
+    const subset = (P, Q) => Q.lo <= P.lo && P.hi <= Q.hi;
+    /** P に入るが Q に入らない値 (反例) */
+    const counter = (P, Q) => {
+      if (P.lo < Q.lo) { const hi = Math.min(Q.lo, P.hi); return isFinite(P.lo) ? (P.lo + hi) / 2 : hi - 1; }
+      const lo = Math.max(Q.hi, P.lo); return isFinite(P.hi) ? (lo + P.hi) / 2 : lo + 1;
+    };
+    function drawBand(P, c, y, color, name) {
+      const b = bounds(c), w = P.win;
+      const L = isFinite(b.lo) ? b.lo : w.xmin, R = isFinite(b.hi) ? b.hi : w.xmax;
+      P.segment(L, y, R, y, { color, width: 9, alpha: 0.35 });
+      P.segment(L, y, R, y, { color, width: 2 });
+      if (isFinite(b.lo)) P.point(b.lo, y, { color, r: 6, hollow: true }); else P.arrow(L + 0.6, y, L, y, { color, width: 2 });
+      if (isFinite(b.hi)) P.point(b.hi, y, { color, r: 6, hollow: true }); else P.arrow(R - 0.6, y, R, y, { color, width: 2 });
+      P.text(w.xmin, y, `${name} : ${condTex(c).replace(/\\/g, '')}`, { color, dx: 8, dy: -12, font: Plot.FONT_MATH, bg: true });
+    }
+    function draw() {
+      H.pLo.x = st.p.lo; H.pHi.x = st.p.hi; H.qLo.x = st.q.lo; H.qHi.x = st.q.hi;
+      const Pb = bounds(st.p), Qb = bounds(st.q);
+      const pq = subset(Pb, Qb), qp = subset(Qb, Pb);
+      const cpq = pq ? null : counter(Pb, Qb), cqp = qp ? null : counter(Qb, Pb);
+      plot.render((P) => {
+        numberAxis(P, 0, P.win.xmin, P.win.xmax, 1);
+        drawBand(P, st.p, YP, C.ochre, 'p');
+        drawBand(P, st.q, YQ, C.ink, 'q');
+        if (cpq != null) {
+          P.point(cpq, YP, { color: C.clay, r: 5 });
+          P.segment(cpq, YP, cpq, YQ, { color: C.clay, width: 1.2, dash: [3, 3] });
+          P.text(cpq, YP, `反例 x=${fmt(cpq)}（p だが q でない）`, { color: C.clay, align: 'center', baseline: 'bottom', dy: -12, bg: true });
+        }
+        if (cqp != null) {
+          P.point(cqp, YQ, { color: C.clay, r: 5 });
+          P.text(cqp, YQ, `x=${fmt(cqp)}（q だが p でない）`, { color: C.clay, align: 'center', baseline: 'top', dy: 12, bg: true });
+        }
+      });
+      const verdict = pq && qp ? '必要十分条件' : pq ? '十分条件（必要条件ではない）' : qp ? '必要条件（十分条件ではない）' : 'どちらでもない';
+      const tone = pq && qp ? 'sage' : pq || qp ? 'ochre' : 'clay';
+      const TF = (t) => t ? '<span style="color:var(--sage-text);font-weight:700">真</span>' : '<span style="color:var(--clay-text);font-weight:700">偽</span>';
+      const p = esc(condTex(st.p)), q = esc(condTex(st.q)), np = esc(negTex(st.p)), nq = esc(negTex(st.q));
+      readout.innerHTML = `
+        <div class="readout-grid">
+          <div class="stat ${pq ? 'sage' : 'clay'}"><div class="k">p ⇒ q（P ⊂ Q）</div><div class="v">${pq ? '真' : `偽（反例 x = ${fmt(cpq)}）`}</div></div>
+          <div class="stat ${qp ? 'sage' : 'clay'}"><div class="k">q ⇒ p（Q ⊂ P）</div><div class="v">${qp ? '真' : `偽（反例 x = ${fmt(cqp)}）`}</div></div>
+          <div class="stat ${tone}"><div class="k">p は q であるための</div><div class="v" style="font-family:var(--font-sans);font-size:1rem">${verdict}</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:0.6rem"><table class="data" style="width:100%">
+          <tr><th style="text-align:left"></th><th style="text-align:left">命題</th><th>真偽</th></tr>
+          <tr><td style="text-align:left">もとの命題 $p\\Rightarrow q$</td><td style="text-align:left">$${p}\\ \\Rightarrow\\ ${q}$</td><td>${TF(pq)}</td></tr>
+          <tr><td style="text-align:left">逆 $q\\Rightarrow p$</td><td style="text-align:left">$${q}\\ \\Rightarrow\\ ${p}$</td><td>${TF(qp)}</td></tr>
+          <tr><td style="text-align:left">裏 $\\overline{p}\\Rightarrow\\overline{q}$</td><td style="text-align:left">$${np}\\ \\Rightarrow\\ ${nq}$</td><td>${TF(qp)}</td></tr>
+          <tr><td style="text-align:left">対偶 $\\overline{q}\\Rightarrow\\overline{p}$</td><td style="text-align:left">$${nq}\\ \\Rightarrow\\ ${np}$</td><td>${TF(pq)}</td></tr>
+        </table></div>
+        <p class="small">逆と裏は互いに対偶なので真偽が一致し、対偶はもとの命題と一致する。</p>`;
+      UI.texAll(readout);
+    }
+    plot.onChange = () => draw();
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'area', label: '展開と因数分解' },
+    { id: 'abs', label: '絶対値と数直線' },
+    { id: 'sets', label: '集合とベン図' },
+    { id: 'logic', label: '命題と条件' },
+  ]);
+});
+</script>
+</body>
+</html>
