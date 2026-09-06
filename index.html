@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>高校数学 インタラクティブツール</title>
+<meta name="description" content="高校数学（数学I・A・II・B・III・C）の全単元を、動かして理解するためのインタラクティブツール集。授業・家庭教師・自習に。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .subject-head .grade { font-size: 0.8rem; color: var(--text-faint); border: 1px solid var(--border-subtle); border-radius: 999px; padding: 0 0.5rem; }
+  .howto { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.8rem; margin-top: 1.2rem; }
+  .howto .note { font-size: 0.9rem; }
+  .toc { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; }
+  .toc a { font-size: 0.86rem; padding: 0.2rem 0.7rem; border: 1px solid var(--border-subtle); border-radius: 999px; background: var(--surface); }
+  .toc a:hover { border-color: var(--ink-line); text-decoration: none; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="index.html">高校数学 インタラクティブツール</a>
+    <span class="spacer"></span>
+    <a class="back" href="https://github.com/soh-arch/math-tools">GitHub</a>
+  </div>
+</header>
+
+<main class="hub">
+  <section class="hero">
+    <h1>動かして、確かめて、納得する。</h1>
+    <p>高校数学の全範囲（数学I・A・II・B・III・C）について、係数や点を動かすとグラフ・図形・数値がその場で変わる教材です。授業での提示、家庭教師での説明、そして自分で試して理解を確かめるために使えます。</p>
+    <div class="hints">
+      <span>スライダーや図の中の点をドラッグして動かせます</span>
+      <span>各ページ右上の「拡大表示」で教室投影用に文字を大きくできます</span>
+      <span>タブごとに URL が変わるので、見せたい画面をそのまま共有できます</span>
+    </div>
+    <nav class="toc" aria-label="科目">
+      <a href="#math1">数学I</a><a href="#mathA">数学A</a><a href="#math2">数学II</a><a href="#mathB">数学B</a><a href="#mathC">数学C</a><a href="#math3">数学III</a>
+    </nav>
+  </section>
+
+  <section class="subject" id="math1">
+    <div class="subject-head"><h2>数学I</h2><span class="grade">主に 1 年</span><span class="count">4 ツール</span></div>
+    <div class="cards">
+      <a class="card" href="tools/numbers-expressions.html">
+        <h3>数と式</h3>
+        <p>展開・因数分解を面積で見る。絶対値は「距離」、集合はベン図、命題は集合の包含で。</p>
+        <div class="topics"><span>面積モデル</span><span>絶対値</span><span>集合とベン図</span><span>必要・十分条件</span></div>
+      </a>
+      <a class="card" href="tools/quadratic.html">
+        <h3>二次関数</h3>
+        <p>係数を動かして放物線の形と位置の関係をつかむ。区間の最大・最小、判別式、二次不等式。</p>
+        <div class="topics"><span>平方完成</span><span>最大・最小</span><span>判別式</span><span>二次不等式</span></div>
+      </a>
+      <a class="card" href="tools/trig-ratio.html">
+        <h3>図形と計量（三角比）</h3>
+        <p>単位円と直角三角形で三角比を定義し、正弦定理・余弦定理を三角形を動かして確かめる。</p>
+        <div class="topics"><span>単位円</span><span>直角三角形</span><span>正弦定理</span><span>余弦定理・面積</span></div>
+      </a>
+      <a class="card" href="tools/data-analysis.html">
+        <h3>データの分析</h3>
+        <p>自分のデータを入れてヒストグラム・箱ひげ図・散布図を描く。分散は「偏差の 2 乗の面積」で。</p>
+        <div class="topics"><span>ヒストグラム</span><span>箱ひげ図</span><span>分散・標準偏差</span><span>相関係数</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="subject" id="mathA">
+    <div class="subject-head"><h2>数学A</h2><span class="grade">主に 1 年</span><span class="count">4 ツール</span></div>
+    <div class="cards">
+      <a class="card" href="tools/counting.html">
+        <h3>場合の数</h3>
+        <p>順列と組合せの違いを並べて見る。パスカルの三角形、最短経路、円順列と重複組合せ。</p>
+        <div class="topics"><span>順列・組合せ</span><span>パスカルの三角形</span><span>最短経路</span><span>円順列</span></div>
+      </a>
+      <a class="card" href="tools/probability.html">
+        <h3>確率</h3>
+        <p>試行を繰り返して大数の法則を体感する。反復試行、条件付き確率の面積図、期待値。</p>
+        <div class="topics"><span>シミュレーション</span><span>反復試行</span><span>条件付き確率</span><span>期待値</span></div>
+      </a>
+      <a class="card" href="tools/geometry.html">
+        <h3>図形の性質</h3>
+        <p>三角形の五心、チェバ・メネラウスの定理、円周角、方べきの定理を頂点を動かして確かめる。</p>
+        <div class="topics"><span>五心</span><span>チェバ・メネラウス</span><span>円の性質</span><span>方べきの定理</span></div>
+      </a>
+      <a class="card" href="tools/integers.html">
+        <h3>整数の性質</h3>
+        <p>互除法を長方形の分割で見る。一次不定方程式の格子点、素因数分解とふるい、合同式と n 進法。</p>
+        <div class="topics"><span>互除法</span><span>不定方程式</span><span>素因数分解</span><span>合同式・n進法</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="subject" id="math2">
+    <div class="subject-head"><h2>数学II</h2><span class="grade">主に 2 年</span><span class="count">5 ツール</span></div>
+    <div class="cards">
+      <a class="card" href="tools/equations.html">
+        <h3>式と証明・複素数と方程式</h3>
+        <p>二項定理、相加・相乗平均の図、解と係数の関係、因数定理と組立除法。</p>
+        <div class="topics"><span>二項定理</span><span>相加相乗平均</span><span>解と係数</span><span>因数定理</span></div>
+      </a>
+      <a class="card" href="tools/coordinate-geometry.html">
+        <h3>図形と方程式</h3>
+        <p>直線と円を座標で扱う。点と直線の距離、内分・外分、円と直線の位置関係、軌跡と領域。</p>
+        <div class="topics"><span>直線</span><span>内分・外分</span><span>円と直線</span><span>軌跡・領域</span></div>
+      </a>
+      <a class="card" href="tools/trig-functions.html">
+        <h3>三角関数</h3>
+        <p>単位円がグラフにほどけていく様子、A sin(b(x−c))+d の変形、合成、三角方程式。</p>
+        <div class="topics"><span>単位円とグラフ</span><span>グラフの変形</span><span>加法定理・合成</span><span>三角方程式</span></div>
+      </a>
+      <a class="card" href="tools/exp-log.html">
+        <h3>指数関数・対数関数</h3>
+        <p>底を変えてグラフを見る。逆関数の対称性、対数目盛で見る対数の性質、桁数の計算。</p>
+        <div class="topics"><span>指数関数</span><span>対数関数</span><span>対数の性質</span><span>方程式・桁数</span></div>
+      </a>
+      <a class="card" href="tools/calculus-2.html">
+        <h3>微分・積分</h3>
+        <p>割線が接線になる瞬間、導関数の符号と増減表、極値と解の個数、定積分と面積。</p>
+        <div class="topics"><span>接線</span><span>導関数と増減</span><span>極値</span><span>定積分と面積</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="subject" id="mathB">
+    <div class="subject-head"><h2>数学B</h2><span class="grade">主に 2 年</span><span class="count">2 ツール</span></div>
+    <div class="cards">
+      <a class="card" href="tools/sequences.html">
+        <h3>数列</h3>
+        <p>等差・等比・階差数列、Σ の公式を図で、漸化式は蜘蛛の巣図で、帰納法はドミノで。</p>
+        <div class="topics"><span>等差・等比</span><span>Σ</span><span>階差数列</span><span>漸化式</span><span>数学的帰納法</span></div>
+      </a>
+      <a class="card" href="tools/statistics-inference.html">
+        <h3>統計的な推測</h3>
+        <p>二項分布が正規分布に近づく様子、標本平均の分布、信頼区間のシミュレーション、仮説検定。</p>
+        <div class="topics"><span>確率分布</span><span>正規分布</span><span>標本平均</span><span>信頼区間・検定</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="subject" id="mathC">
+    <div class="subject-head"><h2>数学C</h2><span class="grade">2〜3 年</span><span class="count">3 ツール</span></div>
+    <div class="cards">
+      <a class="card" href="tools/vectors.html">
+        <h3>ベクトル</h3>
+        <p>和・差・実数倍、内積と正射影、一次独立と分解、位置ベクトルと図形、空間ベクトル。</p>
+        <div class="topics"><span>和・差</span><span>内積</span><span>分解</span><span>位置ベクトル</span><span>空間</span></div>
+      </a>
+      <a class="card" href="tools/complex-plane.html">
+        <h3>複素数平面</h3>
+        <p>掛け算は回転と拡大。極形式、ド・モアブルの定理と n 乗根、図形への応用。</p>
+        <div class="topics"><span>極形式</span><span>積と商</span><span>ド・モアブル</span><span>n 乗根</span><span>図形</span></div>
+      </a>
+      <a class="card" href="tools/conics.html">
+        <h3>平面上の曲線</h3>
+        <p>放物線・楕円・双曲線の定義を距離で確かめる。媒介変数表示と極座標。</p>
+        <div class="topics"><span>放物線</span><span>楕円</span><span>双曲線</span><span>媒介変数</span><span>極座標</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="subject" id="math3">
+    <div class="subject-head"><h2>数学III</h2><span class="grade">主に 3 年</span><span class="count">3 ツール</span></div>
+    <div class="cards">
+      <a class="card" href="tools/limits.html">
+        <h3>極限</h3>
+        <p>数列の極限を ε の帯で見る。関数の極限と左右極限、無限級数、e の定義。</p>
+        <div class="topics"><span>数列の極限</span><span>関数の極限</span><span>無限級数</span><span>e</span></div>
+      </a>
+      <a class="card" href="tools/calculus-3-diff.html">
+        <h3>微分法</h3>
+        <p>いろいろな関数の導関数、合成関数・媒介変数の微分、平均値の定理、グラフの概形、速度と加速度。</p>
+        <div class="topics"><span>導関数</span><span>合成関数</span><span>平均値の定理</span><span>凹凸と概形</span><span>速度・加速度</span></div>
+      </a>
+      <a class="card" href="tools/calculus-3-int.html">
+        <h3>積分法</h3>
+        <p>区分求積法、置換積分の図解、面積、回転体の体積、曲線の長さ。</p>
+        <div class="topics"><span>区分求積</span><span>置換積分</span><span>面積</span><span>回転体</span><span>曲線の長さ</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="subject">
+    <div class="subject-head"><h2>使い方のヒント</h2></div>
+    <div class="howto">
+      <div class="note ink"><div class="title">授業で見せる</div>「拡大表示」で文字を大きくし、スライダーを 1 つだけ動かして「何が変わって何が変わらないか」を問いかけると効果的です。</div>
+      <div class="note sage"><div class="title">家庭教師で使う</div>生徒に操作を任せ、「読み取り欄」の数値が図とどう対応しているかを説明してもらうと理解度が分かります。</div>
+      <div class="note ochre"><div class="title">自習で使う</div>各ページ下部の「見方」に、動かして確かめてほしいことを書いています。予想してから動かすのがコツです。</div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  高校数学 インタラクティブツール — 数式表示に <a href="https://katex.org/">KaTeX</a> を使用しています。
+</footer>
+</body>
+</html>

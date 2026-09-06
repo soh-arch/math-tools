@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>二次関数</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>二次関数</h1>
+    <p class="lede">係数を動かしてグラフの形・位置がどう変わるかを見る。平方完成、区間での最大・最小、判別式と $x$ 軸の位置関係、二次不等式の解を一つの画面で確かめられます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 平方完成と頂点 -->
+  <section class="tool-body" data-tab="vertex">
+    <div class="layout">
+      <aside class="controls" id="c-vertex"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-vertex"></canvas><div class="caption">頂点をドラッグしても動かせます</div></div>
+        <div class="readout" id="r-vertex"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">頂点の形と一般形</div>
+        $y=a(x-p)^2+q$ を展開すると $y=ax^2-2apx+ap^2+q$。逆に $y=ax^2+bx+c$ を平方完成すると
+        $$y=a\left(x+\frac{b}{2a}\right)^2-\frac{b^2-4ac}{4a}$$
+        となり、頂点は $\left(-\dfrac{b}{2a},\ -\dfrac{b^2-4ac}{4a}\right)$、軸は直線 $x=-\dfrac{b}{2a}$ です。
+      </div>
+      <ul>
+        <li>$a$ だけを動かすと、頂点は動かず「開き方」だけが変わる。$a>0$ で下に凸、$a<0$ で上に凸。</li>
+        <li>$p$ を動かすと $x$ 軸方向に、$q$ を動かすと $y$ 軸方向に平行移動する。$x-p$ なのに右へ動く理由を、点の対応で確かめよう。</li>
+        <li>「一般形で操作」に切り替えると、$b$ を動かしたとき頂点が放物線を描いて動くのが見える。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 区間での最大・最小 -->
+  <section class="tool-body" data-tab="minmax">
+    <div class="layout">
+      <aside class="controls" id="c-minmax"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-minmax"></canvas><div class="caption">区間の端点 (x 軸上の点) をドラッグできます</div></div>
+        <div class="readout" id="r-minmax"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ochre">
+        <div class="title">候補は 3 か所だけ</div>
+        区間 $s\le x\le t$ での最大値・最小値は、両端 $x=s,\ x=t$ と、軸 $x=p$ が区間内にあるときの頂点、この 3 か所のどれかで実現します。軸が区間の外なら、関数は区間内で単調なので両端で決まります。
+      </div>
+      <ul>
+        <li>区間を左右にずらして、軸をまたぐ瞬間に最小値(または最大値)の場所が頂点に切り替わるのを観察しよう。</li>
+        <li>区間の幅を変えると、最大値が左端から右端へ入れ替わる。入れ替わるのは軸に関して対称な位置。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 判別式と x 軸 -->
+  <section class="tool-body" data-tab="disc">
+    <div class="layout">
+      <aside class="controls" id="c-disc"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-disc"></canvas></div>
+        <div class="readout" id="r-disc"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">判別式 $D=b^2-4ac$</div>
+        解の公式 $x=\dfrac{-b\pm\sqrt{D}}{2a}$ の $\sqrt{D}$ が実数になるかどうかで、共有点の個数が決まります。
+        $D>0$ なら 2 点、$D=0$ なら 1 点(接する)、$D<0$ なら共有点なし。
+      </div>
+      <ul>
+        <li>$c$ だけを動かすとグラフが上下に平行移動し、$D$ の符号が切り替わる瞬間に $x$ 軸と接する。</li>
+        <li>頂点の $y$ 座標は $-\dfrac{D}{4a}$。$a>0$ のとき、頂点が $x$ 軸より下 ⇔ $D>0$ という対応を確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 二次不等式 -->
+  <section class="tool-body" data-tab="ineq">
+    <div class="layout">
+      <aside class="controls" id="c-ineq"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-ineq"></canvas></div>
+        <div class="readout" id="r-ineq"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage">
+        <div class="title">不等式は「グラフが x 軸より上か下か」</div>
+        $ax^2+bx+c>0$ の解は、グラフが $x$ 軸より上にある $x$ の範囲。塗られた部分のグラフを見て、その真下の $x$ 軸の範囲を読み取ります。
+      </div>
+      <ul>
+        <li>$a<0$ のときは解の形が「内側」と「外側」で入れ替わる。両辺を $-1$ 倍して $a>0$ にそろえる手順と見比べよう。</li>
+        <li>$D<0$ のとき、解が「すべての実数」か「解なし」になる理由がグラフから読める。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学I', title: '二次関数' });
+
+  const texQuad = (a, b, c) => 'y=' + UI.texPoly([a, b, c]);
+  const texVertexForm = (a, p, q) => {
+    const A = fmt(Math.abs(a)) === '1' ? (a < 0 ? '-' : '') : fmt(a);
+    const P = fmt(Math.abs(p)) === '0' ? 'x^2' : `(x${p < 0 ? '+' : '-'}${fmt(Math.abs(p))})^2`;
+    const Q = fmt(q) === '0' ? '' : (q < 0 ? '-' : '+') + fmt(Math.abs(q));
+    return `y=${A}${P}${Q}`;
+  };
+
+  /* ======================= 平方完成と頂点 ======================= */
+  (() => {
+    const ctl = $('#c-vertex');
+    const st = { a: 1, p: 1, q: -2, mode: 'vertex' };
+    const coef = () => ({ a: st.a, b: -2 * st.a * st.p, c: st.a * st.p * st.p + st.q });
+
+    const plot = new Plot('#cv-vertex', { xmin: -6, xmax: 6, ymin: -6, ymax: 6 });
+    const vertexHandle = plot.addHandle({ x: st.p, y: st.q, color: C.clay, label: '頂点', onMove: (x, y) => {
+      st.p = Math.round(x * 2) / 2; st.q = Math.round(y * 2) / 2; syncSliders(); return [st.p, st.q];
+    } });
+
+    UI.heading(ctl, '操作する形');
+    const seg = UI.segmented(ctl, { options: [{ value: 'vertex', label: '頂点の形 a,p,q' }, { value: 'general', label: '一般形 a,b,c' }], value: 'vertex', onChange: (v) => { st.mode = v; rebuild(); } });
+    const box = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    let sl = {};
+    function rebuild() {
+      box.innerHTML = ''; sl = {};
+      if (st.mode === 'vertex') {
+        sl.a = UI.slider(box, { label: '$a$（開き方）', min: -3, max: 3, step: 0.25, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+        sl.p = UI.slider(box, { label: '$p$（軸の位置）', min: -5, max: 5, step: 0.5, value: st.p, onInput: (v) => { st.p = v; draw(); } });
+        sl.q = UI.slider(box, { label: '$q$（頂点の高さ）', min: -5, max: 5, step: 0.5, value: st.q, onInput: (v) => { st.q = v; draw(); } });
+      } else {
+        const k = coef();
+        const fromGeneral = (a, b, c) => { st.a = a; if (Math.abs(a) < 1e-9) { st.p = 0; st.q = c; } else { st.p = -b / (2 * a); st.q = c - b * b / (4 * a); } };
+        let a = k.a, b = k.b, c = k.c;
+        sl.a = UI.slider(box, { label: '$a$', min: -3, max: 3, step: 0.25, value: a, onInput: (v) => { a = v; fromGeneral(a, b, c); draw(); } });
+        sl.b = UI.slider(box, { label: '$b$', min: -6, max: 6, step: 0.5, value: b, onInput: (v) => { b = v; fromGeneral(a, b, c); draw(); } });
+        sl.c = UI.slider(box, { label: '$c$（$y$ 切片）', min: -6, max: 6, step: 0.5, value: c, onInput: (v) => { c = v; fromGeneral(a, b, c); draw(); } });
+      }
+      UI.texAll(box);
+      draw();
+    }
+    function syncSliders() {
+      if (st.mode === 'vertex') { sl.p.set(st.p); sl.q.set(st.q); }
+      else { const k = coef(); sl.b.set(k.b); sl.c.set(k.c); }
+    }
+    UI.divider(ctl);
+    const showAxis = UI.checkbox(ctl, { label: '軸と $y$ 切片を表示', checked: true, onChange: draw });
+    const showTrace = UI.checkbox(ctl, { label: '$y=ax^2$ を薄く表示（移動前）', checked: true, onChange: draw });
+    UI.buttonRow(ctl, [{ label: 'リセット', small: true, onClick: () => { st.a = 1; st.p = 1; st.q = -2; rebuild(); } }]);
+
+    const readout = $('#r-vertex');
+    function draw() {
+      vertexHandle.x = st.p; vertexHandle.y = st.q;
+      const { a, b, c } = coef();
+      plot.render((P) => {
+        if (showTrace.get()) P.fn((x) => a * x * x, { color: C.ink, width: 1.5, dash: [5, 5], alpha: 0.45 });
+        P.fn((x) => a * x * x + b * x + c, { color: C.ink, width: 2.6 });
+        if (showAxis.get() && Math.abs(a) > 1e-9) {
+          P.vline(st.p, { color: C.clay, width: 1, dash: [6, 4] });
+          P.text(st.p, P.win.ymax, `x=${fmt(st.p)}`, { color: C.clay, dx: 6, dy: 16, font: Plot.FONT_MATH, bg: true });
+          P.point(0, c, { color: C.ochre, label: `(0, ${fmt(c)})`, dx: 8, dy: 4 });
+        }
+        if (showTrace.get()) {
+          const y0 = a * 0 * 0; // 原点の頂点
+          if (Math.abs(st.p) + Math.abs(st.q) > 0.01) P.arrow(0, y0, st.p, st.q, { color: C.sage, width: 1.5, dash: [3, 4] });
+        }
+      });
+      const D = b * b - 4 * a * c;
+      readout.innerHTML = `
+        <div class="tex-block">$$${texVertexForm(a, st.p, st.q)}\\quad\\Longleftrightarrow\\quad ${texQuad(a, b, c)}$$</div>
+        <div class="kv">
+          <span class="k">頂点</span><span class="v">( ${fmt(st.p)} , ${fmt(st.q)} )</span>
+          <span class="k">軸</span><span class="v">x = ${fmt(st.p)}</span>
+          <span class="k">y 切片</span><span class="v">${fmt(c)}</span>
+          <span class="k">向き</span><span class="v">${Math.abs(a) < 1e-9 ? '（a=0：直線になる）' : a > 0 ? '下に凸' : '上に凸'}</span>
+          <span class="k">平行移動</span><span class="v">y=${fmt(Math.abs(a))==='1'?(a<0?'-':''):fmt(a)}x² を x 方向に ${fmt(st.p)}、y 方向に ${fmt(st.q)}</span>
+        </div>`;
+      UI.texAll(readout);
+    }
+    rebuild();
+  })();
+
+  /* ======================= 区間での最大・最小 ======================= */
+  (() => {
+    const ctl = $('#c-minmax');
+    const st = { a: 1, b: -2, c: -1, s: -1, t: 2 };
+    const f = (x) => st.a * x * x + st.b * x + st.c;
+    const plot = new Plot('#cv-minmax', { xmin: -6, xmax: 6, ymin: -6, ymax: 6 });
+    const hS = plot.addHandle({ x: st.s, y: 0, color: C.ochre, label: 's', onMove: (x) => { st.s = Math.min(Math.round(x * 2) / 2, st.t - 0.5); sS.set(st.s); return [st.s, 0]; } });
+    const hT = plot.addHandle({ x: st.t, y: 0, color: C.ochre, label: 't', onMove: (x) => { st.t = Math.max(Math.round(x * 2) / 2, st.s + 0.5); sT.set(st.t); return [st.t, 0]; } });
+
+    UI.heading(ctl, '二次関数');
+    const sA = UI.slider(ctl, { label: '$a$', min: -3, max: 3, step: 0.25, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+    const sB = UI.slider(ctl, { label: '$b$', min: -6, max: 6, step: 0.5, value: st.b, onInput: (v) => { st.b = v; draw(); } });
+    const sC = UI.slider(ctl, { label: '$c$', min: -6, max: 6, step: 0.5, value: st.c, onInput: (v) => { st.c = v; draw(); } });
+    UI.heading(ctl, '区間 s ≤ x ≤ t');
+    const sS = UI.slider(ctl, { label: '$s$（左端）', min: -5, max: 5, step: 0.5, value: st.s, onInput: (v) => { st.s = Math.min(v, st.t - 0.5); sS.set(st.s); draw(); } });
+    const sT = UI.slider(ctl, { label: '$t$（右端）', min: -5, max: 5, step: 0.5, value: st.t, onInput: (v) => { st.t = Math.max(v, st.s + 0.5); sT.set(st.t); draw(); } });
+    UI.buttonRow(ctl, [
+      { label: '区間を左へ', small: true, onClick: () => { st.s -= 0.5; st.t -= 0.5; sS.set(st.s); sT.set(st.t); draw(); } },
+      { label: '区間を右へ', small: true, onClick: () => { st.s += 0.5; st.t += 0.5; sS.set(st.s); sT.set(st.t); draw(); } },
+    ]);
+
+    const readout = $('#r-minmax');
+    function draw() {
+      hS.x = st.s; hT.x = st.t;
+      const p = Math.abs(st.a) < 1e-9 ? NaN : -st.b / (2 * st.a);
+      const cands = [[st.s, f(st.s), 'x=s'], [st.t, f(st.t), 'x=t']];
+      const axisInside = isFinite(p) && p > st.s && p < st.t;
+      if (axisInside) cands.push([p, f(p), '頂点']);
+      let mx = cands[0], mn = cands[0];
+      for (const c of cands) { if (c[1] > mx[1] + 1e-12) mx = c; if (c[1] < mn[1] - 1e-12) mn = c; }
+      plot.render((P) => {
+        P.rect(st.s, P.win.ymin, st.t - st.s, P.win.ymax - P.win.ymin, { color: 'none', fill: Plot.rgba(C.ochre, 0.10) });
+        P.fn(f, { color: C.ink, width: 1.5, alpha: 0.35 });
+        P.fn(f, { color: C.ink, width: 3, domain: [st.s, st.t] });
+        if (isFinite(p)) {
+          P.vline(p, { color: axisInside ? C.clay : C.faint, width: 1, dash: [6, 4] });
+          P.point(p, f(p), { color: C.clay, hollow: !axisInside, label: '頂点', dx: 8, dy: st.a > 0 ? 16 : -8 });
+        }
+        P.point(st.s, f(st.s), { color: C.ochre, r: 4 });
+        P.point(st.t, f(st.t), { color: C.ochre, r: 4 });
+        P.hline(mx[1], { color: C.sage, width: 1, dash: [3, 4] });
+        P.hline(mn[1], { color: C.sage, width: 1, dash: [3, 4] });
+        P.point(mx[0], mx[1], { color: C.sage, r: 6, label: '最大', dx: 10, dy: -6 });
+        P.point(mn[0], mn[1], { color: C.sage, r: 6, label: '最小', dx: 10, dy: 16 });
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$${texQuad(st.a, st.b, st.c)}\\qquad (${fmt(st.s)}\\le x\\le ${fmt(st.t)})$$</div>
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">最大値</div><div class="v">${fmt(mx[1])}　(${mx[2]}, x=${fmt(mx[0])})</div></div>
+          <div class="stat sage"><div class="k">最小値</div><div class="v">${fmt(mn[1])}　(${mn[2]}, x=${fmt(mn[0])})</div></div>
+          <div class="stat ${axisInside ? 'clay' : ''}"><div class="k">軸 x=${fmt(p)}</div><div class="v">${axisInside ? '区間の内側' : '区間の外側'}</div></div>
+        </div>
+        <p class="small">候補： f(s)=${fmt(f(st.s))}, f(t)=${fmt(f(st.t))}${axisInside ? `, 頂点 f(${fmt(p)})=${fmt(f(p))}` : '（軸は区間外なので頂点は候補にならない）'}</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 判別式と x 軸 ======================= */
+  (() => {
+    const ctl = $('#c-disc');
+    const st = { a: 1, b: -2, c: -1 };
+    const plot = new Plot('#cv-disc', { xmin: -6, xmax: 6, ymin: -6, ymax: 6 });
+    UI.heading(ctl, '係数');
+    UI.slider(ctl, { label: '$a$', min: -3, max: 3, step: 0.25, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+    UI.slider(ctl, { label: '$b$', min: -6, max: 6, step: 0.5, value: st.b, onInput: (v) => { st.b = v; draw(); } });
+    const sC = UI.slider(ctl, { label: '$c$', min: -6, max: 6, step: 0.25, value: st.c, onInput: (v) => { st.c = v; draw(); } });
+    UI.buttonRow(ctl, [{ label: 'x 軸に接する c にする', small: true, onClick: () => { if (Math.abs(st.a) > 1e-9) { st.c = st.b * st.b / (4 * st.a); sC.set(st.c); draw(); } } }]);
+    const readout = $('#r-disc');
+    function draw() {
+      const { a, b, c } = st;
+      const D = b * b - 4 * a * c;
+      const roots = [];
+      if (Math.abs(a) < 1e-9) { if (Math.abs(b) > 1e-9) roots.push(-c / b); }
+      else if (D > 1e-12) roots.push((-b - Math.sqrt(D)) / (2 * a), (-b + Math.sqrt(D)) / (2 * a));
+      else if (Math.abs(D) <= 1e-12) roots.push(-b / (2 * a));
+      const tone = D > 0 ? 'sage' : D === 0 ? 'ochre' : 'clay';
+      plot.render((P) => {
+        P.fn((x) => a * x * x + b * x + c, { color: C.ink, width: 2.6 });
+        if (Math.abs(a) > 1e-9) {
+          const p = -b / (2 * a), q = -D / (4 * a);
+          P.segment(p, 0, p, q, { color: C.clay, width: 1.2, dash: [4, 4] });
+          P.point(p, q, { color: C.clay, label: `頂点 y=${fmt(q)}`, dx: 8, dy: a > 0 ? 16 : -8 });
+        }
+        roots.forEach((r, i) => P.point(r, 0, { color: C.sage, r: 6, label: `x=${fmt(r, 3)}`, dx: -12, dy: 20 + 0 * i }));
+      });
+      const txt = Math.abs(a) < 1e-9 ? '（a=0：一次関数）' : D > 0 ? '異なる 2 点で交わる' : D === 0 ? '1 点で接する' : '共有点なし';
+      readout.innerHTML = `
+        <div class="tex-block">$$${texQuad(a, b, c)}\\qquad D=b^2-4ac=(${fmt(b)})^2-4\\cdot(${fmt(a)})\\cdot(${fmt(c)})=${fmt(D, 3)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ${tone}"><div class="k">D の符号</div><div class="v">${D > 0 ? 'D > 0' : D === 0 ? 'D = 0' : 'D < 0'}</div></div>
+          <div class="stat ${tone}"><div class="k">x 軸との位置関係</div><div class="v">${txt}</div></div>
+          <div class="stat"><div class="k">共有点の x 座標</div><div class="v">${roots.length ? roots.map((r) => fmt(r, 3)).join(' , ') : 'なし'}</div></div>
+        </div>
+        ${Math.abs(a) > 1e-9 && D >= 0 ? `<div class="tex-block small">$$x=\\frac{-(${fmt(b)})\\pm\\sqrt{${fmt(D, 3)}}}{2\\cdot(${fmt(a)})}$$</div>` : ''}`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 二次不等式 ======================= */
+  (() => {
+    const ctl = $('#c-ineq');
+    const st = { a: 1, b: -1, c: -2, op: '>' };
+    const plot = new Plot('#cv-ineq', { xmin: -6, xmax: 6, ymin: -6, ymax: 6 });
+    UI.heading(ctl, '不等式');
+    UI.slider(ctl, { label: '$a$', min: -3, max: 3, step: 0.25, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+    UI.slider(ctl, { label: '$b$', min: -6, max: 6, step: 0.5, value: st.b, onInput: (v) => { st.b = v; draw(); } });
+    UI.slider(ctl, { label: '$c$', min: -6, max: 6, step: 0.25, value: st.c, onInput: (v) => { st.c = v; draw(); } });
+    UI.segmented(ctl, { label: '不等号', options: [{ value: '>', label: '> 0' }, { value: '>=', label: '≥ 0' }, { value: '<', label: '< 0' }, { value: '<=', label: '≤ 0' }], value: '>', onChange: (v) => { st.op = v; draw(); } });
+    const readout = $('#r-ineq');
+    const opTex = { '>': '>', '>=': '\\ge', '<': '<', '<=': '\\le' };
+
+    function draw() {
+      const { a, b, c, op } = st;
+      const f = (x) => a * x * x + b * x + c;
+      const D = b * b - 4 * a * c;
+      const above = op === '>' || op === '>=', incl = op === '>=' || op === '<=';
+      let roots = [];
+      if (Math.abs(a) < 1e-9) { if (Math.abs(b) > 1e-9) roots = [-c / b]; }
+      else if (D > 1e-12) roots = [(-b - Math.sqrt(D)) / (2 * a), (-b + Math.sqrt(D)) / (2 * a)].sort((x, y) => x - y);
+      else if (Math.abs(D) <= 1e-12) roots = [-b / (2 * a)];
+      const test = (x) => above ? (incl ? f(x) >= -1e-9 : f(x) > 1e-9) : (incl ? f(x) <= 1e-9 : f(x) < -1e-9);
+
+      // 解を区間の列として求める
+      const bounds = [-Infinity, ...roots, Infinity];
+      const intervals = [];
+      for (let i = 0; i < bounds.length - 1; i++) {
+        const lo = bounds[i], hi = bounds[i + 1];
+        const mid = !isFinite(lo) ? (isFinite(hi) ? hi - 1 : 0) : !isFinite(hi) ? lo + 1 : (lo + hi) / 2;
+        if (hi - lo < 1e-9) continue;
+        if (test(mid)) intervals.push([lo, hi]);
+      }
+      const pointSols = roots.filter((r) => incl && !intervals.some(([lo, hi]) => lo <= r && r <= hi));
+
+      plot.render((P) => {
+        const yTop = P.win.ymax, yBot = P.win.ymin;
+        P.fillBetween(f, above ? () => yTop : () => yBot, P.win.xmin, P.win.xmax, { fill: Plot.rgba(C.sage, 0.12), samples: 400 });
+        P.fn(f, { color: C.ink, width: 2.6 });
+        for (const [lo, hi] of intervals) {
+          const L = isFinite(lo) ? lo : P.win.xmin, R = isFinite(hi) ? hi : P.win.xmax;
+          P.segment(L, 0, R, 0, { color: C.sage, width: 7, alpha: 0.75 });
+        }
+        for (const r of pointSols) P.point(r, 0, { color: C.sage, r: 6 });
+        roots.forEach((r) => P.point(r, 0, { color: C.sage, r: 6, hollow: !incl, label: fmt(r, 2), dx: -8, dy: 22 }));
+      });
+
+      const texInt = (lo, hi) => {
+        if (!isFinite(lo) && !isFinite(hi)) return '\\text{すべての実数}';
+        const l = incl ? '\\le' : '<';
+        if (!isFinite(lo)) return `x ${l} ${fmt(hi, 2)}`;
+        if (!isFinite(hi)) return `${fmt(lo, 2)} ${l} x`;
+        return `${fmt(lo, 2)} ${l} x ${l} ${fmt(hi, 2)}`;
+      };
+      let sol;
+      if (intervals.length === 0 && pointSols.length === 0) sol = '\\text{解なし}';
+      else sol = [...intervals.map(([lo, hi]) => texInt(lo, hi)), ...pointSols.map((r) => `x=${fmt(r, 2)}`)].join(',\\ ');
+      readout.innerHTML = `
+        <div class="tex-block">$$${UI.texPoly([a, b, c])} ${opTex[op]} 0\\quad\\Longrightarrow\\quad ${sol}$$</div>
+        <p class="small">グラフが $x$ 軸より${above ? '上' : '下'}にある部分（薄い緑）の真下の $x$ の範囲が解。$D=${fmt(D, 3)}$、共有点 ${roots.length ? roots.map((r) => fmt(r, 3)).join(', ') : 'なし'}。${incl ? '境界を含む（●）。' : '境界を含まない（○）。'}</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'vertex', label: '平方完成と頂点' },
+    { id: 'minmax', label: '区間の最大・最小' },
+    { id: 'disc', label: '判別式と x 軸' },
+    { id: 'ineq', label: '二次不等式' },
+  ]);
+});
+</script>
+</body>
+</html>
