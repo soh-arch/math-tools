@@ -181,9 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
           P.text(st.p, P.win.ymax, `x=${fmt(st.p)}`, { color: C.clay, dx: 6, dy: 16, font: Plot.FONT_MATH, bg: true });
           P.point(0, c, { color: C.ochre, label: `(0, ${fmt(c)})`, dx: 8, dy: 4 });
         }
-        if (showTrace.get()) {
-          const y0 = a * 0 * 0; // 原点の頂点
-          if (Math.abs(st.p) + Math.abs(st.q) > 0.01) P.arrow(0, y0, st.p, st.q, { color: C.sage, width: 1.5, dash: [3, 4] });
+        if (showTrace.get() && Math.abs(st.p) + Math.abs(st.q) > 0.01) {
+          P.arrow(0, 0, st.p, st.q, { color: C.sage, width: 1.5, dash: [3, 4] });
         }
       });
       const D = b * b - 4 * a * c;
