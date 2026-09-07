@@ -135,11 +135,13 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let k = 0; k <= n; k++) out[k] = Math.exp(logs[k]);
     return out;
   }
-  function bars(P, xs, ps, w, color, alpha = 0.75, outline = false) {
+  function bars(P, xs, ps, w, color, alpha = 0.75) {
     for (let i = 0; i < xs.length; i++) {
       if (ps[i] < 1e-9) continue;
-      P.rect(xs[i] - w / 2, 0, w, ps[i], outline ? { color, width: 1.5, fill: 'transparent' } : { color: 'none', fill: Plot.rgba(color, alpha) });
-      if (!outline) P.rect(xs[i] - w / 2, 0, w, ps[i], { color: C.surface, width: 1 });
+      const x0 = xs[i] - w / 2, x1 = xs[i] + w / 2;
+      P.rect(x0, 0, w, ps[i], { color: 'none', fill: Plot.rgba(color, alpha) });
+      // 仕切りは左・上・右のみ。底辺を描くと x 軸を消してしまう
+      P.polygon([[x0, 0], [x0, ps[i]], [x1, ps[i]], [x1, 0]], { color: C.surface, width: 1, open: true });
     }
   }
 
@@ -184,15 +186,26 @@ document.addEventListener('DOMContentLoaded', () => {
       const allX = [...rows.map((r) => r[0]), ...ys.map((r) => r[0])];
       const lo = Math.min(...allX, 0) - 1, hi = Math.max(...allX, 1) + 1;
       const pmax = Math.max(...rows.map((r) => r[1]), 0.1);
-      plot.setView(lo, hi, -pmax * 0.08, pmax * 1.25);
+      const changed = st.a !== 1 || st.b !== 0;
+      const top = pmax * 1.25;
+      const bandPx = changed ? 68 : 48;
+      const H = Math.max(bandPx * 3, plot.H || 0);
+      plot.setView(lo, hi, -top * bandPx / (H - bandPx), top);
       const w = Math.min(0.8, Math.abs(st.a) * 0.8 || 0.8);
       plot.render((P) => {
         bars(P, rows.map((r) => r[0]), rows.map((r) => r[1]), 0.8, C.ink, 0.55);
-        const changed = st.a !== 1 || st.b !== 0;
         if (changed) bars(P, ys.map((r) => r[0]), ys.map((r) => r[1]), w, C.sage, 0.45);
-        P.point(E, 0, { color: C.ink, r: 6, label: `E[X]=${fmt(E, 2)}`, dx: -10, dy: 22 });
-        P.segment(E - sd, -pmax * 0.04, E + sd, -pmax * 0.04, { color: C.ink, width: 3 });
-        if (changed) { const EY = st.a * E + st.b, sdY = Math.abs(st.a) * sd; P.point(EY, 0, { color: C.sage, r: 6, label: `E[Y]=${fmt(EY, 2)}`, dx: -10, dy: -14 }); P.segment(EY - sdY, -pmax * 0.065, EY + sdY, -pmax * 0.065, { color: C.sage, width: 3 }); }
+        // 目盛りラベルの帯 (軸の下 5〜21px) を避けて期待値 ± 標準偏差 を置く
+        const row = (px) => -px * (P.win.ymax - P.win.ymin) / P.H;
+        P.point(E, 0, { color: C.ink, r: 6 });
+        P.segment(E - sd, row(34), E + sd, row(34), { color: C.ink, width: 3 });
+        P.text(E, row(34), `E[X]=${fmt(E, 2)}`, { color: C.inkText, align: 'center', baseline: 'middle', font: Plot.FONT_MATH, bg: true });
+        if (changed) {
+          const EY = st.a * E + st.b, sdY = Math.abs(st.a) * sd;
+          P.point(EY, 0, { color: C.sage, r: 6 });
+          P.segment(EY - sdY, row(54), EY + sdY, row(54), { color: C.sage, width: 3 });
+          P.text(EY, row(54), `E[Y]=${fmt(EY, 2)}`, { color: C.sageSolid, align: 'center', baseline: 'middle', font: Plot.FONT_MATH, bg: true });
+        }
         P.legend([{ label: 'X', color: C.ink }, { label: 'Y = aX + b', color: C.sage }], { left: 60 });
       });
       readout.innerHTML = `
@@ -324,7 +337,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const Pp = POPS[st.pop];
       const m = Pp.xs.reduce((s, x, i) => s + x * Pp.ps[i], 0);
       const v = Pp.xs.reduce((s, x, i) => s + x * x * Pp.ps[i], 0) - m * m, sd = Math.sqrt(v);
-      popPlot.render((P) => { bars(P, Pp.xs, Pp.ps, 0.8, C.ink, 0.55); P.point(m, 0, { color: C.clay, r: 5, label: `m = ${fmt(m, 2)}`, dx: -12, dy: 20 }); });
+      const popBand = 52, popH = Math.max(popBand * 3, popPlot.H || 0);
+      popPlot.setView(0, 7, -0.55 * popBand / (popH - popBand), 0.55);
+      popPlot.render((P) => { bars(P, Pp.xs, Pp.ps, 0.8, C.ink, 0.55); P.point(m, 0, { color: C.clay, r: 5, label: `m = ${fmt(m, 2)}`, dx: -12, dy: 34 }); });
       const se = sd / Math.sqrt(st.n);
       const bw = Math.max(0.02, Math.min(0.5, se / 2.5));
       const lo = Math.max(1, m - 4.5 * se), hi = Math.min(6, m + 4.5 * se);
