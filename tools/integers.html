@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>整数の性質</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+<style>
+  .sieve { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; font-family: var(--font-mono); font-size: 0.85rem; }
+  .sieve span { text-align: center; padding: 0.25rem 0; border: 1px solid var(--border-subtle); border-radius: 4px; background: var(--surface); color: var(--text); }
+  .sieve span.prime { background: var(--sage-subtle); color: var(--sage-text); font-weight: 700; border-color: var(--sage-line); }
+  .sieve span.cross { color: var(--text-faint); text-decoration: line-through; }
+  .sieve span.cur { outline: 2px solid var(--clay-graphic); }
+  .divs { display: flex; flex-wrap: wrap; gap: 0.3rem; font-family: var(--font-mono); font-size: 0.9rem; }
+  .divs span { background: var(--bg-sunken); border-radius: 4px; padding: 0.05rem 0.5rem; }
+  .steps { font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.9; }
+  .steps .g { color: var(--sage-text); font-weight: 700; }
+  .steps .q { color: var(--ink-text); }
+  .steps .r { color: var(--clay-text); }
+</style>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>整数の性質</h1>
+    <p class="lede">ユークリッドの互除法を長方形の分割で見る。一次不定方程式の解は直線上の格子点、素因数分解とふるい、合同式は「時計の針」、$n$ 進法は割り算の繰り返し。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <section class="tool-body" data-tab="euclid">
+    <div class="layout">
+      <aside class="controls" id="c-euclid"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-euclid"></canvas><div class="caption">a × b の長方形を正方形で埋める</div></div>
+        <div class="readout" id="r-euclid"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink"><div class="title">互除法の原理</div>
+        $a=qb+r$ のとき $\gcd(a,b)=\gcd(b,r)$。$a\times b$ の長方形から $b\times b$ の正方形を取れるだけ取ると、残りは $r\times b$ の長方形。これを繰り返して最後に残る正方形の一辺が最大公約数です。</div>
+      <ul>
+        <li>互いに素な 2 数（例: 13 と 8）を入れると、最後の正方形が $1\times1$ になる。</li>
+        <li>拡張互除法（余りをさかのぼって代入）で $ax+by=\gcd(a,b)$ の整数解が作れる。次のタブの不定方程式で使う。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tool-body" data-tab="diophantine">
+    <div class="layout">
+      <aside class="controls" id="c-dio"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-dio"></canvas></div>
+        <div class="readout" id="r-dio"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage"><div class="title">解は等間隔に並ぶ</div>
+        $ax+by=c$ の整数解は、直線上の格子点。1 つの解 $(x_0,y_0)$ が見つかれば、他の解はそこから $x$ が $\dfrac{b}{g}$、$y$ が $-\dfrac{a}{g}$ ずつ動いた点（$g=\gcd(a,b)$）。$c$ が $g$ の倍数でなければ解はありません。</div>
+      <ul>
+        <li>$t$ を動かすと、隣の解へ $(\dfrac{b}{g},\,-\dfrac{a}{g})$ だけジャンプする。直線の傾き $-\dfrac{a}{b}$ と一致する。</li>
+        <li>$a=4,\ b=6,\ c=5$ のように解がない場合、直線は格子点を 1 つも通らない。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tool-body" data-tab="factor">
+    <div class="layout">
+      <aside class="controls" id="c-factor"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-factor"></canvas><div class="caption">素因数分解の樹形図</div></div>
+        <div class="readout" id="r-factor"></div>
+        <div class="readout"><h3 style="margin-bottom:0.4rem">エラトステネスのふるい（1〜120）</h3><div class="btn-row" id="sieve-btns" style="margin-bottom:0.6rem"></div><div class="sieve" id="sieve"></div><p class="small" id="sieve-msg"></p></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ochre"><div class="title">約数の個数は指数から</div>
+        $N=p^a q^b r^c$ の約数は $p$ を 0〜$a$ 個、$q$ を 0〜$b$ 個、… 選んで掛けたものなので、個数は $(a+1)(b+1)(c+1)$。約数の総和は $(1+p+\cdots+p^a)(1+q+\cdots+q^b)\cdots$ です。</div>
+      <ul>
+        <li>$360=2^3\cdot3^2\cdot5$ の約数が $4\cdot3\cdot2=24$ 個であることを、一覧で数えて確かめよう。</li>
+        <li>ふるいでは、$\sqrt{120}<11$ なので 7 の倍数を消したら残りはすべて素数。なぜか考えよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tool-body" data-tab="mod">
+    <div class="layout">
+      <aside class="controls" id="c-mod"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-mod"></canvas><div class="caption">m で割った余りで色分け</div></div>
+        <div class="readout" id="r-mod"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink"><div class="title">合同式は「余りだけ見る」計算</div>
+        $a\equiv b \pmod m$ とは、$a-b$ が $m$ の倍数ということ。同じ色の数は互いに合同です。和・差・積は余りどうしで計算してよい（$a\equiv a',\ b\equiv b'$ なら $ab\equiv a'b'$）。割り算はできないことに注意。</div>
+      <ul>
+        <li>$7^{100}$ を 5 で割った余りは、$7\equiv2$ なので $2^{100}$ の余りを考えればよい。$2^4=16\equiv1$ だから答えは $1$。</li>
+        <li>$n$ 進法は「$n$ で割った余りを下の位から並べる」操作。表の余りの列を下から読もう。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$, el = UI.el;
+  UI.header({ unit: '数学A', title: '整数の性質' });
+  const gcd = UI.gcd;
+  const PAL = [C.ink, C.clay, C.sage, C.ochre, '#6B5B95', '#2A9D8F', '#B5651D', '#5C7A99'];
+
+  function extGcd(a, b) {
+    // 返り値 [g, x, y] で ax + by = g、steps: [{a,b,q,r}]
+    const steps = [];
+    let A = a, B = b;
+    while (B !== 0) { const q = Math.floor(A / B), r = A - q * B; steps.push({ a: A, b: B, q, r }); A = B; B = r; }
+    let x = 1, y = 0, x1 = 0, y1 = 1;
+    for (const s of steps) { [x, x1] = [x1, x - s.q * x1]; [y, y1] = [y1, y - s.q * y1]; }
+    return { g: A, x, y, steps };
+  }
+
+  /* ======================= 互除法 ======================= */
+  (() => {
+    const ctl = $('#c-euclid');
+    const st = { a: 252, b: 198 };
+    const plot = new Plot('#cv-euclid', { grid: false, axes: false, aspect: 0.6 });
+    UI.heading(ctl, '2 つの正の整数');
+    const nA = UI.number(ctl, { label: '$a$', value: st.a, min: 1, max: 9999, step: 1, onInput: (v) => { st.a = Math.max(1, Math.round(v)); draw(); } });
+    const nB = UI.number(ctl, { label: '$b$', value: st.b, min: 1, max: 9999, step: 1, onInput: (v) => { st.b = Math.max(1, Math.round(v)); draw(); } });
+    UI.buttonRow(ctl, [
+      { label: '252, 198', small: true, onClick: () => set(252, 198) },
+      { label: '1071, 1029', small: true, onClick: () => set(1071, 1029) },
+      { label: '13, 8', small: true, onClick: () => set(13, 8) },
+      { label: '入れ替え', small: true, onClick: () => set(st.b, st.a) },
+    ]);
+    function set(a, b) { st.a = a; st.b = b; nA.set(a); nB.set(b); draw(); }
+    const readout = $('#r-euclid');
+    function draw() {
+      const a = st.a, b = st.b;
+      const { g, x, y, steps } = extGcd(a, b);
+      const W = Math.max(a, b), H = Math.min(a, b);
+      plot.setView(-W * 0.03, W * 1.03, -H * 0.03 - W * 0.02, H * 1.03 + W * 0.02);
+      plot.render((P) => {
+        // 分割: 横長になるよう常に w >= h
+        let x0 = 0, y0 = 0, w = W, h = H, k = 0, horizontal = true;
+        P.rect(0, 0, W, H, { color: C.borderStrong, width: 1.5 });
+        while (h > 0 && w > 0 && k < 60) {
+          const n = Math.floor(horizontal ? w / h : h / w);
+          const s = horizontal ? h : w;
+          const col = PAL[k % PAL.length];
+          for (let i = 0; i < n; i++) {
+            const rx = horizontal ? x0 + i * s : x0, ry = horizontal ? y0 : y0 + i * s;
+            P.rect(rx, ry, s, s, { color: C.surface, width: 1.2, fill: Plot.rgba(col, k === steps.length - 1 ? 0.6 : 0.28) });
+            if (P.px(s) > 26) P.text(rx + s / 2, ry + s / 2, String(s), { color: C.text, align: 'center', baseline: 'middle', font: '12px "Noto Sans JP", sans-serif' });
+          }
+          if (horizontal) { x0 += n * s; w -= n * s; } else { y0 += n * s; h -= n * s; }
+          horizontal = !horizontal; k++;
+        }
+        P.text(W / 2, H, `${W === a ? 'a' : 'b'} = ${W}`, { color: C.muted, align: 'center', dy: -6 });
+        P.text(W, H / 2, `${W === a ? 'b' : 'a'} = ${H}`, { color: C.muted, dx: 6, baseline: 'middle' });
+      });
+      const lines = steps.map((s) => `<div>${s.a} = <span class="q">${s.q}</span> × ${s.b} + <span class="r">${s.r}</span></div>`).join('');
+      readout.innerHTML = `
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">最大公約数 gcd(${a}, ${b})</div><div class="v">${g}</div></div>
+          <div class="stat"><div class="k">最小公倍数</div><div class="v">${a / g * b}</div></div>
+          <div class="stat ink"><div class="k">ax + by = g の解</div><div class="v">x = ${x}, y = ${y}</div></div>
+        </div>
+        <div class="steps" style="margin-top:0.6rem">${lines}<div>余りが 0 になったときの「割る数」<span class="g"> ${g} </span>が最大公約数。</div></div>
+        <p class="small">拡張互除法: ${a}·(${x}) + ${b}·(${y}) = ${a * x + b * y}。図では、各段階で取れる正方形の色が変わり、最後の正方形の一辺が ${g}。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 一次不定方程式 ======================= */
+  (() => {
+    const ctl = $('#c-dio');
+    const st = { a: 3, b: 5, c: 1, t: 0 };
+    const plot = new Plot('#cv-dio', { xmin: -10, xmax: 10, ymin: -8, ymax: 8, aspect: 0.62 });
+    UI.heading(ctl, 'ax + by = c');
+    const nA = UI.number(ctl, { label: '$a$', value: st.a, step: 1, onInput: (v) => { st.a = Math.round(v); draw(); } });
+    const nB = UI.number(ctl, { label: '$b$', value: st.b, step: 1, onInput: (v) => { st.b = Math.round(v); draw(); } });
+    const nC = UI.number(ctl, { label: '$c$', value: st.c, step: 1, onInput: (v) => { st.c = Math.round(v); draw(); } });
+    const sT = UI.slider(ctl, { label: '$t$（解の番号）', min: -5, max: 5, step: 1, value: 0, digits: 0, onInput: (v) => { st.t = v; draw(); } });
+    UI.buttonRow(ctl, [
+      { label: '3x + 5y = 1', small: true, onClick: () => set(3, 5, 1) },
+      { label: '7x − 4y = 2', small: true, onClick: () => set(7, -4, 2) },
+      { label: '4x + 6y = 5（解なし）', small: true, onClick: () => set(4, 6, 5) },
+      { label: '4x + 6y = 10', small: true, onClick: () => set(4, 6, 10) },
+    ]);
+    function set(a, b, c) { st.a = a; st.b = b; st.c = c; nA.set(a); nB.set(b); nC.set(c); draw(); }
+    const readout = $('#r-dio');
+    function draw() {
+      const { a, b, c } = st;
+      if (a === 0 && b === 0) { readout.innerHTML = '<p class="small">a, b の少なくとも一方は 0 以外にしてください。</p>'; return; }
+      const g = gcd(a, b);
+      const solvable = c % g === 0;
+      let x0 = 0, y0 = 0, dx = 0, dy = 0;
+      if (solvable) {
+        const e = extGcd(Math.abs(a), Math.abs(b));
+        x0 = e.x * Math.sign(a) * (c / g); y0 = e.y * Math.sign(b) * (c / g);
+        dx = b / g; dy = -a / g;
+        // x0 を 0 以上で最小に
+        if (dx !== 0) { const k = Math.floor(x0 / Math.abs(dx)); x0 -= k * Math.abs(dx); y0 -= k * Math.abs(dx) * (dy / dx); }
+      }
+      const sol = (t) => [x0 + dx * t, y0 + dy * t];
+      plot.render((P) => {
+        for (let i = Math.ceil(P.win.xmin); i <= P.win.xmax; i++) for (let j = Math.ceil(P.win.ymin); j <= P.win.ymax; j++) P.point(i, j, { color: C.borderSubtle, r: 1.6 });
+        P.lineABC(a, b, -c, { color: C.ink, width: 2 });
+        if (solvable) {
+          for (let t = -40; t <= 40; t++) { const [x, y] = sol(t); if (x >= P.win.xmin && x <= P.win.xmax && y >= P.win.ymin && y <= P.win.ymax) P.point(x, y, { color: C.sage, r: 5 }); }
+          const [px, py] = sol(st.t), [qx, qy] = sol(st.t + 1);
+          P.arrow(px, py, qx, qy, { color: C.ochre, width: 2 });
+          P.point(px, py, { color: C.clay, r: 6.5, label: `(${px}, ${py})`, dx: 10, dy: -8 });
+          P.text((px + qx) / 2, (py + qy) / 2, `(${dx}, ${dy})`, { color: C.ochre, dx: 8, dy: 14, bg: true });
+        }
+      });
+      const bTex = (v) => (v < 0 ? '-' : '+') + (Math.abs(v) === 1 ? '' : Math.abs(v));
+      const eq = `${a === 1 ? '' : a === -1 ? '-' : a}x ${bTex(b)}y = ${c}`;
+      if (!solvable) {
+        readout.innerHTML = `<div class="tex-block">$$${eq}$$</div><div class="note clay"><div class="title">整数解なし</div>$\\gcd(${a},${b})=${g}$ で、左辺は常に ${g} の倍数。右辺 ${c} は ${g} の倍数でないので、等式を満たす整数 $x,y$ は存在しない。直線が格子点を通らないことを確認しよう。</div>`;
+      } else {
+        const [px, py] = sol(st.t);
+        readout.innerHTML = `
+          <div class="tex-block">$$${eq}\\quad\\Longrightarrow\\quad x=${x0}${bTex(dx)}t,\\ \\ y=${y0}${bTex(dy)}t\\quad(t\\text{ は整数})$$</div>
+          <div class="readout-grid">
+            <div class="stat sage"><div class="k">1 つの解 (t = 0)</div><div class="v">(${x0}, ${y0})</div></div>
+            <div class="stat clay"><div class="k">t = ${st.t} の解</div><div class="v">(${px}, ${py})　→ ${a}·${px} ${bTex(b)}·${py} = ${a * px + b * py}</div></div>
+            <div class="stat ochre"><div class="k">隣の解への移動</div><div class="v">(${dx}, ${dy}) = (b/g, −a/g), g = ${g}</div></div>
+          </div>`;
+      }
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 素因数分解・ふるい ======================= */
+  (() => {
+    const ctl = $('#c-factor');
+    const st = { n: 360 };
+    const plot = new Plot('#cv-factor', { grid: false, axes: false, xmin: -5, xmax: 5, ymin: -5.5, ymax: 0.6, aspect: 0.55 });
+    UI.heading(ctl, '自然数');
+    const nN = UI.number(ctl, { label: '$N$', value: st.n, min: 2, max: 1000000, step: 1, onInput: (v) => { st.n = Math.max(2, Math.min(1000000, Math.round(v))); draw(); } });
+    UI.buttonRow(ctl, [
+      { label: '360', small: true, onClick: () => { st.n = 360; nN.set(360); draw(); } },
+      { label: '1001', small: true, onClick: () => { st.n = 1001; nN.set(1001); draw(); } },
+      { label: '2024', small: true, onClick: () => { st.n = 2024; nN.set(2024); draw(); } },
+      { label: '97（素数）', small: true, onClick: () => { st.n = 97; nN.set(97); draw(); } },
+    ]);
+    const readout = $('#r-factor');
+    function factorize(n) { const f = []; let m = n; for (let p = 2; p * p <= m; p++) while (m % p === 0) { f.push(p); m /= p; } if (m > 1) f.push(m); return f; }
+    function draw() {
+      const n = st.n, fs = factorize(n);
+      const depth = fs.length - 1;
+      plot.setView(-5, 5, -Math.max(1, depth) * 1.1 - 0.6, 0.7);
+      plot.render((P) => {
+        let cur = n, x = 0, y = 0;
+        const node = (X, Y, v, leaf) => {
+          const w = Math.max(0.55, String(v).length * 0.16);
+          P.circle(X, Y, 0.34, { color: leaf ? C.sage : C.ink, width: 1.6, fill: leaf ? C.sageSubtle : C.surface });
+          P.text(X, Y, String(v), { color: leaf ? C.sageText || C.sage : C.text, align: 'center', baseline: 'middle', font: 'bold 13px "Noto Sans JP", sans-serif' });
+        };
+        if (fs.length === 1) { node(0, 0, n, true); P.text(0, -0.9, '素数', { color: C.sage, align: 'center' }); return; }
+        node(x, y, cur, false);
+        for (let i = 0; i < fs.length - 1; i++) {
+          const p = fs[i]; cur = cur / p;
+          const lx = x - 0.9, rx = x + 0.9, ny = y - 1.1;
+          P.segment(x, y - 0.34, lx, ny + 0.34, { color: C.border, width: 1.2 });
+          P.segment(x, y - 0.34, rx, ny + 0.34, { color: C.border, width: 1.2 });
+          node(lx, ny, p, true);
+          node(rx, ny, cur, i === fs.length - 2);
+          x = rx; y = ny;
+        }
+      });
+      const counts = {}; for (const p of fs) counts[p] = (counts[p] || 0) + 1;
+      const primes = Object.keys(counts).map(Number).sort((a, b) => a - b);
+      const tex = primes.map((p) => counts[p] === 1 ? `${p}` : `${p}^{${counts[p]}}`).join('\\cdot');
+      const numDiv = primes.reduce((acc, p) => acc * (counts[p] + 1), 1);
+      const sumDiv = primes.reduce((acc, p) => acc * (Math.pow(p, counts[p] + 1) - 1) / (p - 1), 1);
+      const divs = []; for (let d = 1; d * d <= n; d++) if (n % d === 0) { divs.push(d); if (d * d !== n) divs.push(n / d); } divs.sort((a, b) => a - b);
+      readout.innerHTML = `
+        <div class="tex-block">$$${n}=${tex}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">約数の個数 ${primes.map((p) => `(${counts[p]}+1)`).join('')}</div><div class="v">${numDiv}</div></div>
+          <div class="stat"><div class="k">約数の総和</div><div class="v">${sumDiv}</div></div>
+          <div class="stat ${fs.length === 1 ? 'sage' : ''}"><div class="k">判定</div><div class="v">${fs.length === 1 ? '素数' : '合成数'}</div></div>
+        </div>
+        <p class="small" style="margin-top:0.5rem">約数の一覧（${divs.length} 個）:</p>
+        <div class="divs">${divs.length <= 200 ? divs.map((d) => `<span>${d}</span>`).join('') : '（多すぎるため省略）'}</div>`;
+      UI.texAll(readout);
+    }
+    draw();
+
+    // エラトステネスのふるい
+    const grid = $('#sieve'), msg = $('#sieve-msg');
+    const N = 120; let state, primesFound, nextP;
+    function resetSieve() { state = new Array(N + 1).fill(0); state[1] = 2; primesFound = []; nextP = 2; render('1 は素数でも合成数でもないので除く。「次の素数でふるう」を押そう。'); }
+    function render(text) {
+      grid.innerHTML = '';
+      for (let k = 1; k <= N; k++) {
+        const s = el('span', { text: k });
+        if (state[k] === 1) s.classList.add('prime');
+        if (state[k] === 2) s.classList.add('cross');
+        if (k === nextP && state[k] !== 2) s.classList.add('cur');
+        grid.append(s);
+      }
+      msg.textContent = text;
+    }
+    function step() {
+      while (nextP <= N && state[nextP] !== 0) nextP++;
+      if (nextP > N) { render('終了。残ったのがすべて素数（' + primesFound.length + ' 個）。'); return; }
+      const p = nextP; state[p] = 1; primesFound.push(p);
+      let crossed = 0; for (let k = p * 2; k <= N; k += p) if (state[k] === 0) { state[k] = 2; crossed++; }
+      nextP = p + 1;
+      if (p * p > N) { for (let k = 2; k <= N; k++) if (state[k] === 0) { state[k] = 1; primesFound.push(k); } render(`${p} は素数。${p}² > ${N} なので、残りはすべて素数。合計 ${primesFound.length} 個。`); nextP = N + 1; return; }
+      render(`${p} は素数。${p} の倍数 ${crossed} 個を消した。`);
+    }
+    UI.buttonRow($('#sieve-btns'), [
+      { label: '次の素数でふるう', primary: true, small: true, onClick: step },
+      { label: '最後まで', small: true, onClick: () => { for (let i = 0; i < 40 && nextP <= N; i++) step(); } },
+      { label: 'リセット', small: true, onClick: resetSieve },
+    ]);
+    resetSieve();
+  })();
+
+  /* ======================= 合同式・n 進法 ======================= */
+  (() => {
+    const ctl = $('#c-mod');
+    const st = { mode: 'mod', m: 7, a: 23, b: 9, N: 45, base: 2 };
+    const plot = new Plot('#cv-mod', { grid: false, axes: false, xmin: -2.6, xmax: 2.6, ymin: -2.6, ymax: 2.6, aspect: 0.62 });
+    UI.segmented(ctl, { options: [{ value: 'mod', label: '合同式' }, { value: 'base', label: 'n 進法' }], value: 'mod', onChange: (v) => { st.mode = v; rebuild(); } });
+    const box = el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    const readout = $('#r-mod');
+    function rebuild() {
+      box.innerHTML = '';
+      if (st.mode === 'mod') {
+        UI.slider(box, { label: '$m$（割る数）', min: 2, max: 12, step: 1, value: st.m, digits: 0, onInput: (v) => { st.m = v; draw(); } });
+        UI.number(box, { label: '$a$', value: st.a, min: 0, max: 999, step: 1, onInput: (v) => { st.a = Math.max(0, Math.round(v)); draw(); } });
+        UI.number(box, { label: '$b$', value: st.b, min: 0, max: 999, step: 1, onInput: (v) => { st.b = Math.max(0, Math.round(v)); draw(); } });
+      } else {
+        UI.number(box, { label: '10 進数 $N$', value: st.N, min: 0, max: 100000, step: 1, onInput: (v) => { st.N = Math.max(0, Math.round(v)); draw(); } });
+        UI.slider(box, { label: '底 $n$', min: 2, max: 16, step: 1, value: st.base, digits: 0, onInput: (v) => { st.base = v; draw(); } });
+      }
+      UI.texAll(box);
+      draw();
+    }
+    function draw() {
+      if (st.mode === 'mod') drawMod(); else drawBase();
+    }
+    function drawMod() {
+      const m = st.m, rings = 4, count = m * rings;
+      const pos = (k) => { const ang = Math.PI / 2 - 2 * Math.PI * (k % m) / m; const r = 0.8 + 0.42 * Math.floor(k / m); return [r * Math.cos(ang), r * Math.sin(ang), ang]; };
+      plot.render((P) => {
+        for (let j = 0; j < rings; j++) P.circle(0, 0, 0.8 + 0.42 * j, { color: C.borderSubtle, width: 1 });
+        for (let i = 0; i < m; i++) { const [x, y] = pos(i + m * (rings - 1)); P.segment(0, 0, x * 1.12, y * 1.12, { color: C.borderSubtle, width: 1 }); }
+        for (let k = 0; k < count; k++) {
+          const [x, y] = pos(k), res = k % m;
+          const col = PAL[res % PAL.length];
+          const hot = k === st.a || k === st.b;
+          P.circle(x, y, hot ? 0.22 : 0.17, { color: hot ? C.text : col, width: hot ? 2.2 : 1, fill: Plot.rgba(col, hot ? 0.9 : 0.35) });
+          P.text(x, y, String(k), { color: hot ? C.surface : C.text, align: 'center', baseline: 'middle', font: (hot ? 'bold ' : '') + '11px "Noto Sans JP", sans-serif' });
+        }
+        for (let i = 0; i < m; i++) { const [x, y] = pos(i); const rr = 0.8 + 0.42 * rings + 0.12; const ang = Math.atan2(y, x); P.text(rr * Math.cos(ang), rr * Math.sin(ang), '余り ' + i, { color: PAL[i % PAL.length], align: 'center', baseline: 'middle', font: '11px "Noto Sans JP", sans-serif' }); }
+      });
+      const ra = st.a % m, rb = st.b % m, cong = ra === rb;
+      readout.innerHTML = `
+        <div class="tex-block">$$${st.a}\\equiv${ra},\\quad ${st.b}\\equiv${rb}\\pmod{${m}}\\qquad ${st.a}-${st.b}=${st.a - st.b}${cong ? `=${m}\\times${(st.a - st.b) / m}` : ''}$$</div>
+        <div class="readout-grid">
+          <div class="stat ${cong ? 'sage' : 'clay'}"><div class="k">${st.a} ≡ ${st.b} (mod ${m}) ?</div><div class="v">${cong ? '成り立つ（同じ色）' : '成り立たない'}</div></div>
+          <div class="stat ink"><div class="k">和 a + b = ${st.a + st.b}</div><div class="v">≡ ${ra} + ${rb} = ${ra + rb} ≡ ${(ra + rb) % m}</div></div>
+          <div class="stat ink"><div class="k">積 ab = ${st.a * st.b}</div><div class="v">≡ ${ra} × ${rb} = ${ra * rb} ≡ ${(ra * rb) % m}</div></div>
+        </div>
+        <p class="small">図は ${m} 本の針をもつ時計。数を 0 から順に時計回りに置くと、${m} ごとに同じ針の上（同じ余り）に戻る。${st.a} と ${st.b} の位置を見比べよう。実際に ${st.a + st.b} を ${m} で割った余りは ${(st.a + st.b) % m}、${st.a * st.b} を割った余りは ${(st.a * st.b) % m}。</p>`;
+      UI.texAll(readout);
+    }
+    function drawBase() {
+      const N = st.N, n = st.base;
+      const digitsChar = '0123456789ABCDEF';
+      const rows = []; let q = N;
+      if (N === 0) rows.push({ q: 0, r: 0, next: 0 });
+      while (q > 0) { const r = q % n; rows.push({ q, r, next: Math.floor(q / n) }); q = Math.floor(q / n); }
+      const digits = rows.map((r) => r.r).reverse();
+      const str = digits.map((d) => digitsChar[d]).join('');
+      plot.render((P) => {
+        // 筆算風の表示
+        const x0 = -1.4, y0 = 2.0, dy = 0.62;
+        P.text(x0 - 0.2, y0 + 0.4, `${N} を ${n} で割り続ける`, { color: C.muted });
+        rows.forEach((row, i) => {
+          const y = y0 - i * dy;
+          P.text(x0, y, `${n}`, { color: C.ink, align: 'right', baseline: 'middle', font: 'bold 14px "Noto Sans JP", sans-serif' });
+          P.text(x0 + 0.25, y, `) ${row.q}`, { color: C.text, baseline: 'middle', font: '14px "Noto Sans JP", sans-serif' });
+          P.text(x0 + 1.9, y, `… 余り ${row.r}`, { color: C.clay, baseline: 'middle', font: 'bold 14px "Noto Sans JP", sans-serif' });
+          if (i < rows.length - 1) P.segment(x0 + 0.2, y - dy / 2 + 0.02, x0 + 1.6, y - dy / 2 + 0.02, { color: C.border, width: 1 });
+        });
+        const yl = y0 - rows.length * dy;
+        P.text(x0 + 0.25, yl, `${rows[rows.length - 1].next}`, { color: C.text, baseline: 'middle', font: '14px "Noto Sans JP", sans-serif' });
+        P.arrow(x0 + 2.9, yl - 0.1, x0 + 2.9, y0 + 0.1, { color: C.sage, width: 2 });
+        P.text(x0 + 3.05, (yl + y0) / 2, '下から読む', { color: C.sage, baseline: 'middle' });
+      });
+      const expansion = digits.map((d, i) => { const p = digits.length - 1 - i; return `${d}\\cdot${n}^{${p}}`; }).join('+');
+      readout.innerHTML = `
+        <div class="tex-block">$$${N}_{(10)}=${str}_{(${n})}\\qquad ${str}_{(${n})}=${expansion}=${N}$$</div>
+        <p class="small">${n} 進法の各位は ${n} の累乗の個数。最下位が ${n}^0 の位で、割った余りは下の位から順に決まる。${n === 2 ? '2 進法では各位が 0 か 1 だけ。' : n === 16 ? '16 進法では 10〜15 を A〜F で表す。' : ''}</p>`;
+      UI.texAll(readout);
+    }
+    rebuild();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'euclid', label: 'ユークリッドの互除法' },
+    { id: 'diophantine', label: '一次不定方程式' },
+    { id: 'factor', label: '素因数分解とふるい' },
+    { id: 'mod', label: '合同式と n 進法' },
+  ]);
+});
+</script>
+</body>
+</html>
