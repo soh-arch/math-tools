@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function sync() { sA.set(st.pA); sBA.set(st.pBA); sBnA.set(st.pBnA); }
     UI.divider(ctl);
     UI.buttonRow(ctl, [
-      { label: '検査の例', small: true, primary: true, onClick: () => { st.pA = 0.01; st.pBA = 0.9; st.pBnA = 0.05; st.N = 10000; selN.set('10000'); sync(); draw(); } },
+      { label: '検査の例', small: true, onClick: () => { st.pA = 0.01; st.pBA = 0.9; st.pBnA = 0.05; st.N = 10000; selN.set('10000'); sync(); draw(); } },
       { label: '独立な例', small: true, onClick: () => { st.pA = 0.4; st.pBA = 0.5; st.pBnA = 0.5; sync(); draw(); } },
       { label: '標準', small: true, onClick: () => { st.pA = 0.4; st.pBA = 0.6; st.pBnA = 0.3; sync(); draw(); } },
     ]);
