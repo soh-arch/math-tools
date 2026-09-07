@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>平面上の曲線</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<style>.controls .segmented { flex-wrap: wrap; } .controls .segmented button { white-space: nowrap; }</style>
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>平面上の曲線</h1>
+    <p class="lede">放物線・楕円・双曲線を「距離の条件」として見て、焦点・準線・漸近線の役割を確かめます。後半では媒介変数表示と極座標で、点が動いて曲線が描かれる様子を追います。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 放物線 -->
+  <section class="tool-body" data-tab="parabola">
+    <div class="layout">
+      <aside class="controls" id="c-parabola"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-parabola"></canvas><div class="caption">点 P を曲線に沿ってドラッグできます</div></div>
+        <div class="readout" id="r-parabola"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">放物線は「焦点までの距離 ＝ 準線までの距離」</div>
+        焦点 $F(p,0)$ と準線 $x=-p$ から等距離にある点 $P(x,y)$ の軌跡が放物線 $y^2=4px$。
+        $PF=\sqrt{(x-p)^2+y^2}$、$PH=|x+p|$ とおいて $PF=PH$ を整理すると $y^2=4px$ になります。
+        $x^2=4py$ は焦点 $(0,p)$、準線 $y=-p$ で、$y$ 軸が軸になります。
+      </div>
+      <ul>
+        <li>P をどこへ動かしても $PF=PH$（読み取り欄の 2 つの値が一致）。これが放物線の定義。</li>
+        <li>$p$ を大きくすると焦点が頂点から離れ、放物線は開く。$p<0$ にすると左（または下）に開く。</li>
+        <li>$x^2=4py$ を $y=\dfrac{1}{4p}x^2$ と書けば、数学Iの二次関数のグラフ。焦点・準線という新しい見方が加わる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 楕円 -->
+  <section class="tool-body" data-tab="ellipse">
+    <div class="layout">
+      <aside class="controls" id="c-ellipse"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-ellipse"></canvas><div class="caption">点 P を楕円に沿ってドラッグできます</div></div>
+        <div class="readout" id="r-ellipse"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">楕円は「2 つの焦点までの距離の和が一定」</div>
+        $\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}=1\ (a>b>0)$ の焦点は $F(c,0),\ F'(-c,0)$、$c=\sqrt{a^2-b^2}$ で、楕円上のどの点 P でも $PF+PF'=2a$（長軸の長さ）。
+        $b>a$ のときは焦点が $y$ 軸上 $(0,\pm\sqrt{b^2-a^2})$ に移り、和は $2b$ になります。
+        離心率 $e=\dfrac{c}{a}$ は $0\le e<1$ で、$0$ に近いほど円に近い。
+      </div>
+      <ul>
+        <li>P を動かしても $PF+PF'$ が変わらないこと、$a=b$ にすると焦点が原点に重なり円になることを見よう。</li>
+        <li>「円を縮小」を入れると、円 $x^2+y^2=a^2$ 上の点 $(x,y)$ を $y$ 方向に $\dfrac{b}{a}$ 倍した点が楕円上に来る。楕円は円を一方向につぶした図形。</li>
+        <li>$a$ を固定して $b$ を小さくすると $c$ が大きくなり $e$ が $1$ に近づく。焦点が端に寄っていく。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 双曲線 -->
+  <section class="tool-body" data-tab="hyperbola">
+    <div class="layout">
+      <aside class="controls" id="c-hyperbola"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-hyperbola"></canvas><div class="caption">点 P を双曲線に沿ってドラッグできます</div></div>
+        <div class="readout" id="r-hyperbola"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">双曲線は「2 つの焦点までの距離の差が一定」</div>
+        $\dfrac{x^2}{a^2}-\dfrac{y^2}{b^2}=1$ の焦点は $(\pm c,0)$、$c=\sqrt{a^2+b^2}$ で、$|PF-PF'|=2a$。漸近線は $y=\pm\dfrac{b}{a}x$、つまり
+        原点を中心とする $2a\times2b$ の長方形の対角線です。右辺が $-1$ のときは上下に開き、焦点は $(0,\pm c)$、$|PF-PF'|=2b$。離心率 $e=\dfrac{c}{a}>1$。
+      </div>
+      <ul>
+        <li>P を遠くへ動かすと曲線が漸近線に近づく。$a,b$ を変えると長方形と一緒に漸近線の傾きが変わる。</li>
+        <li>$a=b$ にすると漸近線が $y=\pm x$ で直交する（直角双曲線）。</li>
+        <li>楕円との比較：$c^2=a^2-b^2$（楕円）と $c^2=a^2+b^2$（双曲線）。焦点はどちらも頂点より外側か内側か、図で確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 媒介変数表示 -->
+  <section class="tool-body" data-tab="param">
+    <div class="layout">
+      <aside class="controls" id="c-param"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-param"></canvas></div>
+        <div class="readout" id="r-param"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">媒介変数 $t$ は「時刻」、曲線は点の通り道</div>
+        $x=f(t),\ y=g(t)$ と表すと、$t$ を動かしたとき点 $(x,y)$ が描く図形が曲線になります。
+        円 $x=\cos t,\ y=\sin t$ では $t$ は角、サイクロイド $x=a(t-\sin t),\ y=a(1-\cos t)$ では $t$ は転がる円の回転角です。
+        $t$ を消去できれば $x,y$ の方程式になりますが、消去せずに扱えるのが媒介変数表示の強みです。
+      </div>
+      <ul>
+        <li>「再生」で点が動く速さの違いに注目。サイクロイドでは点が地面に触れる瞬間（$t=2\pi k$）に速度が $0$ になる。</li>
+        <li>楕円 $x=a\cos t,\ y=b\sin t$ の $t$ は、中心から見た角ではない。「補助円」の考え方（楕円のタブ）と見比べよう。</li>
+        <li><b>発展</b>：速度ベクトル $\left(\dfrac{dx}{dt},\dfrac{dy}{dt}\right)$ は曲線の接線方向を向く（数学III）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 極座標 -->
+  <section class="tool-body" data-tab="polar">
+    <div class="layout">
+      <aside class="controls" id="c-polar"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-polar"></canvas></div>
+        <div class="readout" id="r-polar"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">極座標 $(r,\theta)$：原点からの距離と向き</div>
+        $x=r\cos\theta,\ y=r\sin\theta$、逆に $r=\sqrt{x^2+y^2}$、$\tan\theta=\dfrac{y}{x}$。
+        極方程式 $r=f(\theta)$ は「向き $\theta$ を決めると距離 $r$ が決まる」曲線で、$r<0$ のときは反対向きに $|r|$ だけ進んだ点を表します。
+        $r=2\cos\theta$ は $r^2=2r\cos\theta$、すなわち $x^2+y^2=2x$（円）です。
+      </div>
+      <ul>
+        <li>$\theta$ を動かして、原点からの半直線（薄い線）と曲線の交点が点 $(r,\theta)$ になることを見よう。$r<0$ の区間では点が半直線の反対側に出る。</li>
+        <li>$r\cos\theta=1$ は $x=1$。直線でも極方程式で表せることを確かめよう。</li>
+        <li>「自由な点」モードで点をドラッグし、$(x,y)$ と $(r,\theta)$ の対応を読む。第 2 象限以降で $\theta$ がどう決まるかに注意。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学C', title: '平面上の曲線' });
+  const PI = Math.PI;
+  const dist = (x1, y1, x2, y2) => Math.hypot(x1 - x2, y1 - y2);
+  const sq = (v) => { const s = fmt(v * v, 2); return s; };
+
+  /* ======================= 放物線 ======================= */
+  (() => {
+    const ctl = $('#c-parabola');
+    const st = { p: 1, orient: 'h', u: 2.5 };
+    const plot = new Plot('#cv-parabola', { xmin: -6, xmax: 6, ymin: -5, ymax: 5 });
+    const pos = () => st.orient === 'h' ? [st.u * st.u / (4 * st.p), st.u] : [st.u, st.u * st.u / (4 * st.p)];
+    const hP = plot.addHandle({ x: 0, y: 0, color: C.ink, label: 'P', onMove: (x, y) => {
+      st.u = Math.max(-8, Math.min(8, st.orient === 'h' ? y : x)); return pos();
+    } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, '方程式');
+    UI.segmented(ctl, { options: [{ value: 'h', label: 'y² = 4px' }, { value: 'v', label: 'x² = 4py' }], value: 'h', onChange: (v) => { st.orient = v; draw(); } });
+    const sP = UI.slider(ctl, { label: '$p$（焦点の位置）', min: -3, max: 3, step: 0.25, value: st.p, onInput: (v) => { if (v === 0) { v = st.p > 0 ? -0.25 : 0.25; sP.set(v); } st.p = v; draw(); } });
+    const cAux = UI.checkbox(ctl, { label: '軸と頂点を表示', checked: true, onChange: draw });
+    UI.note(ctl, { tone: 'clay', html: '焦点 $F$ と準線（赤の破線）。$P$ から準線に下ろした垂線の足を $H$ とする。' });
+
+    const readout = $('#r-parabola');
+    function draw() {
+      const [px, py] = pos(); hP.x = px; hP.y = py;
+      const p = st.p, h = st.orient === 'h';
+      const F = h ? [p, 0] : [0, p];
+      const H = h ? [-p, py] : [px, -p];
+      const PF = dist(px, py, F[0], F[1]), PH = dist(px, py, H[0], H[1]);
+      plot.render((P) => {
+        if (h) P.param((t) => t * t / (4 * p), (t) => t, -12, 12, { color: C.ink, width: 2.6, samples: 400 });
+        else P.param((t) => t, (t) => t * t / (4 * p), -12, 12, { color: C.ink, width: 2.6, samples: 400 });
+        if (h) P.vline(-p, { color: C.clay, width: 1.6, dash: [7, 5] }); else P.hline(-p, { color: C.clay, width: 1.6, dash: [7, 5] });
+        if (cAux.get()) {
+          if (h) P.hline(0, { color: C.faint, width: 1, dash: [2, 5] }); else P.vline(0, { color: C.faint, width: 1, dash: [2, 5] });
+          P.point(0, 0, { color: C.muted, r: 3.5, label: '頂点', dx: h ? 8 : -36, dy: h ? 18 : 18 });
+        }
+        P.segment(px, py, F[0], F[1], { color: C.sage, width: 2.2 });
+        P.segment(px, py, H[0], H[1], { color: C.sage, width: 2.2, dash: [6, 4] });
+        if (dist(px, py, H[0], H[1]) > 0.5) P.angleMark(H[0], H[1], px, py, h ? H[0] : H[0] + 1, h ? H[1] + 1 : H[1], { r: 0.35, right: true, color: C.sage });
+        P.point(H[0], H[1], { color: C.sage, r: 4.5, label: 'H', dx: h ? -20 : 8, dy: h ? -6 : 18 });
+        P.point(F[0], F[1], { color: C.clay, r: 6, label: 'F', dx: 8, dy: 18 });
+        P.text(h ? -p : P.win.xmin, h ? P.win.ymax : -p, h ? `x = ${fmt(-p)}` : `y = ${fmt(-p)}`, { color: C.clay, font: Plot.FONT_MATH, dx: 6, dy: h ? 18 : -6, bg: true });
+        P.text((px + F[0]) / 2, (py + F[1]) / 2, fmt(PF, 2), { color: C.sage, dx: 6, dy: -6, bg: true });
+        P.text((px + H[0]) / 2, (py + H[1]) / 2, fmt(PH, 2), { color: C.sage, dx: 6, dy: 18, bg: true });
+      });
+      const eq = h ? `y^2=4\\cdot(${fmt(p)})\\,x=${fmt(4 * p)}x` : `x^2=4\\cdot(${fmt(p)})\\,y=${fmt(4 * p)}y`;
+      readout.innerHTML = `
+        <div class="tex-block">$$${eq},\\qquad F(${h ? fmt(p) + ',\\ 0' : '0,\\ ' + fmt(p)}),\\qquad \\text{準線 } ${h ? 'x' : 'y'}=${fmt(-p)}$$</div>
+        <div class="tex-block">$$P(${fmt(px, 2)},\\ ${fmt(py, 2)}):\\quad PF=\\sqrt{(${fmt(px, 2)}-${fmt(F[0])})^2+(${fmt(py, 2)}-${fmt(F[1])})^2}=${fmt(PF, 3)},\\qquad PH=|${h ? fmt(px, 2) : fmt(py, 2)}-(${fmt(-p)})|=${fmt(PH, 3)}$$</div>`;
+      UI.stats(readout, [
+        { k: '$PF$（焦点までの距離）', v: fmt(PF, 3), tone: 'sage' },
+        { k: '$PH$（準線までの距離）', v: fmt(PH, 3), tone: 'sage' },
+        { k: '$PF=PH$', v: Math.abs(PF - PH) < 1e-6 ? '成り立つ' : '—', tone: 'sage' },
+      ]);
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 楕円 ======================= */
+  (() => {
+    const ctl = $('#c-ellipse');
+    const st = { a: 3, b: 2, phi: 0.9 };
+    const plot = new Plot('#cv-ellipse', { xmin: -6.5, xmax: 6.5, ymin: -5, ymax: 5 });
+    const pos = () => [st.a * Math.cos(st.phi), st.b * Math.sin(st.phi)];
+    const hP = plot.addHandle({ x: 0, y: 0, color: C.ink, label: 'P', onMove: (x, y) => { st.phi = Math.atan2(y / st.b, x / st.a); return pos(); } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, '楕円 x²/a² + y²/b² = 1');
+    const sA = UI.slider(ctl, { label: '$a$', min: 0.5, max: 5, step: 0.25, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+    const sB = UI.slider(ctl, { label: '$b$', min: 0.5, max: 5, step: 0.25, value: st.b, onInput: (v) => { st.b = v; draw(); } });
+    const cAux = UI.checkbox(ctl, { label: '円を縮小（補助円 $x^2+y^2=a^2$）', checked: false, onChange: draw });
+    const cLabels = UI.checkbox(ctl, { label: '頂点・長軸・短軸を表示', checked: true, onChange: draw });
+    UI.buttonRow(ctl, [
+      { label: '円にする (a = b)', small: true, onClick: () => { st.b = st.a; sB.set(st.b); draw(); } },
+      { label: 'リセット', small: true, onClick: () => { st.a = 3; st.b = 2; sA.set(st.a); sB.set(st.b); draw(); } },
+    ]);
+
+    const readout = $('#r-ellipse');
+    function draw() {
+      const [px, py] = pos(); hP.x = px; hP.y = py;
+      const { a, b } = st;
+      const horiz = a >= b;
+      const c = Math.sqrt(Math.abs(a * a - b * b));
+      const F = horiz ? [c, 0] : [0, c], F2 = horiz ? [-c, 0] : [0, -c];
+      const d1 = dist(px, py, F[0], F[1]), d2 = dist(px, py, F2[0], F2[1]);
+      const major = Math.max(a, b), minor = Math.min(a, b), e = c / major;
+      plot.render((P) => {
+        if (cAux.get()) {
+          const R = horiz ? a : b;
+          P.circle(0, 0, R, { color: C.faint, width: 1.2, dash: [5, 4] });
+          const Q = [R * Math.cos(st.phi), R * Math.sin(st.phi)];
+          P.segment(0, 0, Q[0], Q[1], { color: C.faint, width: 1, dash: [2, 4] });
+          P.segment(Q[0], Q[1], px, py, { color: C.ochre, width: 1.6, dash: [5, 4] });
+          P.arrow(Q[0], Q[1], px, py, { color: C.ochre, width: 1.6 });
+          P.point(Q[0], Q[1], { color: C.ochre, r: 4.5, label: 'Q', dx: 8, dy: -6 });
+          P.angleMark(0, 0, 1, 0, Q[0], Q[1], { r: 0.5, label: 't', color: C.ochre });
+        }
+        P.param((t) => a * Math.cos(t), (t) => b * Math.sin(t), 0, 2 * PI, { color: C.ink, width: 2.6, close: true, fill: Plot.rgba(C.ink, 0.05) });
+        if (cLabels.get()) {
+          P.segment(-a, 0, a, 0, { color: horiz ? C.ink : C.faint, width: 1, dash: [3, 4], alpha: 0.7 });
+          P.segment(0, -b, 0, b, { color: horiz ? C.faint : C.ink, width: 1, dash: [3, 4], alpha: 0.7 });
+          P.point(a, 0, { color: C.muted, r: 3.5, label: `(${fmt(a)}, 0)`, dx: 6, dy: 18 });
+          P.point(-a, 0, { color: C.muted, r: 3.5, label: `(−${fmt(a)}, 0)`, dx: -52, dy: 18 });
+          P.point(0, b, { color: C.muted, r: 3.5, label: `(0, ${fmt(b)})`, dx: 8, dy: -6 });
+          P.point(0, -b, { color: C.muted, r: 3.5, label: `(0, −${fmt(b)})`, dx: 8, dy: 18 });
+          P.text(horiz ? a * 0.55 : 0, horiz ? 0 : b * 0.55, `長軸 2${horiz ? 'a' : 'b'} = ${fmt(2 * major)}`, { color: C.ink, dx: 6, dy: -8, bg: true });
+          P.text(horiz ? 0 : a * 0.55, horiz ? -b * 0.55 : 0, `短軸 2${horiz ? 'b' : 'a'} = ${fmt(2 * minor)}`, { color: C.muted, dx: 6, dy: 4, bg: true });
+        }
+        P.segment(px, py, F[0], F[1], { color: C.sage, width: 2.2 });
+        P.segment(px, py, F2[0], F2[1], { color: C.sage, width: 2.2 });
+        P.text((px + F[0]) / 2, (py + F[1]) / 2, `PF = ${fmt(d1, 2)}`, { color: C.sage, dx: 6, dy: -6, bg: true });
+        P.text((px + F2[0]) / 2, (py + F2[1]) / 2, `PF' = ${fmt(d2, 2)}`, { color: C.sage, dx: -70, dy: 18, bg: true });
+        P.point(F[0], F[1], { color: C.clay, r: 6, label: 'F', dx: 6, dy: 18 });
+        P.point(F2[0], F2[1], { color: C.clay, r: 6, label: "F'", dx: -18, dy: 18 });
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$\\frac{x^2}{${sq(a)}}+\\frac{y^2}{${sq(b)}}=1,\\qquad c=\\sqrt{${sq(major)}-${sq(minor)}}=${fmt(c, 3)},\\qquad F(${horiz ? fmt(c, 2) + ',\\ 0' : '0,\\ ' + fmt(c, 2)}),\\ F'(${horiz ? '-' + fmt(c, 2) + ',\\ 0' : '0,\\ -' + fmt(c, 2)})$$</div>
+        <div class="tex-block">$$P(${fmt(px, 2)},\\ ${fmt(py, 2)}):\\quad PF+PF'=${fmt(d1, 3)}+${fmt(d2, 3)}=${fmt(d1 + d2, 3)}=2${horiz ? 'a' : 'b'}$$</div>`;
+      UI.stats(readout, [
+        { k: `$PF+PF'$`, v: `${fmt(d1 + d2, 3)}（= 2×${fmt(major)}）`, tone: 'sage' },
+        { k: `離心率 $e=\\dfrac{c}{${horiz ? 'a' : 'b'}}$`, v: `${fmt(e, 3)}${e < 1e-9 ? '（円）' : ''}`, tone: 'clay' },
+        { k: '焦点の位置', v: e < 1e-9 ? '原点に重なる' : horiz ? 'x 軸上（a > b）' : 'y 軸上（b > a）', tone: 'ink' },
+        ...(cAux.get() ? [{ k: '補助円からの縮小', v: horiz ? `y を ${fmt(b / a, 3)} 倍（b/a）` : `x を ${fmt(a / b, 3)} 倍（a/b）`, tone: 'ochre' }] : []),
+      ]);
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 双曲線 ======================= */
+  (() => {
+    const ctl = $('#c-hyperbola');
+    const st = { a: 2, b: 1.5, sign: 1, t: 1.0, br: 1 };
+    const plot = new Plot('#cv-hyperbola', { xmin: -7, xmax: 7, ymin: -5.5, ymax: 5.5 });
+    const pos = () => st.sign > 0 ? [st.br * st.a * Math.cosh(st.t), st.b * Math.sinh(st.t)] : [st.a * Math.sinh(st.t), st.br * st.b * Math.cosh(st.t)];
+    const hP = plot.addHandle({ x: 0, y: 0, color: C.ink, label: 'P', onMove: (x, y) => {
+      if (st.sign > 0) { st.br = x >= 0 ? 1 : -1; st.t = Math.max(-2.6, Math.min(2.6, Math.asinh(y / st.b))); }
+      else { st.br = y >= 0 ? 1 : -1; st.t = Math.max(-2.6, Math.min(2.6, Math.asinh(x / st.a))); }
+      return pos();
+    } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, '双曲線 x²/a² − y²/b² = ±1');
+    UI.segmented(ctl, { options: [{ value: 1, label: '= 1（左右に開く）' }, { value: -1, label: '= −1（上下に開く）' }], value: 1, onChange: (v) => { st.sign = v; draw(); } });
+    UI.slider(ctl, { label: '$a$', min: 0.5, max: 5, step: 0.25, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+    UI.slider(ctl, { label: '$b$', min: 0.5, max: 5, step: 0.25, value: st.b, onInput: (v) => { st.b = v; draw(); } });
+    const cRect = UI.checkbox(ctl, { label: '漸近線を決める長方形 $2a\\times2b$', checked: true, onChange: draw });
+    UI.note(ctl, { tone: 'ink', html: '漸近線 $y=\\pm\\dfrac{b}{a}x$ は長方形の対角線。曲線は遠くでこの直線に近づく。' });
+
+    const readout = $('#r-hyperbola');
+    function draw() {
+      const [px, py] = pos(); hP.x = px; hP.y = py;
+      const { a, b } = st, horiz = st.sign > 0;
+      const c = Math.sqrt(a * a + b * b);
+      const F = horiz ? [c, 0] : [0, c], F2 = horiz ? [-c, 0] : [0, -c];
+      const d1 = dist(px, py, F[0], F[1]), d2 = dist(px, py, F2[0], F2[1]);
+      const k = horiz ? a : b, e = c / k;
+      plot.render((P) => {
+        if (cRect.get()) P.rect(-a, -b, 2 * a, 2 * b, { color: C.ochre, width: 1, dash: [4, 4], fill: Plot.rgba(C.ochre, 0.06) });
+        P.line(0, 0, a, b, { color: C.clay, width: 1.3, dash: [7, 5] });
+        P.line(0, 0, a, -b, { color: C.clay, width: 1.3, dash: [7, 5] });
+        P.text(a * 1.6, b * 1.6, 'y = (b/a)x', { color: C.clay, font: Plot.FONT_MATH, dx: 6, dy: -4, bg: true });
+        P.text(a * 1.6, -b * 1.6, 'y = −(b/a)x', { color: C.clay, font: Plot.FONT_MATH, dx: 6, dy: 16, bg: true });
+        for (const s of [1, -1]) {
+          if (horiz) P.param((t) => s * a * Math.cosh(t), (t) => b * Math.sinh(t), -3.2, 3.2, { color: C.ink, width: 2.6, samples: 300 });
+          else P.param((t) => a * Math.sinh(t), (t) => s * b * Math.cosh(t), -3.2, 3.2, { color: C.ink, width: 2.6, samples: 300 });
+        }
+        if (horiz) { P.point(a, 0, { color: C.muted, r: 3.5, label: `A(${fmt(a)}, 0)`, dx: 6, dy: 18 }); P.point(-a, 0, { color: C.muted, r: 3.5, label: `A'(−${fmt(a)}, 0)`, dx: -66, dy: 18 }); }
+        else { P.point(0, b, { color: C.muted, r: 3.5, label: `B(0, ${fmt(b)})`, dx: 8, dy: -6 }); P.point(0, -b, { color: C.muted, r: 3.5, label: `B'(0, −${fmt(b)})`, dx: 8, dy: 18 }); }
+        P.segment(px, py, F[0], F[1], { color: C.sage, width: 2.2 });
+        P.segment(px, py, F2[0], F2[1], { color: C.sage, width: 2.2 });
+        P.text((px + F[0]) / 2, (py + F[1]) / 2, `PF = ${fmt(d1, 2)}`, { color: C.sage, dx: 6, dy: -6, bg: true });
+        P.text((px + F2[0]) / 2, (py + F2[1]) / 2, `PF' = ${fmt(d2, 2)}`, { color: C.sage, dx: 6, dy: 18, bg: true });
+        P.point(F[0], F[1], { color: C.clay, r: 6, label: 'F', dx: 6, dy: 18 });
+        P.point(F2[0], F2[1], { color: C.clay, r: 6, label: "F'", dx: -18, dy: 18 });
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$\\frac{x^2}{${sq(a)}}-\\frac{y^2}{${sq(b)}}=${horiz ? '1' : '-1'},\\qquad c=\\sqrt{${sq(a)}+${sq(b)}}=${fmt(c, 3)},\\qquad F(${horiz ? fmt(c, 2) + ',\\ 0' : '0,\\ ' + fmt(c, 2)}),\\ F'(${horiz ? '-' + fmt(c, 2) + ',\\ 0' : '0,\\ -' + fmt(c, 2)})$$</div>
+        <div class="tex-block">$$P(${fmt(px, 2)},\\ ${fmt(py, 2)}):\\quad |PF-PF'|=|${fmt(d1, 3)}-${fmt(d2, 3)}|=${fmt(Math.abs(d1 - d2), 3)}=2${horiz ? 'a' : 'b'}$$</div>`;
+      UI.stats(readout, [
+        { k: `$|PF-PF'|$`, v: `${fmt(Math.abs(d1 - d2), 3)}（= 2×${fmt(k)}）`, tone: 'sage' },
+        { k: `離心率 $e=\\dfrac{c}{${horiz ? 'a' : 'b'}}$`, v: fmt(e, 3), tone: 'clay' },
+        { k: '漸近線', v: `y = ±${fmt(b / a, 3)}x${Math.abs(a - b) < 1e-9 ? '（直角双曲線）' : ''}`, tone: 'clay' },
+      ]);
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 媒介変数表示 ======================= */
+  (() => {
+    const ctl = $('#c-param');
+    const presets = {
+      circle: { label: '円 (cos t, sin t)', x: (t) => Math.cos(t), y: (t) => Math.sin(t), dx: (t) => -Math.sin(t), dy: (t) => Math.cos(t), t0: 0, t1: 2 * PI, view: [-2.2, 2.2, -1.6, 1.6], tex: 'x=\\cos t,\\ y=\\sin t', speed: 1.2 },
+      ellipse: { label: '楕円 (2cos t, sin t)', x: (t) => 2 * Math.cos(t), y: (t) => Math.sin(t), dx: (t) => -2 * Math.sin(t), dy: (t) => Math.cos(t), t0: 0, t1: 2 * PI, view: [-3.2, 3.2, -2.2, 2.2], tex: 'x=2\\cos t,\\ y=\\sin t', speed: 1.2 },
+      cycloid: { label: 'サイクロイド a(t−sin t), a(1−cos t)', x: (t) => t - Math.sin(t), y: (t) => 1 - Math.cos(t), dx: (t) => 1 - Math.cos(t), dy: (t) => Math.sin(t), t0: 0, t1: 4 * PI, view: [-1.5, 14, -1.5, 4.5], tex: 'x=t-\\sin t,\\ y=1-\\cos t\\quad(a=1)', speed: 2 },
+      parabola: { label: '放物線 (t, t²)', x: (t) => t, y: (t) => t * t, dx: () => 1, dy: (t) => 2 * t, t0: -2.5, t1: 2.5, view: [-4, 4, -1.5, 6.5], tex: 'x=t,\\ y=t^2', speed: 1.5 },
+      line: { label: '直線 (1+2t, −1+t)', x: (t) => 1 + 2 * t, y: (t) => -1 + t, dx: () => 2, dy: () => 1, t0: -3, t1: 3, view: [-6, 8, -5, 5], tex: 'x=1+2t,\\ y=-1+t', speed: 1.5 },
+      astroid: { label: 'アステロイド (cos³t, sin³t)', x: (t) => Math.cos(t) ** 3, y: (t) => Math.sin(t) ** 3, dx: (t) => -3 * Math.cos(t) ** 2 * Math.sin(t), dy: (t) => 3 * Math.sin(t) ** 2 * Math.cos(t), t0: 0, t1: 2 * PI, view: [-1.8, 1.8, -1.3, 1.3], tex: 'x=\\cos^3 t,\\ y=\\sin^3 t', speed: 1.2 },
+      lissajous: { label: '発展：リサージュ (sin 3t, sin 2t)', x: (t) => Math.sin(3 * t), y: (t) => Math.sin(2 * t), dx: (t) => 3 * Math.cos(3 * t), dy: (t) => 2 * Math.cos(2 * t), t0: 0, t1: 2 * PI, view: [-1.8, 1.8, -1.3, 1.3], tex: 'x=\\sin 3t,\\ y=\\sin 2t', speed: 0.8 },
+    };
+    const st = { key: 'cycloid', t: 2.2 };
+    const plot = new Plot('#cv-param', { xmin: -1.5, xmax: 14, ymin: -1.5, ymax: 4.5 });
+
+    UI.heading(ctl, '曲線');
+    UI.select(ctl, { options: Object.entries(presets).map(([value, p]) => ({ value, label: p.label })), value: st.key, onChange: (v) => { st.key = v; anim.stop(); btn.textContent = '▶ 再生'; const p = presets[v]; st.t = p.t0 + (p.t1 - p.t0) * 0.35; sT.setRange(p.t0, p.t1, 0.01); sT.set(st.t); plot.setView(...p.view); draw(); } });
+    const sT = UI.slider(ctl, { label: '$t$', min: presets.cycloid.t0, max: presets.cycloid.t1, step: 0.01, value: st.t, format: (v) => fmt(v, 2) + (Math.abs(v / PI - Math.round(v / PI * 4) / 4) < 1e-3 ? `（${fmt(v / PI, 2)}π）` : ''), onInput: (v) => { st.t = v; draw(); } });
+    const anim = UI.animator((dt) => { const p = presets[st.key]; st.t += dt * p.speed; if (st.t > p.t1) st.t = p.t0; sT.set(st.t); draw(); });
+    const btn = UI.button(ctl, { label: '▶ 再生', primary: true, onClick: () => { btn.textContent = anim.toggle() ? '■ 停止' : '▶ 再生'; } });
+    const cTrace = UI.checkbox(ctl, { label: '$t$ までの軌跡を強調', checked: true, onChange: draw });
+    const cVel = UI.checkbox(ctl, { label: '発展：速度ベクトル $\\left(\\dfrac{dx}{dt},\\dfrac{dy}{dt}\\right)$', checked: false, onChange: draw });
+
+    const readout = $('#r-param');
+    function draw() {
+      const p = presets[st.key], t = st.t;
+      const x = p.x(t), y = p.y(t), vx = p.dx(t), vy = p.dy(t);
+      plot.render((P) => {
+        P.param(p.x, p.y, p.t0, p.t1, { color: C.ink, width: cTrace.get() ? 1.4 : 2.6, alpha: cTrace.get() ? 0.45 : 1, samples: 800 });
+        if (cTrace.get()) P.param(p.x, p.y, p.t0, t, { color: C.ink, width: 2.8, samples: 600 });
+        if (st.key === 'cycloid') {
+          P.circle(t, 1, 1, { color: C.ochre, width: 1.3, dash: [5, 4], alpha: 0.8 });
+          P.point(t, 1, { color: C.ochre, r: 3.5 });
+          P.segment(t, 1, x, y, { color: C.ochre, width: 1.6 });
+          P.segment(t, 1, t, 0, { color: C.ochre, width: 1, dash: [3, 3], alpha: 0.6 });
+          P.angleMark(t, 1, t, 0, x, y, { r: 0.4, label: 't', color: C.ochre });
+          P.text(t, 1, `中心 (t, 1)`, { color: C.ochre, dx: 8, dy: -8, bg: true });
+        }
+        P.dropLines(x, y, { color: C.clay });
+        if (cVel.get()) {
+          const s = st.key === 'cycloid' ? 0.6 : 0.5;
+          P.arrow(x, y, x + vx * s, y + vy * s, { color: C.ochre, width: 2.2 });
+          P.label(x + vx * s, y + vy * s, '速度', { color: C.ochre, dx: 6, dy: -6 });
+        }
+        P.point(x, y, { color: C.clay, r: 6.5, label: `P(${fmt(x, 2)}, ${fmt(y, 2)})`, dx: 10, dy: st.key === 'cycloid' ? 20 : -8 });
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$${p.tex}\\qquad(${fmt(p.t0, 2)}\\le t\\le ${fmt(p.t1, 2)})$$</div>
+        <div class="tex-block">$$t=${fmt(t, 3)}:\\quad x=${fmt(x, 3)},\\quad y=${fmt(y, 3)}$$</div>`;
+      UI.stats(readout, [
+        { k: '$t$', v: fmt(t, 3), tone: 'ochre' },
+        { k: '点 $(x(t),\\ y(t))$', v: `(${fmt(x, 3)}, ${fmt(y, 3)})`, tone: 'clay' },
+        ...(cVel.get() ? [{ k: '発展：速度 $(dx/dt,\\ dy/dt)$', v: `(${fmt(vx, 3)}, ${fmt(vy, 3)})　速さ ${fmt(Math.hypot(vx, vy), 3)}`, tone: 'ochre' }] : []),
+      ]);
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 極座標 ======================= */
+  (() => {
+    const ctl = $('#c-polar');
+    const presets = {
+      circle2: { label: '円 r = 2', r: () => 2, t1: 2 * PI, tex: 'r=2', R: 3.5 },
+      lineX: { label: '直線 r cos θ = 1', r: (t) => 1 / Math.cos(t), t1: 2 * PI, tex: 'r\\cos\\theta=1\\ (x=1)', R: 3.5 },
+      circle2cos: { label: '円 r = 2cos θ', r: (t) => 2 * Math.cos(t), t1: 2 * PI, tex: 'r=2\\cos\\theta\\ (x^2+y^2=2x)', R: 3.5 },
+      cardioid: { label: 'カージオイド r = 1 + cos θ', r: (t) => 1 + Math.cos(t), t1: 2 * PI, tex: 'r=1+\\cos\\theta', R: 3 },
+      rose2: { label: '正葉曲線 r = cos 2θ', r: (t) => Math.cos(2 * t), t1: 2 * PI, tex: 'r=\\cos 2\\theta', R: 2 },
+      rose3: { label: '正葉曲線 r = cos 3θ', r: (t) => Math.cos(3 * t), t1: 2 * PI, tex: 'r=\\cos 3\\theta', R: 2 },
+      spiral: { label: 'アルキメデスの螺旋 r = θ/2', r: (t) => t / 2, t1: 4 * PI, tex: 'r=\\dfrac{\\theta}{2}', R: 7 },
+      conic: { label: '発展：r = 1/(1 − 0.5cos θ)', r: (t) => 1 / (1 - 0.5 * Math.cos(t)), t1: 2 * PI, tex: 'r=\\dfrac{1}{1-0.5\\cos\\theta}\\ (\\text{離心率 }0.5\\text{ の楕円})', R: 3.5 },
+    };
+    const st = { key: 'cardioid', th: PI / 3, mode: 'curve', fx: 1.5, fy: 2 };
+    const plot = new Plot('#cv-polar', { xmin: -3, xmax: 3, ymin: -3, ymax: 3, grid: false, ticks: false });
+    const hF = plot.addHandle({ x: st.fx, y: st.fy, color: C.ochre, label: 'P', visible: () => st.mode === 'free', onMove: (x, y) => { st.fx = Math.round(x * 4) / 4; st.fy = Math.round(y * 4) / 4; return [st.fx, st.fy]; } });
+    plot.onChange = () => draw();
+
+    UI.heading(ctl, 'モード');
+    UI.segmented(ctl, { options: [{ value: 'curve', label: '極方程式の曲線' }, { value: 'free', label: '自由な点' }], value: 'curve', onChange: (v) => { st.mode = v; if (v === 'free') { anim.stop(); btn.textContent = '▶ 再生'; } draw(); } });
+    UI.select(ctl, { label: '曲線', options: Object.entries(presets).map(([value, p]) => ({ value, label: p.label })), value: st.key, onChange: (v) => { st.key = v; anim.stop(); btn.textContent = '▶ 再生'; const p = presets[v]; sT.setRange(0, p.t1, 0.01); st.th = Math.min(st.th, p.t1); sT.set(st.th); plot.setView(-p.R, p.R, -p.R, p.R); draw(); } });
+    const sT = UI.slider(ctl, { label: '$\\theta$', min: 0, max: 2 * PI, step: 0.01, value: st.th, format: (v) => `${fmt(UI.deg(v), 0)}° (${fmt(v / PI, 2)}π)`, onInput: (v) => { st.th = v; draw(); } });
+    const anim = UI.animator((dt) => { const p = presets[st.key]; st.th += dt * 1.0; if (st.th > p.t1) st.th = 0; sT.set(st.th); draw(); });
+    const btn = UI.button(ctl, { label: '▶ 再生', primary: true, onClick: () => { if (st.mode === 'free') return; btn.textContent = anim.toggle() ? '■ 停止' : '▶ 再生'; } });
+    const cTrace = UI.checkbox(ctl, { label: '$\\theta$ までの軌跡を強調', checked: true, onChange: draw });
+    UI.note(ctl, { tone: 'ochre', html: '「自由な点」では点 P をドラッグして、直交座標 $(x,y)$ と極座標 $(r,\\theta)$ の対応を読む。' });
+
+    const readout = $('#r-polar');
+    function polarGrid(P) {
+      const R = Math.max(P.win.xmax, P.win.ymax) * 1.5;
+      const step = R > 6 ? 2 : 1;
+      for (let r = step; r <= R; r += step) {
+        P.circle(0, 0, r, { color: C.borderSubtle, width: 1 });
+        P.text(r, 0, String(r), { color: C.faint, dx: 3, dy: 14 });
+      }
+      for (let k = 0; k < 12; k++) {
+        const a = k * PI / 6;
+        P.segment(0, 0, R * Math.cos(a), R * Math.sin(a), { color: C.borderSubtle, width: 1 });
+        const rr = Math.min(P.win.xmax, P.win.ymax) * 0.92;
+        if (k % 3 !== 0) P.text(rr * Math.cos(a), rr * Math.sin(a), `${k * 30}°`, { color: C.faint, align: 'center', baseline: 'middle', bg: true });
+      }
+    }
+    function draw() {
+      hF.x = st.fx; hF.y = st.fy;
+      if (st.mode === 'curve') {
+        const p = presets[st.key], th = st.th, r = p.r(th);
+        const x = r * Math.cos(th), y = r * Math.sin(th);
+        plot.render((P) => {
+          polarGrid(P);
+          P.polar(p.r, 0, p.t1, { color: C.ink, width: cTrace.get() ? 1.4 : 2.6, alpha: cTrace.get() ? 0.45 : 1, samples: 1200 });
+          if (cTrace.get()) P.polar(p.r, 0, th, { color: C.ink, width: 2.8, samples: 800 });
+          const L = Math.max(P.win.xmax, P.win.ymax) * 2;
+          P.segment(0, 0, L * Math.cos(th), L * Math.sin(th), { color: C.clay, width: 1, dash: [4, 4], alpha: 0.7 });
+          if (isFinite(r) && Math.abs(r) < 100) {
+            P.segment(0, 0, x, y, { color: C.clay, width: 2.4, dash: r < 0 ? [6, 4] : [] });
+            P.angleMark(0, 0, 1, 0, Math.cos(th), Math.sin(th), { r: 0.45, label: 'θ', color: C.clay, fill: Plot.rgba(C.clay, 0.12) });
+            P.point(x, y, { color: C.clay, r: 6.5, label: `(r, θ) = (${fmt(r, 2)}, ${fmt(UI.deg(th), 0)}°)`, dx: 10, dy: -8 });
+          }
+        });
+        readout.innerHTML = `
+          <div class="tex-block">$$${p.tex}\\qquad(0\\le\\theta\\le ${fmt(p.t1 / PI, 0)}\\pi)$$</div>
+          <div class="tex-block">$$\\theta=${fmt(UI.deg(th), 1)}^\\circ:\\quad r=${isFinite(r) ? fmt(r, 3) : '\\text{（定義されない）}'},\\qquad (x,y)=(r\\cos\\theta,\\ r\\sin\\theta)=(${fmt(x, 3)},\\ ${fmt(y, 3)})$$</div>`;
+        UI.stats(readout, [
+          { k: '$r$', v: `${fmt(r, 3)}${r < -1e-9 ? '（負：反対向き）' : ''}`, tone: r < -1e-9 ? 'ochre' : 'clay' },
+          { k: '$\\theta$', v: `${fmt(UI.deg(th), 1)}° = ${fmt(th, 3)} rad`, tone: 'clay' },
+          { k: '直交座標 $(x, y)$', v: `(${fmt(x, 3)}, ${fmt(y, 3)})`, tone: 'ink' },
+        ]);
+      } else {
+        const x = st.fx, y = st.fy, r = Math.hypot(x, y);
+        let th = Math.atan2(y, x); if (th < 0) th += 2 * PI;
+        plot.render((P) => {
+          polarGrid(P);
+          P.dropLines(x, y, { color: C.ink });
+          P.circle(0, 0, r, { color: C.ochre, width: 1, dash: [4, 4], alpha: 0.7 });
+          P.segment(0, 0, x, y, { color: C.ochre, width: 2.4 });
+          if (r > 0.1) P.angleMark(0, 0, 1, 0, x, y, { r: 0.5, label: 'θ', color: C.clay, fill: Plot.rgba(C.clay, 0.12) });
+          P.text(x / 2, y / 2, `r = ${fmt(r, 2)}`, { color: C.ochre, dx: 6, dy: -6, bg: true });
+          P.text(x, 0, fmt(x), { color: C.ink, align: 'center', baseline: y >= 0 ? 'top' : 'bottom', dy: y >= 0 ? 6 : -6, bg: true });
+          P.text(0, y, fmt(y), { color: C.ink, align: x >= 0 ? 'right' : 'left', baseline: 'middle', dx: x >= 0 ? -6 : 6, bg: true });
+        });
+        readout.innerHTML = `
+          <div class="tex-block">$$(x,y)=(${fmt(x)},\\ ${fmt(y)})\\quad\\Longrightarrow\\quad r=\\sqrt{${fmt(x)}^2+${fmt(y)}^2}=${fmt(r, 3)},\\qquad \\theta=${fmt(UI.deg(th), 1)}^\\circ\\ (\\tan\\theta=${x !== 0 ? fmt(y / x, 3) : '\\text{（}x=0\\text{）}'})$$</div>`;
+        UI.stats(readout, [
+          { k: '極座標 $(r, \\theta)$', v: `(${fmt(r, 3)}, ${fmt(UI.deg(th), 1)}°)`, tone: 'ochre' },
+          { k: '$\\theta$（ラジアン, $0\\le\\theta<2\\pi$）', v: `${fmt(th, 3)} = ${fmt(th / PI, 3)}π`, tone: 'clay' },
+          { k: '検算 $(r\\cos\\theta, r\\sin\\theta)$', v: `(${fmt(r * Math.cos(th), 3)}, ${fmt(r * Math.sin(th), 3)})`, tone: 'sage' },
+        ]);
+      }
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'parabola', label: '放物線' },
+    { id: 'ellipse', label: '楕円' },
+    { id: 'hyperbola', label: '双曲線' },
+    { id: 'param', label: '媒介変数表示' },
+    { id: 'polar', label: '極座標' },
+  ]);
+});
+</script>
+</body>
+</html>

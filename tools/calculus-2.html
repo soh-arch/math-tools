@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const a = st.a, h = st.h, fa = f(a), fb = f(a + h), m = df(a), avg = (fb - fa) / h;
       hA.x = a; hA.y = fa; sA.set(a);
       let lo = -1, hi = 1;
-      for (let t = -3; t <= 3; t += 0.05) { lo = Math.min(lo, f(t)); hi = Math.max(hi, f(t)); }
+      for (let t = -2.5; t <= 2.5; t += 0.05) { lo = Math.min(lo, f(t)); hi = Math.max(hi, f(t)); }
       const pad = (hi - lo) * 0.15;
       plot.setView(-4, 4, lo - pad, hi + pad);
       plot.render((P) => {
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="stat sage"><div class="k">微分係数 f'(a)</div><div class="v">${fmt(m, 4)}</div></div>
           <div class="stat"><div class="k">差</div><div class="v">${fmt(Math.abs(avg - m), 4)}</div></div>
         </div>
-        <div class="tex-block">$$\\frac{f(${fmt(a)}+${fmt(h)})-f(${fmt(a)})}{${fmt(h)}}=\\frac{${fmt(fb, 3)}-${fmt(fa, 3)}}{${fmt(h)}}=${fmt(avg, 4)}\\ \\xrightarrow{\\ h\\to0\\ }\\ f'(${fmt(a)})=${fmt(m, 4)}$$</div>
+        <div class="tex-block">$$\\frac{f(${fmt(a)}+${fmt(h)})-f(${fmt(a)})}{${fmt(h)}}=\\frac{${fmt(fb, 3)}-${fa < 0 ? `(${fmt(fa, 3)})` : fmt(fa, 3)}}{${fmt(h)}}=${fmt(avg, 4)}\\ \\xrightarrow{\\ h\\to0\\ }\\ f'(${fmt(a)})=${fmt(m, 4)}$$</div>
         <div class="tex-block">$$\\text{接線：}\\ y=${fmt(m, 3)}(x${a < 0 ? '+' : '-'}${fmt(Math.abs(a))})${fa < 0 ? '-' : '+'}${fmt(Math.abs(fa), 3)}\\quad\\Longrightarrow\\quad y=${UI.texPoly([m, b0], 'x', 3)}$$</div>`;
       UI.texAll(readout);
     }

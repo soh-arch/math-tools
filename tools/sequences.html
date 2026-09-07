@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数列</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+<style>
+  .stair { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1rem 1rem 0.8rem; overflow-x: auto; }
+  .stair .row { display: flex; align-items: center; gap: 0; margin-bottom: 0.15rem; min-height: 2.6rem; }
+  .stair .row .name { width: 3.6rem; flex: none; color: var(--text-faint); font-size: 0.85rem; }
+  .stair .tile { width: 3.4rem; flex: none; text-align: center; font-family: var(--font-mono); font-size: 0.95rem; padding: 0.3rem 0; border-radius: var(--radius); border: 1px solid var(--border-subtle); background: var(--ink-subtle); color: var(--ink-text); margin: 0 0.3rem; }
+  .stair .row.b .tile { background: var(--clay-subtle); color: var(--clay-text); }
+  .stair .row.c .tile { background: var(--ochre-subtle); color: var(--ochre-text); }
+  .stair .row.b { padding-left: 2rem; }
+  .stair .row.c { padding-left: 4rem; }
+  .stair .idx { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-faint); }
+  .dominoes { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.4rem 1rem 1rem; display: flex; gap: 0.5rem; align-items: flex-end; justify-content: center; flex-wrap: wrap; min-height: 150px; }
+  .domino { width: 44px; height: 96px; border-radius: 6px; border: 2px solid var(--border); background: var(--bg-sunken); color: var(--text-faint); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 0.3rem; font-family: var(--font-mono); font-size: 0.85rem; transform-origin: bottom left; transition: transform 0.45s ease-in, background 0.3s, border-color 0.3s, color 0.3s; }
+  .domino .p { font-size: 0.72rem; }
+  .domino.ready { border-color: var(--ochre-solid); background: var(--ochre-subtle); color: var(--ochre-text); }
+  .domino.down { transform: rotate(-70deg); border-color: var(--sage-solid); background: var(--sage-subtle); color: var(--sage-text); }
+  .domino.proved { border-color: var(--sage-solid); background: var(--sage-solid); color: #fff; }
+  .steps { display: grid; gap: 0.5rem; }
+  .steps .step { border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 0.5rem 0.8rem; background: var(--surface); }
+  .steps .step.done { border-color: var(--sage-line); background: var(--sage-subtle); }
+  .steps .step .t { font-weight: 700; font-size: 0.86rem; color: var(--text-muted); }
+  .steps .step.done .t { color: var(--sage-text); }
+</style>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>数列</h1>
+    <p class="lede">等差・等比数列の一般項と和、$\Sigma$ の公式が図形として見えること、階差数列からもとの数列を復元する仕組み、漸化式が定める数列のふるまい（蜘蛛の巣図）、数学的帰納法の「ドミノ倒し」を、動かしながら確かめられます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 等差数列・等比数列 -->
+  <section class="tool-body" data-tab="arith">
+    <div class="layout">
+      <aside class="controls" id="c-arith"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-arith"></canvas></div>
+        <div class="readout" id="r-arith"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">等差数列と等比数列</div>
+        等差数列は $a_n=a+(n-1)d$、和は $S_n=\dfrac{n\{2a+(n-1)d\}}{2}=\dfrac{n(a+a_n)}{2}$（初項と末項の平均 × 項数）。
+        等比数列は $a_n=ar^{n-1}$、和は $S_n=\dfrac{a(r^n-1)}{r-1}$（$r\ne1$）。
+      </div>
+      <ul>
+        <li>等差数列の点は一直線に並ぶ（傾きが公差 $d$）。$d$ を負にすると右下がりになる。</li>
+        <li>等比数列で $r\gt1$ なら急激に増え、$0\lt r\lt1$ なら $0$ に近づく。$r\lt0$ では符号が交互に変わる。</li>
+        <li>$|r|\lt1$ のとき、$n$ を大きくしても $S_n$ は $\dfrac{a}{1-r}$ を超えない。「和が一定の値に近づく」感覚をつかもう（数学IIIの無限等比級数につながる）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Σと和の公式 -->
+  <section class="tool-body" data-tab="sigma">
+    <div class="layout">
+      <aside class="controls" id="c-sigma"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-sigma"></canvas></div>
+        <div class="readout" id="r-sigma"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage">
+        <div class="title">和の公式</div>
+        $$\sum_{k=1}^{n}k=\frac{n(n+1)}{2},\qquad \sum_{k=1}^{n}k^2=\frac{n(n+1)(2n+1)}{6},\qquad \sum_{k=1}^{n}k^3=\left\{\frac{n(n+1)}{2}\right\}^2$$
+        $1+2+\cdots+n$ は、階段を 2 つ組み合わせると $n\times(n+1)$ の長方形になることから分かります。
+      </div>
+      <ul>
+        <li>「1+2+…+n」で $n$ を変えて、青の階段と緑の階段がぴったり組み合わさり、長方形の面積 $n(n+1)$ の半分が和になることを見よう。</li>
+        <li>「Σ計算機」では、$\Sigma$ の線形性 $\sum(k^2+k)=\sum k^2+\sum k$ のように、公式を組み合わせて計算している。</li>
+        <li>$\sum_{k=1}^{n}2^k$ は等比数列の和なので、$\dfrac{2(2^n-1)}{2-1}=2^{n+1}-2$。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 階差数列 -->
+  <section class="tool-body" data-tab="diff">
+    <div class="layout">
+      <aside class="controls" id="c-diff"></aside>
+      <div class="stage">
+        <div class="stair" id="stair-diff"></div>
+        <div class="canvas-wrap"><canvas id="cv-diff"></canvas></div>
+        <div class="readout" id="r-diff"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">階差数列から一般項を復元する</div>
+        $b_n=a_{n+1}-a_n$ を階差数列といいます。$a_2=a_1+b_1,\ a_3=a_1+b_1+b_2,\ \ldots$ と積み上げると、$n\ge2$ のとき
+        $$a_n=a_1+\sum_{k=1}^{n-1}b_k$$
+        階差数列が等差数列や等比数列なら、和の公式で $a_n$ が求まります。得られた式が $n=1$ でも成り立つか確かめるのを忘れずに。
+      </div>
+      <ul>
+        <li>上の段の隣り合う 2 項の差が下の段。差の段が「等差」なら、もとの数列は 2 次式で表される。</li>
+        <li>「第 2 階差」をオンにすると、差の差が一定になる（＝階差が等差）ことが見える。</li>
+        <li>自分で 8 項を入力して、規則が見つかるか試してみよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 漸化式 -->
+  <section class="tool-body" data-tab="recur">
+    <div class="layout">
+      <aside class="controls" id="c-recur"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-recur"></canvas><div class="caption">蜘蛛の巣図：y = px + q と y = x の間を往復する</div></div>
+        <div class="readout" id="r-recur"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ochre">
+        <div class="title">特性方程式と一般項</div>
+        $a_{n+1}=pa_n+q$ の両辺と同じ形の $\alpha=p\alpha+q$（特性方程式）を辺々引くと $a_{n+1}-\alpha=p(a_n-\alpha)$。
+        つまり $\{a_n-\alpha\}$ は公比 $p$ の等比数列なので
+        $$a_n=\alpha+(a_1-\alpha)p^{\,n-1},\qquad \alpha=\frac{q}{1-p}$$
+        図では $\alpha$ は直線 $y=px+q$ と $y=x$ の交点（不動点）です。
+      </div>
+      <ul>
+        <li>$|p|\lt1$ なら $a_n$ は $\alpha$ に近づき（収束）、$|p|\gt1$ なら $\alpha$ から離れていく（発散）。$p\lt0$ なら $\alpha$ の両側を交互にとる（振動）。</li>
+        <li>縦の移動が「$a_n$ を漸化式に代入して $a_{n+1}$ を得る」、横の移動が「その値を次の $x$ にする」に対応する。</li>
+        <li>$p=1$ のときは特性方程式が解けず、単なる等差数列 $a_n=a_1+(n-1)q$ になる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 数学的帰納法 -->
+  <section class="tool-body" data-tab="induction">
+    <div class="layout">
+      <aside class="controls" id="c-induction"></aside>
+      <div class="stage">
+        <div class="dominoes" id="dominoes"></div>
+        <div class="readout" id="r-induction"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage">
+        <div class="title">数学的帰納法の 2 段構え</div>
+        すべての自然数 $n$ について命題 $P(n)$ が成り立つことを示すには、
+        <strong>[1] $P(1)$ が成り立つ</strong>（最初のドミノを倒す）と、
+        <strong>[2] $P(k)$ を仮定すると $P(k+1)$ が成り立つ</strong>（どのドミノも倒れたら次を倒す）の 2 つを示せばよい。
+        [1] だけでは最初の 1 枚しか倒れず、[2] だけでは誰も最初の 1 枚を倒してくれません。
+      </div>
+      <ul>
+        <li>「$P(1)$ を示す」だけ押して、他のドミノが倒れないことを確かめよう。次に「$P(k)\Rightarrow P(k+1)$ を示す」を押すと、連鎖してすべて倒れる。</li>
+        <li>命題を切り替えて、[1] の確認が「$n=1$ を代入するだけ」であること、[2] の本体が「仮定を使って $k+1$ の形を作る」計算であることを読もう。</li>
+        <li>$2^n\gt n$ のような不等式でも、$P(k)$ を仮定して $2^{k+1}=2\cdot2^k\gt2k\ge k+1$ のように示せる。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学B', title: '数列' });
+
+  /** 係数 (高次から、有理数可) の多項式を TeX に */
+  function texPolyFrac(coefs, v = 'n') {
+    let s = '';
+    coefs.forEach((c, i) => {
+      const p = coefs.length - 1 - i;
+      if (Math.abs(c) < 1e-12) return;
+      const fr = UI.toFrac(Math.abs(c), 100);
+      let mag = fr ? (fr[1] === 1 ? String(fr[0]) : `\\tfrac{${fr[0]}}{${fr[1]}}`) : fmt(Math.abs(c), 3);
+      const sym = p === 0 ? '' : p === 1 ? v : `${v}^{${p}}`;
+      if (sym && mag === '1') mag = '';
+      s += (c < 0 ? '-' : (s ? '+' : '')) + mag + sym;
+    });
+    return s || '0';
+  }
+  const texNum = (x) => { const fr = UI.toFrac(x, 100); return fr ? (fr[1] === 1 ? String(fr[0]) : (fr[0] < 0 ? '-' : '') + `\\tfrac{${Math.abs(fr[0])}}{${fr[1]}}`) : fmt(x, 3); };
+  const paren = (x) => (x < 0 ? `(${texNum(x)})` : texNum(x));
+
+  /* ======================= 等差数列・等比数列 ======================= */
+  (() => {
+    const ctl = $('#c-arith');
+    const st = { kind: 'arith', a: 2, d: 3, r: 0.5, n: 10 };
+    const plot = new Plot('#cv-arith', { xmin: 0, xmax: 21, ymin: -5, ymax: 30, equal: false, aspect: 0.6, xLabel: 'n', yLabel: 'a_n' });
+    const term = (k) => st.kind === 'arith' ? st.a + (k - 1) * st.d : st.a * Math.pow(st.r, k - 1);
+    const sum = (n) => { let s = 0; for (let k = 1; k <= n; k++) s += term(k); return s; };
+
+    UI.heading(ctl, '数列の種類');
+    UI.segmented(ctl, { options: [{ value: 'arith', label: '等差数列' }, { value: 'geo', label: '等比数列' }], value: 'arith', onChange: (v) => { st.kind = v; sD.el.style.display = v === 'arith' ? '' : 'none'; sR.el.style.display = v === 'geo' ? '' : 'none'; draw(); } });
+    UI.slider(ctl, { label: '$a$（初項）', min: -5, max: 10, step: 1, value: st.a, digits: 0, onInput: (v) => { st.a = v; draw(); } });
+    const sD = UI.slider(ctl, { label: '$d$（公差）', min: -3, max: 3, step: 0.5, value: st.d, onInput: (v) => { st.d = v; draw(); } });
+    const sR = UI.slider(ctl, { label: '$r$（公比）', min: -2, max: 2, step: 0.1, value: st.r, onInput: (v) => { st.r = v; draw(); } });
+    sR.el.style.display = 'none';
+    UI.slider(ctl, { label: '$n$（項数）', min: 1, max: 20, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+    UI.divider(ctl);
+    const cbS = UI.checkbox(ctl, { label: '和 $S_k$ も点で描く', checked: false, onChange: draw });
+
+    const readout = $('#r-arith');
+    function draw() {
+      const n = st.n;
+      const terms = []; for (let k = 1; k <= n; k++) terms.push(term(k));
+      const sums = []; let s = 0; for (const t of terms) { s += t; sums.push(s); }
+      let lo = Math.min(0, ...terms), hi = Math.max(0, ...terms);
+      if (cbS.get()) { lo = Math.min(lo, ...sums); hi = Math.max(hi, ...sums); }
+      if (!isFinite(lo) || !isFinite(hi)) { lo = -5; hi = 5; }
+      const pad = Math.max(1, (hi - lo) * 0.15);
+      plot.setView(0, Math.max(n, 6) + 1, lo - pad, hi + pad);
+      plot.render((P) => {
+        terms.forEach((t, i) => P.rect(i + 1 - 0.3, 0, 0.6, t, { color: 'none', fill: Plot.rgba(C.ink, 0.16) }));
+        if (cbS.get()) {
+          for (let i = 1; i < n; i++) P.segment(i, sums[i - 1], i + 1, sums[i], { color: C.sage, width: 1.2, dash: [3, 3] });
+          sums.forEach((v, i) => P.point(i + 1, v, { color: C.sage, r: 4, hollow: true }));
+        }
+        if (st.kind === 'arith') P.segment(1, terms[0], n, terms[n - 1], { color: C.inkLine, width: 1 });
+        terms.forEach((t, i) => P.point(i + 1, t, { color: C.ink, r: 4.5 }));
+        if (st.kind === 'geo' && Math.abs(st.r) < 1 && cbS.get()) {
+          const lim = st.a / (1 - st.r);
+          P.hline(lim, { color: C.clay, width: 1.2, dash: [6, 4] });
+          P.text(P.win.xmax, lim, `a/(1−r) = ${fmt(lim, 3)}`, { color: C.clay, align: 'right', baseline: 'bottom', dx: -8, dy: -4, bg: true });
+        }
+        P.legend([{ label: 'a_n（項）', color: C.ink }].concat(cbS.get() ? [{ label: 'S_n（和）', color: C.sage, dash: [3, 3] }] : []), { left: 12, top: 10 });
+      });
+
+      const an = terms[n - 1], Sn = sums[n - 1];
+      let gen, sumTex;
+      if (st.kind === 'arith') {
+        gen = `a_n=${texNum(st.a)}+(n-1)\\cdot${paren(st.d)}=${texPolyFrac([st.d, st.a - st.d])}`;
+        sumTex = `S_n=\\frac{n\\{2a+(n-1)d\\}}{2}=\\frac{${n}\\{2\\cdot${paren(st.a)}+${n - 1}\\cdot${paren(st.d)}\\}}{2}=${texNum(Sn)}`;
+      } else {
+        gen = `a_n=${texNum(st.a)}\\cdot${paren(st.r)}^{\\,n-1}`;
+        sumTex = Math.abs(st.r - 1) < 1e-9 ? `S_n=na=${n}\\cdot${texNum(st.a)}=${texNum(Sn)}` : `S_n=\\frac{a(r^n-1)}{r-1}=\\frac{${paren(st.a)}\\{${paren(st.r)}^{${n}}-1\\}}{${paren(st.r)}-1}=${fmt(Sn, 4)}`;
+      }
+      const rows = terms.map((t, i) => `<tr><td>${i + 1}</td><td>${fmt(t, 4)}</td><td>${fmt(sums[i], 4)}</td></tr>`).join('');
+      readout.innerHTML = `
+        <div class="tex-block">$$${gen}\\qquad a_{${n}}=${fmt(an, 4)}$$</div>
+        <div class="tex-block">$$${sumTex}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">第 ${n} 項 a_n</div><div class="v">${fmt(an, 4)}</div></div>
+          <div class="stat sage"><div class="k">和 S_n</div><div class="v">${fmt(Sn, 4)}</div></div>
+          ${st.kind === 'geo' && Math.abs(st.r) < 1 ? `<div class="stat clay"><div class="k">a/(1−r)（発展）</div><div class="v">${fmt(st.a / (1 - st.r), 4)}</div></div>` : ''}
+        </div>
+        <div class="table-wrap" style="margin-top:0.6rem;max-height:220px;overflow:auto"><table class="data"><tr><th>$k$</th><th>$a_k$</th><th>$S_k$</th></tr>${rows}</table></div>
+        ${st.kind === 'geo' && Math.abs(st.r) < 1 ? `<p class="small">発展：$|r|\\lt1$ のとき $r^n\\to0$ なので、$S_n=\\dfrac{a(1-r^n)}{1-r}$ は $\\dfrac{a}{1-r}=${fmt(st.a / (1 - st.r), 4)}$ に限りなく近づく。</p>` : ''}`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= Σと和の公式 ======================= */
+  (() => {
+    const ctl = $('#c-sigma');
+    const st = { mode: 'k', n: 6, expr: 'k' };
+    const EXPRS = {
+      k: { label: 'Σ k', tex: 'k', f: (k) => k, formula: (n) => `\\frac{n(n+1)}{2}`, sub: (n) => `\\frac{${n}\\cdot${n + 1}}{2}` },
+      k2: { label: 'Σ k²', tex: 'k^2', f: (k) => k * k, formula: () => `\\frac{n(n+1)(2n+1)}{6}`, sub: (n) => `\\frac{${n}\\cdot${n + 1}\\cdot${2 * n + 1}}{6}` },
+      k3: { label: 'Σ k³', tex: 'k^3', f: (k) => k ** 3, formula: () => `\\left\\{\\frac{n(n+1)}{2}\\right\\}^2`, sub: (n) => `\\left(\\frac{${n}\\cdot${n + 1}}{2}\\right)^2` },
+      odd: { label: 'Σ (2k−1)', tex: '(2k-1)', f: (k) => 2 * k - 1, formula: () => `2\\cdot\\frac{n(n+1)}{2}-n=n^2`, sub: (n) => `${n}^2` },
+      k2k: { label: 'Σ (k²+k)', tex: '(k^2+k)', f: (k) => k * k + k, formula: () => `\\frac{n(n+1)(2n+1)}{6}+\\frac{n(n+1)}{2}=\\frac{n(n+1)(n+2)}{3}`, sub: (n) => `\\frac{${n}\\cdot${n + 1}\\cdot${n + 2}}{3}` },
+      pow2: { label: 'Σ 2^k', tex: '2^k', f: (k) => 2 ** k, formula: () => `\\frac{2(2^n-1)}{2-1}=2^{n+1}-2`, sub: (n) => `2^{${n + 1}}-2` },
+    };
+    const plot = new Plot('#cv-sigma', { xmin: 0, xmax: 8, ymin: 0, ymax: 7, equal: true, aspect: 0.6, grid: false, axes: false, ticks: false });
+
+    UI.heading(ctl, 'テーマ');
+    UI.segmented(ctl, { options: [{ value: 'k', label: '1+2+…+n' }, { value: 'k2', label: '1²+2²+…+n²' }, { value: 'calc', label: 'Σ計算機' }], value: 'k', onChange: (v) => { st.mode = v; exprSel.el.style.display = v === 'calc' ? '' : 'none'; draw(); } });
+    const sN = UI.slider(ctl, { label: '$n$', min: 1, max: 12, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+    const exprSel = UI.select(ctl, { label: '式', options: Object.entries(EXPRS).map(([k, e]) => ({ value: k, label: e.label })), value: 'k', onChange: (v) => { st.expr = v; draw(); } });
+    exprSel.el.style.display = 'none';
+
+    const readout = $('#r-sigma');
+    function drawStairs(P, n) {
+      for (let i = 1; i <= n; i++) {
+        for (let j = 0; j < n + 1; j++) {
+          const mine = j < i;
+          P.rect(j, n - i, 1, 1, { color: C.surface, width: 1.5, fill: Plot.rgba(mine ? C.ink : C.sage, 0.45) });
+        }
+      }
+      P.rect(0, 0, n + 1, n, { color: C.text, width: 1.5 });
+      P.text((n + 1) / 2, n, `${n + 1}`, { color: C.text, align: 'center', baseline: 'bottom', dy: -6, font: 'bold 14px "Noto Sans JP", sans-serif' });
+      P.text(0, n / 2, `${n}`, { color: C.text, align: 'right', baseline: 'middle', dx: -8, font: 'bold 14px "Noto Sans JP", sans-serif' });
+      for (let i = 1; i <= n; i++) P.text(i - 0.5, n - i + 0.5, String(i), { color: '#fff', align: 'center', baseline: 'middle', font: 'bold 13px "Noto Sans JP", sans-serif' });
+      P.legend([{ label: `1+2+…+${n}（青）`, color: C.ink, width: 8 }, { label: '同じ階段を逆さに（緑）', color: C.sage, width: 8 }], { left: P.X(n + 1) + 20, top: 10 });
+    }
+    function drawSquares(P, n) {
+      let x = 0;
+      for (let k = 1; k <= n; k++) {
+        for (let i = 0; i < k; i++) for (let j = 0; j < k; j++) P.rect(x + i, j, 1, 1, { color: C.surface, width: 1, fill: Plot.rgba(C.ink, 0.35 + 0.03 * k) });
+        P.text(x + k / 2, 0, `${k}²=${k * k}`, { color: C.inkText, align: 'center', baseline: 'top', dy: 6 });
+        x += k + 0.6;
+      }
+    }
+    function drawBars(P, n, f) {
+      const vals = []; for (let k = 1; k <= n; k++) vals.push(f(k));
+      const hi = Math.max(...vals);
+      for (let k = 1; k <= n; k++) {
+        const h = vals[k - 1] / hi * 5;
+        P.rect(k - 0.35, 0, 0.7, h, { color: 'none', fill: Plot.rgba(C.ink, 0.5) });
+        P.text(k, h, fmt(vals[k - 1]), { color: C.inkText, align: 'center', baseline: 'bottom', dy: -3, font: '12px "Noto Sans JP", sans-serif' });
+        P.text(k, 0, `k=${k}`, { color: C.faint, align: 'center', baseline: 'top', dy: 5, font: '12px "Noto Sans JP", sans-serif' });
+      }
+      P.segment(0.3, 0, n + 0.7, 0, { color: C.borderStrong, width: 1 });
+    }
+    function draw() {
+      const n = st.n;
+      let html;
+      if (st.mode === 'k') {
+        plot.setView(-1, n + 2 + 8, -0.5, n + 1);
+        plot.render((P) => drawStairs(P, n));
+        const s = n * (n + 1) / 2;
+        html = `<div class="tex-block">$$1+2+\\cdots+${n}=\\frac{${n}\\times${n + 1}}{2}=${s}$$</div>
+          <p class="small">同じ階段を 2 つ組み合わせると、縦 $${n}$、横 $${n + 1}$ の長方形（面積 $${n * (n + 1)}$）。和はその半分。一般に $\\displaystyle\\sum_{k=1}^{n}k=\\frac{n(n+1)}{2}$。</p>`;
+      } else if (st.mode === 'k2') {
+        const total = n * (n + 1) + 0.6 * (n - 1);
+        plot.setView(-0.5, total + 0.5, -1.5, n + 0.5);
+        plot.render((P) => drawSquares(P, n));
+        const rows = []; let acc = 0;
+        for (let k = 1; k <= n; k++) { acc += k * k; rows.push(`<tr><td>${k}</td><td>${k * k}</td><td>${acc}</td></tr>`); }
+        const s = n * (n + 1) * (2 * n + 1) / 6;
+        html = `<div class="tex-block">$$1^2+2^2+\\cdots+${n}^2=\\frac{${n}\\cdot${n + 1}\\cdot${2 * n + 1}}{6}=${s}$$</div>
+          <div class="table-wrap" style="max-height:200px;overflow:auto"><table class="data"><tr><th>$k$</th><th>$k^2$</th><th>$1^2+\\cdots+k^2$</th></tr>${rows.join('')}</table></div>
+          <p class="small">公式 $\\displaystyle\\sum_{k=1}^{n}k^2=\\frac{n(n+1)(2n+1)}{6}$ は、$(k+1)^3-k^3=3k^2+3k+1$ を $k=1$ から $n$ まで足し合わせることで導ける。</p>`;
+      } else {
+        const e = EXPRS[st.expr];
+        plot.setView(-0.5, n + 1.5, -1, 6.5);
+        plot.render((P) => drawBars(P, n, e.f));
+        let s = 0; const parts = []; for (let k = 1; k <= n; k++) { s += e.f(k); if (k <= 5 || k === n) parts.push(fmt(e.f(k))); }
+        const listed = n > 6 ? parts.slice(0, 5).join('+') + '+\\cdots+' + parts[parts.length - 1] : parts.join('+');
+        html = `<div class="tex-block">$$\\sum_{k=1}^{${n}}${e.tex}=${listed}=${s}$$</div>
+          <div class="tex-block">$$\\sum_{k=1}^{n}${e.tex}=${e.formula(n)}\\quad\\xrightarrow{\\ n=${n}\\ }\\quad ${e.sub(n)}=${s}$$</div>`;
+      }
+      readout.innerHTML = html;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 階差数列 ======================= */
+  (() => {
+    const ctl = $('#c-diff');
+    const PRESETS = [
+      { label: '1, 2, 4, 7, 11, 16, …', a: [1, 2, 4, 7, 11, 16, 22, 29] },
+      { label: '2, 3, 6, 11, 18, 27, …', a: [2, 3, 6, 11, 18, 27, 38, 51] },
+      { label: '1, 3, 7, 15, 31, 63, …', a: [1, 3, 7, 15, 31, 63, 127, 255] },
+      { label: '5, 8, 11, 14, …（等差）', a: [5, 8, 11, 14, 17, 20, 23, 26] },
+    ];
+    const st = { a: PRESETS[0].a.slice() };
+    const plot = new Plot('#cv-diff', { xmin: 0, xmax: 9, ymin: 0, ymax: 30, equal: false, height: 240, xLabel: 'n', yLabel: 'a_n' });
+
+    UI.heading(ctl, '数列');
+    UI.select(ctl, { options: PRESETS.map((p, i) => ({ value: i, label: p.label })), value: 0, onChange: (v) => { st.a = PRESETS[+v].a.slice(); input.value = st.a.join(', '); draw(); } });
+    const input = UI.el('input', { type: 'text', value: st.a.join(', '), style: 'width:100%' });
+    input.addEventListener('input', () => {
+      const vals = input.value.split(/[,\s、]+/).map(Number).filter((v) => isFinite(v));
+      if (vals.length >= 3) { st.a = vals.slice(0, 8); draw(); }
+    });
+    ctl.append(UI.el('div', { class: 'field' }, [UI.el('label', { text: '最初の 8 項（カンマ区切りで編集できます）' }), input]));
+    UI.divider(ctl);
+    const cb2 = UI.checkbox(ctl, { label: '第 2 階差 $c_n=b_{n+1}-b_n$ も表示', checked: false, onChange: draw });
+
+    const stair = $('#stair-diff');
+    const readout = $('#r-diff');
+    const diffs = (arr) => arr.slice(1).map((v, i) => v - arr[i]);
+    const isConst = (arr) => arr.length >= 1 && arr.every((v) => Math.abs(v - arr[0]) < 1e-9);
+    function row(name, cls, vals, sub) {
+      const r = UI.el('div', { class: 'row ' + cls }, [UI.el('span', { class: 'name', html: name })]);
+      vals.forEach((v, i) => r.append(UI.el('div', { class: 'tile' }, [UI.el('div', { text: fmt(v, 3) }), UI.el('div', { class: 'idx', text: `${sub}${i + 1}` })])));
+      return r;
+    }
+    function draw() {
+      const a = st.a, b = diffs(a), c = diffs(b), n = a.length;
+      stair.innerHTML = '';
+      stair.append(row('$a_n$', 'a', a, 'a'), row('$b_n$', 'b', b, 'b'));
+      if (cb2.get()) stair.append(row('$c_n$', 'c', c, 'c'));
+      UI.texAll(stair);
+
+      const lo = Math.min(0, ...a), hi = Math.max(0, ...a), pad = Math.max(1, (hi - lo) * 0.15);
+      plot.setView(0, n + 1, lo - pad, hi + pad);
+      plot.render((P) => {
+        a.forEach((v, i) => { if (i < n - 1) { P.segment(i + 1, v, i + 2, v, { color: C.clay, width: 1, dash: [3, 3] }); P.segment(i + 2, v, i + 2, a[i + 1], { color: C.clay, width: 1.5 }); P.text(i + 2, (v + a[i + 1]) / 2, `b${i + 1}=${fmt(b[i])}`, { color: C.clay, dx: 5, baseline: 'middle', font: '12px "Noto Sans JP", sans-serif' }); } });
+        a.forEach((v, i) => P.point(i + 1, v, { color: C.ink, r: 4.5 }));
+      });
+
+      let kind, formula, poly = null, check = '';
+      if (isConst(b)) {
+        kind = `階差 $b_n$ が一定（$${fmt(b[0])}$）なので、$\\{a_n\\}$ 自身が等差数列。`;
+        formula = `a_n=${texNum(a[0])}+(n-1)\\cdot${paren(b[0])}=${texPolyFrac([b[0], a[0] - b[0]])}`;
+        poly = [b[0], a[0] - b[0]];
+      } else if (isConst(c)) {
+        const p = b[0], q = c[0];
+        poly = [q / 2, p - 1.5 * q, a[0] - p + q];
+        kind = `階差 $b_n$ は初項 $${fmt(p)}$、公差 $${fmt(q)}$ の等差数列：$b_k=${texPolyFrac([q, p - q], 'k')}$。`;
+        formula = `a_n=a_1+\\sum_{k=1}^{n-1}b_k=${texNum(a[0])}+\\sum_{k=1}^{n-1}\\left(${texPolyFrac([q, p - q], 'k')}\\right)=${texNum(a[0])}+${texNum(p)}(n-1)+${texNum(q)}\\cdot\\frac{(n-1)(n-2)}{2}=${texPolyFrac(poly)}`;
+      } else if (b.every((v) => Math.abs(v) > 1e-9) && isConst(b.slice(1).map((v, i) => v / b[i]))) {
+        const p = b[0], r = b[1] / b[0];
+        kind = `階差 $b_n$ は初項 $${fmt(p)}$、公比 $${fmt(r)}$ の等比数列：$b_k=${texNum(p)}\\cdot${paren(r)}^{k-1}$。`;
+        formula = `a_n=a_1+\\sum_{k=1}^{n-1}b_k=${texNum(a[0])}+\\frac{${texNum(p)}\\{${paren(r)}^{\\,n-1}-1\\}}{${paren(r)}-1}` + (Math.abs(r - 2) < 1e-9 && Math.abs(p - 2) < 1e-9 && Math.abs(a[0] - 1) < 1e-9 ? '=2^{n}-1' : '');
+        const gen = (k) => a[0] + p * (Math.pow(r, k - 1) - 1) / (r - 1);
+        check = a.map((v, i) => `a_{${i + 1}}=${fmt(gen(i + 1), 3)}`).join(',\\ ');
+      } else {
+        kind = '階差数列にも第 2 階差にも一定の規則が見つかりません（等差・等比のどちらでもない）。';
+        formula = `a_n=a_1+\\sum_{k=1}^{n-1}b_k\\quad(n\\ge2)`;
+      }
+      if (poly) {
+        const gen = (k) => poly.reduce((s, cc) => s * k + cc, 0);
+        check = a.map((v, i) => `a_{${i + 1}}=${fmt(gen(i + 1), 3)}`).join(',\\ ');
+      }
+      readout.innerHTML = `
+        <p>${kind}</p>
+        <div class="tex-block">$$${formula}$$</div>
+        ${check ? `<p class="small">検算（$n=1$ も含めて一致するか）： $${check}$</p>` : ''}`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 漸化式 ======================= */
+  (() => {
+    const ctl = $('#c-recur');
+    const st = { p: 0.5, q: 1, a1: -2, n: 10 };
+    const plot = new Plot('#cv-recur', { xmin: -4, xmax: 4, ymin: -4, ymax: 4, aspect: 0.7 });
+    const isOne = () => Math.abs(st.p - 1) < 1e-9;
+    const f = (x) => st.p * x + st.q;
+
+    UI.heading(ctl, '漸化式 a_{n+1} = p a_n + q');
+    const sP = UI.slider(ctl, { label: '$p$', min: -1.5, max: 1.5, step: 0.1, value: st.p, onInput: (v) => { st.p = v; draw(); } });
+    const sQ = UI.slider(ctl, { label: '$q$', min: -3, max: 3, step: 0.5, value: st.q, onInput: (v) => { st.q = v; draw(); } });
+    const sA = UI.slider(ctl, { label: '$a_1$（初項）', min: -3, max: 3, step: 0.5, value: st.a1, onInput: (v) => { st.a1 = v; draw(); } });
+    UI.slider(ctl, { label: '$n$（描く項数）', min: 1, max: 15, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+    UI.heading(ctl, 'プリセット');
+    const preset = (p, q, a1) => () => { st.p = p; st.q = q; st.a1 = a1; sP.set(p); sQ.set(q); sA.set(a1); draw(); };
+    UI.buttonRow(ctl, [
+      { label: '収束 (p=0.5)', small: true, onClick: preset(0.5, 1, -2) },
+      { label: '発散 (p=1.5)', small: true, onClick: preset(1.5, -1, 2.5) },
+      { label: '振動 (p=−0.8)', small: true, onClick: preset(-0.8, 1, 3) },
+    ]);
+
+    const readout = $('#r-recur');
+    function draw() {
+      const { p, q, a1, n } = st;
+      const seq = [a1]; for (let i = 1; i < n + 1; i++) seq.push(f(seq[i - 1]));
+      const alpha = isOne() ? NaN : q / (1 - p);
+      const vals = seq.slice(0, n + 1).filter((v) => isFinite(v));
+      let lo = Math.min(0, ...vals), hi = Math.max(0, ...vals);
+      if (isFinite(alpha)) { lo = Math.min(lo, alpha); hi = Math.max(hi, alpha); }
+      if (hi - lo < 4) { const m = (lo + hi) / 2; lo = m - 2; hi = m + 2; }
+      const pad = (hi - lo) * 0.12;
+      plot.setView(lo - pad, hi + pad, lo - pad, hi + pad);
+      plot.render((P) => {
+        P.fn((x) => x, { color: C.faint, width: 1.2, dash: [6, 5] });
+        P.fn(f, { color: C.ink, width: 2.4 });
+        let x = a1;
+        P.segment(x, 0, x, f(x), { color: C.ochre, width: 1.6 });
+        for (let i = 0; i < n; i++) {
+          const y = f(x);
+          if (i > 0) P.segment(x, x, x, y, { color: C.ochre, width: 1.6 });
+          P.point(x, y, { color: C.ochre, r: 3.5 });
+          if (i < n - 1) { if (i < 4) P.arrow(x, y, y, y, { color: C.ochre, width: 1.6, head: 8 }); else P.segment(x, y, y, y, { color: C.ochre, width: 1.6 }); }
+          if (i < 3) P.text(x, y, `(a${i + 1}, a${i + 2})`, { color: C.ochreDeep, dx: 8, dy: -6, bg: true, font: '12px "Noto Sans JP", sans-serif' });
+          x = y;
+        }
+        seq.slice(0, n).forEach((v, i) => P.point(v, 0, { color: C.ochre, r: 3, hollow: true }));
+        P.text(a1, 0, 'a₁', { color: C.ochreDeep, align: 'center', baseline: 'top', dy: 6, bg: true });
+        if (isFinite(alpha)) { P.point(alpha, alpha, { color: C.clay, r: 6, label: `α = ${fmt(alpha, 3)}`, dx: 10, dy: 16 }); P.dropLines(alpha, alpha, { color: C.clay }); }
+        P.legend([{ label: `y = ${UI.texPoly([p, q]).replace(/\\/g, '')}`, color: C.ink }, { label: 'y = x', color: C.faint, dash: [6, 5] }, { label: '数列の動き', color: C.ochre }], { left: 12, top: 34 });
+      });
+      const rows = seq.slice(0, n).map((v, i) => `<tr><td>${i + 1}</td><td>${fmt(v, 4)}</td>${isFinite(alpha) ? `<td>${fmt(v - alpha, 4)}</td>` : ''}</tr>`).join('');
+      const behavior = isOne() ? '等差数列（p = 1）' : Math.abs(p) < 1 ? (p < 0 ? '振動しながら α に収束' : 'α に収束') : Math.abs(p) === 1 ? '振動（p = −1）' : (p < 0 ? '振動しながら発散' : '発散');
+      readout.innerHTML = `
+        <div class="tex-block">$$a_{n+1}=${UI.texPoly([p, q], 'a_n')},\\qquad a_1=${texNum(a1)}$$</div>
+        ${isOne() ? `<p>$p=1$ のときは特性方程式 $\\alpha=\\alpha+q$ が解けない。数列は公差 $q$ の等差数列で $a_n=${texNum(a1)}+(n-1)\\cdot${paren(q)}$。</p>` : `
+        <div class="tex-block">$$\\text{特性方程式 }\\ \\alpha=${texNum(p)}\\alpha+${paren(q)}\\ \\Longrightarrow\\ \\alpha=\\frac{${texNum(q)}}{1-${paren(p)}}=${texNum(alpha)}$$</div>
+        <div class="tex-block">$$a_{n+1}-\\alpha=${texNum(p)}(a_n-\\alpha)\\quad\\Longrightarrow\\quad a_n=${texNum(alpha)}+${paren(a1 - alpha)}\\cdot${paren(p)}^{\\,n-1}$$</div>`}
+        <div class="readout-grid">
+          ${isFinite(alpha) ? `<div class="stat clay"><div class="k">不動点 α</div><div class="v">${fmt(alpha, 4)}</div></div>` : ''}
+          <div class="stat ${Math.abs(p) < 1 ? 'sage' : 'clay'}"><div class="k">ふるまい（|p| = ${fmt(Math.abs(p))}）</div><div class="v">${behavior}</div></div>
+          <div class="stat ink"><div class="k">a_${n}</div><div class="v">${fmt(seq[n - 1], 4)}</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:0.6rem;max-height:200px;overflow:auto"><table class="data"><tr><th>$n$</th><th>$a_n$</th>${isFinite(alpha) ? '<th>$a_n-\\alpha$</th>' : ''}</tr>${rows}</table></div>
+        ${isFinite(alpha) ? '<p class="small">$a_n-\\alpha$ の列が公比 $p$ の等比数列になっていることを表で確かめよう。</p>' : ''}`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 数学的帰納法 ======================= */
+  (() => {
+    const ctl = $('#c-induction');
+    const N = 10;
+    const STATEMENTS = {
+      sum: { label: '1+2+…+n = n(n+1)/2', tex: '1+2+\\cdots+n=\\frac{n(n+1)}{2}', lhs: (n) => n * (n + 1) / 2, rhs: (n) => n * (n + 1) / 2, rel: '=',
+        lhsTex: (n) => (n <= 4 ? Array.from({ length: n }, (_, i) => i + 1).join('+') : `1+2+\\cdots+${n}`), rhsTex: (n) => `\\frac{${n}\\cdot${n + 1}}{2}`,
+        base: '$n=1$：左辺 $=1$、右辺 $=\\dfrac{1\\cdot2}{2}=1$ で成立。',
+        step: '$P(k)$：$1+\\cdots+k=\\dfrac{k(k+1)}{2}$ を仮定すると、$1+\\cdots+k+(k+1)=\\dfrac{k(k+1)}{2}+(k+1)=\\dfrac{(k+1)(k+2)}{2}$。これは $P(k+1)$ の右辺。' },
+      odd: { label: '1+3+…+(2n−1) = n²', tex: '1+3+\\cdots+(2n-1)=n^2', lhs: (n) => n * n, rhs: (n) => n * n, rel: '=',
+        lhsTex: (n) => (n <= 4 ? Array.from({ length: n }, (_, i) => 2 * i + 1).join('+') : `1+3+\\cdots+${2 * n - 1}`), rhsTex: (n) => `${n}^2`,
+        base: '$n=1$：左辺 $=1$、右辺 $=1^2=1$ で成立。',
+        step: '$P(k)$：$1+3+\\cdots+(2k-1)=k^2$ を仮定すると、$k^2+(2k+1)=(k+1)^2$。これは $P(k+1)$。' },
+      pow: { label: '2^n > n', tex: '2^n\\gt n', lhs: (n) => 2 ** n, rhs: (n) => n, rel: '>',
+        lhsTex: (n) => `2^{${n}}`, rhsTex: (n) => `${n}`,
+        base: '$n=1$：$2^1=2\\gt1$ で成立。',
+        step: '$P(k)$：$2^k\\gt k$ を仮定すると、$2^{k+1}=2\\cdot2^k\\gt2k=k+k\\ge k+1$。これは $P(k+1)$。' },
+      six: { label: 'n³−n は 6 の倍数', tex: 'n^3-n\\ \\text{は}\\ 6\\ \\text{の倍数}', lhs: (n) => n ** 3 - n, rhs: (n) => (n ** 3 - n) / 6, rel: 'mult',
+        lhsTex: (n) => `${n}^3-${n}=${n ** 3 - n}`, rhsTex: (n) => `6\\times${(n ** 3 - n) / 6}`,
+        base: '$n=1$：$1^3-1=0=6\\cdot0$ で成立。',
+        step: '$P(k)$：$k^3-k=6m$ を仮定すると、$(k+1)^3-(k+1)=k^3+3k^2+2k=(k^3-k)+3k(k+1)=6m+3k(k+1)$。$k(k+1)$ は連続 2 整数の積で偶数だから $3k(k+1)$ は 6 の倍数。よって $P(k+1)$。' },
+    };
+    const st = { key: 'sum', base: false, step: false, fallen: 0, timers: [] };
+
+    UI.heading(ctl, '命題 P(n)');
+    UI.select(ctl, { options: Object.entries(STATEMENTS).map(([k, s]) => ({ value: k, label: s.label })), value: 'sum', onChange: (v) => { st.key = v; reset(); } });
+    UI.heading(ctl, '証明の 2 段階');
+    const bBase = UI.button(ctl, { label: '[1] P(1) を示す', primary: true, onClick: () => { st.base = true; st.fallen = Math.max(st.fallen, 1); render(); if (st.step) cascade(); } });
+    const bStep = UI.button(ctl, { label: '[2] P(k) ⇒ P(k+1) を示す', primary: true, onClick: () => { st.step = true; render(); if (st.base) cascade(); } });
+    UI.button(ctl, { label: 'リセット', onClick: reset });
+
+    const box = $('#dominoes');
+    const readout = $('#r-induction');
+    const tiles = [];
+    for (let i = 1; i <= N; i++) { const d = UI.el('div', { class: 'domino' }, [UI.el('span', { class: 'p', text: 'P(' + i + ')' }), UI.el('span', { text: String(i) })]); tiles.push(d); box.append(d); }
+
+    function clearTimers() { st.timers.forEach(clearTimeout); st.timers = []; }
+    function reset() { clearTimers(); st.base = false; st.step = false; st.fallen = 0; render(); }
+    function cascade() {
+      clearTimers();
+      for (let i = st.fallen + 1; i <= N; i++) {
+        const k = i;
+        st.timers.push(setTimeout(() => { st.fallen = k; render(); }, 380 * (k - st.fallen)));
+      }
+    }
+    function render() {
+      const S = STATEMENTS[st.key];
+      tiles.forEach((t, i) => {
+        const n = i + 1;
+        t.classList.toggle('down', n <= st.fallen && n > 1);
+        t.classList.toggle('proved', n === 1 && st.base);
+        t.classList.toggle('ready', st.step && n > st.fallen);
+      });
+      const rows = [];
+      for (let n = 1; n <= N; n++) {
+        const ok = n <= st.fallen;
+        const l = S.lhs(n), r = S.rhs(n);
+        rows.push(`<tr><td>${n}</td><td>$${S.lhsTex(n)}$</td><td>${S.rel === 'mult' ? `$=${S.rhsTex(n)}$` : `${S.rel === '>' ? '$\\gt$' : '$=$'} $${S.rhsTex(n)}=${fmt(r)}$`}</td><td class="${ok ? 'hl-sage' : ''}">${ok ? '成立 ✓' : '未証明'}</td></tr>`);
+      }
+      readout.innerHTML = `
+        <div class="tex-block">$$P(n):\\ ${S.tex}$$</div>
+        <div class="steps">
+          <div class="step ${st.base ? 'done' : ''}"><div class="t">[1] n = 1 のとき ${st.base ? '— 示した' : '— 未'}</div><div>${S.base}</div></div>
+          <div class="step ${st.step ? 'done' : ''}"><div class="t">[2] n = k で成り立つと仮定して n = k + 1 ${st.step ? '— 示した' : '— 未'}</div><div>${S.step}</div></div>
+        </div>
+        <p class="small" style="margin-top:0.5rem">${st.base && st.step ? (st.fallen >= N ? '[1] と [2] から、すべての自然数 n について P(n) が成り立つ（ドミノがすべて倒れた）。' : '連鎖して倒れていく…') : st.base ? '[1] だけでは P(1) しか示せない。[2] がないと次のドミノは倒れない。' : st.step ? '[2] だけでは「倒れたら次も倒れる」が保証されるだけ。[1] で最初の 1 枚を倒す必要がある。' : '2 つのボタンを押して証明を組み立てよう。順番はどちらからでもよい。'}</p>
+        <div class="table-wrap" style="max-height:230px;overflow:auto"><table class="data"><tr><th>$n$</th><th>左辺</th><th>右辺</th><th>状態</th></tr>${rows.join('')}</table></div>`;
+      UI.texAll(readout);
+    }
+    render();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'arith', label: '等差数列・等比数列' },
+    { id: 'sigma', label: 'Σと和の公式' },
+    { id: 'diff', label: '階差数列' },
+    { id: 'recur', label: '漸化式' },
+    { id: 'induction', label: '数学的帰納法' },
+  ]);
+});
+</script>
+</body>
+</html>

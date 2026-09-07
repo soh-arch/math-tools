@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>積分法（数学III）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>積分法（数学III）</h1>
+    <p class="lede">区分求積法、置換積分の図解、いろいろな面積、回転体の体積、曲線の長さ。「細かく分けて足す」という積分の考え方を、帯・円板・折れ線の図で確かめます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <!-- 区分求積法 -->
+  <section class="tool-body" data-tab="riemann">
+    <div class="layout">
+      <aside class="controls" id="c-riemann"></aside>
+      <div class="stage">
+        <div class="canvas-row">
+          <div class="canvas-wrap"><canvas id="cv-riemann-a"></canvas><div class="caption">n 個の長方形の面積の和</div></div>
+          <div class="canvas-wrap"><canvas id="cv-riemann-b"></canvas><div class="caption">和 Sₙ と n の関係</div></div>
+        </div>
+        <div class="readout" id="r-riemann"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">区分求積法</div>
+        区間 $[0,1]$ を $n$ 等分し、幅 $\dfrac1n$ の長方形の面積を足すと
+        $$\lim_{n\to\infty}\frac1n\sum_{k=1}^{n}f\!\left(\frac kn\right)=\int_0^1 f(x)\,dx$$
+        長方形の高さを左端・右端・中点のどこでとっても、$n\to\infty$ で同じ値に収束します。
+      </div>
+      <ul>
+        <li>$n$ を増やすと長方形の和が積分の値に近づく。誤差がどれくらいの速さで小さくなるか、右の図で観察しよう（中点は特に速い）。</li>
+        <li>単調増加の関数では左端の和 ≤ 積分 ≤ 右端の和。挟まれていることを数値で確かめよう。</li>
+        <li>$\displaystyle\lim_{n\to\infty}\frac1n\sum_{k=1}^n\left(\frac kn\right)^2=\int_0^1x^2dx=\frac13$ のように、和の極限を積分に読みかえる問題の原理。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 置換積分 -->
+  <section class="tool-body" data-tab="substitution">
+    <div class="layout">
+      <aside class="controls" id="c-substitution"></aside>
+      <div class="stage">
+        <div class="canvas-row">
+          <div class="canvas-wrap"><canvas id="cv-sub-a"></canvas><div class="caption">x の世界：∫ f(x) dx（帯にカーソルを重ねる）</div></div>
+          <div class="canvas-wrap"><canvas id="cv-sub-b"></canvas><div class="caption">t の世界：∫ f(g(t)) g′(t) dt</div></div>
+        </div>
+        <div class="readout" id="r-substitution"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">置換積分は「帯の付け替え」</div>
+        $x=g(t)$ と置くと $dx=g'(t)\,dt$、積分区間も $t$ のものに変わり
+        $$\int_a^b f(x)\,dx=\int_\alpha^\beta f(g(t))\,g'(t)\,dt$$
+        左右の同じ番号の帯は面積が等しい。幅が $g'(t)$ 倍に伸び縮みする分、高さも $g'(t)$ 倍されて釣り合っています。
+      </div>
+      <ul>
+        <li>帯にカーソルを重ねて（またはスライダーで）1 本を選ぶと、左右で対応する帯が赤くなる。幅と高さは違うのに面積が同じ。</li>
+        <li>$\sqrt{1-x^2}$ では $x=\sin\theta$ で被積分関数が $\cos^2\theta$ に、$\dfrac{1}{1+x^2}$ では $x=\tan\theta$ で定数 $1$ になる。積分が「簡単になる」様子を右の図で見よう。</li>
+        <li>$2xe^{x^2}$ では $t=x^2$ とすると右の図は $e^t$ のグラフになる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 面積 -->
+  <section class="tool-body" data-tab="area">
+    <div class="layout">
+      <aside class="controls" id="c-area"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-area"></canvas><div class="caption">区間の端点をドラッグ</div></div>
+        <div class="readout" id="r-area"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage">
+        <div class="title">面積は「上 − 下」の積分</div>
+        $a\le x\le b$ で $f(x)\ge g(x)$ なら、2 曲線の間の面積は $\displaystyle\int_a^b\{f(x)-g(x)\}dx$。
+        $x$ 軸との面積は $g=0$ の場合。上下が入れ替わる区間では積分を分けて、符号をそろえて足します。
+        $y$ 軸との面積は $x$ と $y$ の役割を入れかえて $\displaystyle\int_c^d\{x_{右}(y)-x_{左}(y)\}dy$。
+      </div>
+      <ul>
+        <li>緑の部分は被積分関数が正（上が $f$）、赤の部分は負。定積分の値は「緑 − 赤」、面積は「緑 + 赤」になる。</li>
+        <li>$\sin x$ を $0$ から $2\pi$ まで積分すると $0$ だが、面積は $4$。端点を動かして確かめよう。</li>
+        <li>$y$ 軸との面積では、横向きの帯 $\{x_{右}(y)-x_{左}(y)\}\,dy$ を $y$ 方向に積み上げる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 回転体の体積 -->
+  <section class="tool-body" data-tab="volume">
+    <div class="layout">
+      <aside class="controls" id="c-volume"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-volume"></canvas><div class="caption">軸上の端点をドラッグ</div></div>
+        <div class="readout" id="r-volume"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">回転体の体積は「円板の積み重ね」</div>
+        $y=f(x)$ を $x$ 軸のまわりに回転すると、位置 $x$ での断面は半径 $f(x)$ の円で面積は $\pi f(x)^2$。厚さ $dx$ の円板を足して
+        $$V=\pi\int_a^b f(x)^2\,dx$$
+        $y$ 軸のまわりなら $x=g(y)$ として $V=\pi\displaystyle\int_c^d g(y)^2\,dy$。
+      </div>
+      <ul>
+        <li>円板の枚数 $n$ を増やすと、円板の体積の和 $\pi\sum f(x_k)^2\Delta x$ が積分の値に近づく。</li>
+        <li>$\sqrt{4-x^2}$ を回すと球（$\dfrac43\pi r^3=\dfrac{32}{3}\pi$）、$1+\dfrac x2$ を回すと円錐台になる。端点を動かして球の一部（球欠）の体積も見られる。</li>
+        <li>断面の半径が $f(x)$ の「2 乗」で効くので、グラフが 2 倍になると体積は 4 倍になる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 曲線の長さ -->
+  <section class="tool-body" data-tab="length">
+    <div class="layout">
+      <aside class="controls" id="c-length"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-length"></canvas><div class="caption">折れ線にカーソルを重ねると 1 本を選べます</div></div>
+        <div class="readout" id="r-length"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink">
+        <div class="title">曲線の長さは「折れ線の極限」</div>
+        小さな区間では曲線をほぼ線分とみなせて、その長さは $\sqrt{(\Delta x)^2+(\Delta y)^2}$。これを足して細分の極限をとると
+        $$L=\int_\alpha^\beta\sqrt{\left(\frac{dx}{dt}\right)^2+\left(\frac{dy}{dt}\right)^2}dt,\qquad y=f(x)\ \text{なら}\ L=\int_a^b\sqrt{1+f'(x)^2}\,dx$$
+      </div>
+      <ul>
+        <li>$n$ を増やすと折れ線の長さが曲線の長さに下から近づく（折れ線は常に短い）。</li>
+        <li>赤く選んだ 1 本の $\Delta x,\ \Delta y$ と三平方の定理で線分の長さが決まる。$\sqrt{(\Delta x)^2+(\Delta y)^2}=\sqrt{1+\left(\frac{\Delta y}{\Delta x}\right)^2}\,\Delta x$ が積分の形の由来。</li>
+        <li>サイクロイド 1 弧の長さは $8$、アステロイドは $6$、と有理数になるのが面白い。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学III', title: '積分法' });
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  /* シンプソン法による数値積分 */
+  function integrate(f, a, b, n = 2000) {
+    if (b === a) return 0;
+    const h = (b - a) / n;
+    let s = f(a) + f(b);
+    for (let i = 1; i < n; i++) s += (i % 2 ? 4 : 2) * f(a + i * h);
+    return s * h / 3;
+  }
+  function findZeros(g, a, b, n = 800) {
+    const out = [];
+    let px = a, pv = g(a);
+    for (let i = 1; i <= n; i++) {
+      const x = a + (b - a) * i / n, v = g(x);
+      if (isFinite(pv) && isFinite(v) && pv * v < 0) {
+        let lo = px, hi = x, flo = pv;
+        for (let k = 0; k < 60; k++) { const m = (lo + hi) / 2, fm = g(m); if (flo * fm < 0) hi = m; else { lo = m; flo = fm; } }
+        out.push((lo + hi) / 2);
+      }
+      px = x; pv = v;
+    }
+    return out;
+  }
+
+  /* ======================= 区分求積法 ======================= */
+  (() => {
+    const ctl = $('#c-riemann');
+    const st = { preset: 'x2', n: 8, rule: 'left' };
+    const PRESETS = {
+      x2: { label: 'x²', tex: 'x^2', f: (x) => x * x, exact: 1 / 3, exactTex: '\\dfrac13', ymax: 1.3 },
+      sqrt: { label: '√x', tex: '\\sqrt x', f: Math.sqrt, exact: 2 / 3, exactTex: '\\dfrac23', ymax: 1.3 },
+      rat: { label: '1/(1+x²)', tex: '\\dfrac{1}{1+x^2}', f: (x) => 1 / (1 + x * x), exact: Math.PI / 4, exactTex: '\\dfrac\\pi4', ymax: 1.3 },
+      sin: { label: 'sin(πx)', tex: '\\sin\\pi x', f: (x) => Math.sin(Math.PI * x), exact: 2 / Math.PI, exactTex: '\\dfrac2\\pi', ymax: 1.3 },
+      exp: { label: 'e^x', tex: 'e^x', f: Math.exp, exact: Math.E - 1, exactTex: 'e-1', ymax: 3 },
+    };
+    const cur = () => PRESETS[st.preset];
+    const pA = new Plot('#cv-riemann-a', { xmin: -0.15, xmax: 1.15, ymin: -0.2, ymax: 1.3, equal: false, aspect: 0.75 });
+    const pB = new Plot('#cv-riemann-b', { xmin: 0, xmax: 205, ymin: 0, ymax: 1, equal: false, aspect: 0.75, xLabel: 'n', yLabel: '' });
+
+    UI.heading(ctl, '関数と分割');
+    UI.select(ctl, { label: '$f(x)$（区間 $[0,1]$）', options: Object.entries(PRESETS).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; draw(); } });
+    UI.slider(ctl, { label: '分割数 $n$', min: 1, max: 200, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+    UI.segmented(ctl, { label: '高さのとり方', options: [{ value: 'left', label: '左端' }, { value: 'right', label: '右端' }, { value: 'mid', label: '中点' }], value: 'left', onChange: (v) => { st.rule = v; draw(); } });
+    UI.texAll(ctl);
+
+    const readout = $('#r-riemann');
+    const sum = (f, n, rule) => { let s = 0; for (let k = 0; k < n; k++) { const x = rule === 'left' ? k / n : rule === 'right' ? (k + 1) / n : (k + 0.5) / n; s += f(x); } return s / n; };
+    function draw() {
+      const p = cur(), f = p.f, n = st.n, rule = st.rule;
+      const S = sum(f, n, rule);
+      pA.setView(-0.15, 1.15, -0.2 * p.ymax, p.ymax);
+      pA.render((P) => {
+        for (let k = 0; k < n; k++) {
+          const x0 = k / n, x1 = (k + 1) / n;
+          const xs = rule === 'left' ? x0 : rule === 'right' ? x1 : (x0 + x1) / 2;
+          P.rect(x0, 0, 1 / n, f(xs), { color: C.ink, width: n > 80 ? 0.6 : 1, fill: Plot.rgba(C.ink, 0.22) });
+          if (n <= 40) P.point(xs, f(xs), { color: C.clay, r: n > 20 ? 2.5 : 3.5 });
+        }
+        P.fn(f, { color: C.ink, width: 2.6, domain: [0, 1] });
+        P.vline(1, { color: C.faint, width: 1, dash: [4, 4] });
+        P.text(0.5, p.ymax, `Sₙ = ${fmt(S, 5)}`, { color: C.ink, align: 'center', dy: 40, bg: true, font: 'bold 14px "Noto Sans JP", sans-serif' });
+      });
+      const sums = [];
+      for (let m = 1; m <= 200; m++) sums.push(sum(f, m, rule));
+      const lo = Math.min(p.exact, ...sums.slice(0)), hi = Math.max(p.exact, ...sums.slice(0));
+      const pad = (hi - lo) * 0.15 || 0.1;
+      pB.setView(0, 205, lo - pad, hi + pad);
+      pB.render((P) => {
+        P.hline(p.exact, { color: C.clay, width: 1.4, dash: [7, 4] });
+        P.text(203, p.exact, `∫₀¹ f dx = ${fmt(p.exact, 4)}`, { color: C.clay, align: 'right', dy: rule === 'right' ? 16 : -6, bg: true });
+        sums.forEach((s, i) => P.point(i + 1, s, { color: C.ink, r: 2 }));
+        P.point(n, S, { color: C.clay, r: 6, label: `n=${n}`, dx: 10, dy: rule === 'right' ? -8 : 18 });
+      });
+      const kTex = rule === 'left' ? 'k-1' : rule === 'right' ? 'k' : 'k-\\tfrac12';
+      const err = S - p.exact;
+      readout.innerHTML = `
+        <div class="tex-block">$$\\lim_{n\\to\\infty}\\frac1n\\sum_{k=1}^{n}f\\!\\left(\\frac{${kTex}}{n}\\right)=\\int_0^1 ${p.tex}\\,dx=${p.exactTex}=${fmt(p.exact, 5)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">長方形の和 Sₙ（n=${n}, ${rule === 'left' ? '左端' : rule === 'right' ? '右端' : '中点'}）</div><div class="v">${fmt(S, 5)}</div></div>
+          <div class="stat clay"><div class="k">定積分の値</div><div class="v">${fmt(p.exact, 5)}</div></div>
+          <div class="stat ${Math.abs(err) < 0.01 ? 'sage' : 'ochre'}"><div class="k">誤差 Sₙ − 積分</div><div class="v">${fmt(err, 5)}</div></div>
+          <div class="stat"><div class="k">n を 2 倍にすると誤差は</div><div class="v">${fmt((sum(f, 2 * n, rule) - p.exact) / (err || 1), 3)} 倍</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:0.6rem"><table class="data">
+          <tr><th>n</th>${[1, 2, 4, 8, 16, 32, 64, 128].map((m) => `<td>${m}</td>`).join('')}<td>→ ∞</td></tr>
+          <tr><th>Sₙ</th>${[1, 2, 4, 8, 16, 32, 64, 128].map((m) => `<td${m === n ? ' class="hl"' : ''}>${fmt(sum(f, m, rule), 5)}</td>`).join('')}<td class="hl-sage">${fmt(p.exact, 5)}</td></tr>
+        </table></div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 置換積分 ======================= */
+  (() => {
+    const ctl = $('#c-substitution');
+    const st = { preset: 'sqrt', n: 8, k: 2 };
+    const PRESETS = {
+      sqrt: { label: '√(1−x²)　x = sin θ', a: 0, b: 1, f: (x) => Math.sqrt(Math.max(0, 1 - x * x)), g: Math.sin, gp: Math.cos, t0: 0, t1: Math.PI / 2,
+        ftex: '\\sqrt{1-x^2}', xtex: 'x=\\sin\\theta', dxtex: 'dx=\\cos\\theta\\,d\\theta', tname: '\\theta', t0tex: '0', t1tex: '\\dfrac\\pi2', htex: '\\sqrt{1-\\sin^2\\theta}\\cos\\theta=\\cos^2\\theta', exactTex: '\\dfrac\\pi4', viewA: [-0.2, 1.3, -0.25, 1.25], viewB: [-0.2, 1.9, -0.25, 1.25], tlabel: 'θ' },
+      atan: { label: '1/(1+x²)　x = tan θ', a: 0, b: 1, f: (x) => 1 / (1 + x * x), g: Math.tan, gp: (t) => 1 / Math.cos(t) ** 2, t0: 0, t1: Math.PI / 4,
+        ftex: '\\dfrac{1}{1+x^2}', xtex: 'x=\\tan\\theta', dxtex: 'dx=\\dfrac{d\\theta}{\\cos^2\\theta}', tname: '\\theta', t0tex: '0', t1tex: '\\dfrac\\pi4', htex: '\\dfrac{1}{1+\\tan^2\\theta}\\cdot\\dfrac{1}{\\cos^2\\theta}=1', exactTex: '\\dfrac\\pi4', viewA: [-0.2, 1.3, -0.25, 1.25], viewB: [-0.15, 1.0, -0.25, 1.25], tlabel: 'θ' },
+      exp: { label: '2x e^{x²}　t = x²', a: 0, b: 1, f: (x) => 2 * x * Math.exp(x * x), g: Math.sqrt, gp: (t) => 1 / (2 * Math.sqrt(t)), t0: 0, t1: 1,
+        ftex: '2xe^{x^2}', xtex: 't=x^2\\ (x=\\sqrt t)', dxtex: 'dx=\\dfrac{dt}{2\\sqrt t}', tname: 't', t0tex: '0', t1tex: '1', htex: '2\\sqrt t\\,e^{t}\\cdot\\dfrac{1}{2\\sqrt t}=e^t', exactTex: 'e-1', viewA: [-0.2, 1.3, -0.5, 6], viewB: [-0.2, 1.3, -0.5, 6], tlabel: 't' },
+    };
+    const cur = () => PRESETS[st.preset];
+    const pA = new Plot('#cv-sub-a', { xmin: -0.2, xmax: 1.3, ymin: -0.25, ymax: 1.25, equal: false, aspect: 0.78 });
+    const pB = new Plot('#cv-sub-b', { xmin: -0.2, xmax: 1.9, ymin: -0.25, ymax: 1.25, equal: false, aspect: 0.78, xLabel: 'θ' });
+
+    UI.heading(ctl, '置換');
+    UI.select(ctl, { label: '$f(x)$ と置換', options: Object.entries(PRESETS).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; draw(); } });
+    const sN = UI.slider(ctl, { label: '帯の本数 $n$', min: 4, max: 40, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; st.k = clamp(st.k, 0, v - 1); sK.setRange(1, v, 1); sK.set(st.k + 1); draw(); } });
+    const sK = UI.slider(ctl, { label: '注目する帯の番号', min: 1, max: st.n, step: 1, value: st.k + 1, digits: 0, onInput: (v) => { st.k = v - 1; draw(); } });
+    UI.texAll(ctl);
+    const hover = (which) => (x) => {
+      if (x == null) return;
+      const p = cur(), n = st.n;
+      let k = -1;
+      for (let i = 0; i < n; i++) {
+        const t0 = p.t0 + (p.t1 - p.t0) * i / n, t1 = p.t0 + (p.t1 - p.t0) * (i + 1) / n;
+        const lo = which === 'a' ? p.g(t0) : t0, hi = which === 'a' ? p.g(t1) : t1;
+        if (x >= lo && x <= hi) { k = i; break; }
+      }
+      if (k >= 0 && k !== st.k) { st.k = k; sK.set(k + 1); draw(); }
+    };
+    pA.onHover = hover('a'); pB.onHover = hover('b');
+
+    const readout = $('#r-substitution');
+    function draw() {
+      const p = cur(), n = st.n;
+      const gp = (t) => (t === 0 && !isFinite(p.gp(0)) ? p.gp(1e-9) : p.gp(t));
+      const h = (t) => p.f(p.g(t)) * gp(t);
+      pA.opts.xLabel = 'x'; pB.opts.xLabel = p.tlabel;
+      pA.setView(...p.viewA); pB.setView(...p.viewB);
+      const ts = []; for (let i = 0; i <= n; i++) ts.push(p.t0 + (p.t1 - p.t0) * i / n);
+      const strips = ts.slice(0, -1).map((t0, i) => ({ t0, t1: ts[i + 1], x0: p.g(t0), x1: p.g(ts[i + 1]) }));
+      const colorOf = (i) => (i === st.k ? C.clay : i % 2 ? C.sage : C.ink);
+      pA.render((P) => {
+        strips.forEach((s, i) => {
+          const c = colorOf(i);
+          P.fillBetween(p.f, 0, s.x0, s.x1, { fill: Plot.rgba(c, i === st.k ? 0.55 : 0.28), samples: 20 });
+          P.segment(s.x1, 0, s.x1, p.f(s.x1), { color: C.surface, width: 1 });
+        });
+        P.fn(p.f, { color: C.ink, width: 2.4, domain: [p.a, p.b] });
+        P.text(p.b, 0, `x=${fmt(p.b)}`, { color: C.muted, align: 'center', dy: 18, font: Plot.FONT_MATH, bg: true });
+        P.text(0.5, P.win.ymax, 'y = f(x)', { color: C.ink, align: 'center', dy: 40, font: Plot.FONT_MATH, bg: true });
+      });
+      pB.render((P) => {
+        strips.forEach((s, i) => {
+          const c = colorOf(i);
+          P.fillBetween(h, 0, s.t0 + (i === 0 ? 1e-6 : 0), s.t1, { fill: Plot.rgba(c, i === st.k ? 0.55 : 0.28), samples: 20 });
+          P.segment(s.t1, 0, s.t1, h(s.t1), { color: C.surface, width: 1 });
+        });
+        P.fn(h, { color: C.sage, width: 2.4, domain: [p.t0 + 1e-6, p.t1] });
+        P.text(p.t1, 0, `${p.tlabel}=${fmt(p.t1, 3)}`, { color: C.muted, align: 'center', dy: 18, font: Plot.FONT_MATH, bg: true });
+        P.text((p.t0 + p.t1) / 2, P.win.ymax, `y = f(g(${p.tlabel})) g′(${p.tlabel})`, { color: C.sage, align: 'center', dy: 40, font: Plot.FONT_MATH, bg: true });
+      });
+      const IA = integrate(p.f, p.a, p.b), IB = integrate(h, p.t0 + 1e-9, p.t1);
+      const s = strips[st.k];
+      const areaA = integrate(p.f, s.x0, s.x1, 200), areaB = integrate(h, s.t0 + 1e-9, s.t1, 200);
+      readout.innerHTML = `
+        <div class="tex-block">$$${p.xtex},\\quad ${p.dxtex},\\qquad x:\\ ${fmt(p.a)}\\to${fmt(p.b)}\\ \\Longleftrightarrow\\ ${p.tname}:\\ ${p.t0tex}\\to${p.t1tex}$$</div>
+        <div class="tex-block">$$\\int_{${fmt(p.a)}}^{${fmt(p.b)}}${p.ftex}\\,dx=\\int_{${p.t0tex}}^{${p.t1tex}}${p.htex}\\,d${p.tname}=${p.exactTex}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">左：∫ f(x) dx</div><div class="v">${fmt(IA, 5)}</div></div>
+          <div class="stat sage"><div class="k">右：∫ f(g(${p.tlabel})) g′(${p.tlabel}) d${p.tlabel}</div><div class="v">${fmt(IB, 5)}</div></div>
+          <div class="stat clay"><div class="k">帯 ${st.k + 1} の面積（左 / 右）</div><div class="v">${fmt(areaA, 5)} / ${fmt(areaB, 5)}</div></div>
+          <div class="stat clay"><div class="k">帯 ${st.k + 1} の幅（左 Δx / 右 Δ${p.tlabel}）</div><div class="v">${fmt(s.x1 - s.x0, 4)} / ${fmt(s.t1 - s.t0, 4)}</div></div>
+        </div>
+        <p class="small">右の帯の幅 Δ${p.tlabel} は一定、左の幅 Δx = g(${p.tlabel}₁) − g(${p.tlabel}₀) ≈ g′(${p.tlabel}) Δ${p.tlabel} は場所によって違う。その分だけ高さに g′(${p.tlabel}) を掛けるので、帯の面積は一致する。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 面積 ======================= */
+  (() => {
+    const ctl = $('#c-area');
+    const st = { mode: 'x', preset: null, a: 0, b: 2 * Math.PI };
+    const PRESETS = {
+      x: {
+        sin: { label: 'y = sin x（0 ≤ x ≤ 2π）', ftex: '\\sin x', gtex: null, f: Math.sin, g: () => 0, a: 0, b: 2 * Math.PI, lo: -1, hi: 7.5, view: [-1, 7.5, -1.6, 1.6] },
+        xex: { label: 'y = x e^{−x}', ftex: 'xe^{-x}', gtex: null, f: (x) => x * Math.exp(-x), g: () => 0, a: 0, b: 3, lo: -1.5, hi: 6, view: [-1.5, 6, -1, 1] },
+        log: { label: 'y = log x', ftex: '\\log x', gtex: null, f: Math.log, g: () => 0, a: 0.5, b: 3, lo: 0.05, hi: 6, view: [-0.5, 6, -2.5, 2.5] },
+      },
+      two: {
+        para: { label: 'y = x² と y = √x', ftex: '\\sqrt x', gtex: 'x^2', f: Math.sqrt, g: (x) => x * x, a: 0, b: 1, lo: 0, hi: 2, view: [-0.5, 2.2, -0.5, 2] },
+        sincos: { label: 'y = sin x と y = cos x（0 ≤ x ≤ π）', ftex: '\\sin x', gtex: '\\cos x', f: Math.sin, g: Math.cos, a: 0, b: Math.PI, lo: 0, hi: Math.PI, view: [-0.5, 3.7, -1.6, 1.6] },
+        expline: { label: 'y = e^x と y = x + 2', ftex: 'x+2', gtex: 'e^x', f: (x) => x + 2, g: Math.exp, a: -1.8414, b: 1.1462, lo: -3, hi: 2, view: [-3.5, 2.5, -1, 5] },
+      },
+      y: {
+        ysq: { label: 'x = y²（0 ≤ y ≤ 2）', ftex: 'y^2', gtex: null, f: (y) => y * y, g: () => 0, a: 0, b: 2, lo: -2.5, hi: 2.5, view: [-1, 5, -2.6, 2.6] },
+        ytwo: { label: 'x = y² と x = y + 2', ftex: 'y+2', gtex: 'y^2', f: (y) => y + 2, g: (y) => y * y, a: -1, b: 2, lo: -2, hi: 3, view: [-1.5, 6, -2.5, 3.2] },
+      },
+    };
+    const cur = () => PRESETS[st.mode][st.preset];
+    const plot = new Plot('#cv-area', { xmin: -1, xmax: 7.5, ymin: -1.6, ymax: 1.6, equal: false, aspect: 0.6 });
+    const hA = plot.addHandle({ x: 0, y: 0, color: C.ochre, label: 'a', onMove: (x, y) => { const p = cur(); const v = st.mode === 'y' ? y : x; st.a = Math.round(clamp(v, p.lo, st.b - 0.1) * 20) / 20; sA.set(st.a); draw(); } });
+    const hB = plot.addHandle({ x: 0, y: 0, color: C.ochre, label: 'b', onMove: (x, y) => { const p = cur(); const v = st.mode === 'y' ? y : x; st.b = Math.round(clamp(v, st.a + 0.1, p.hi) * 20) / 20; sB.set(st.b); draw(); } });
+
+    UI.heading(ctl, '面積の種類');
+    UI.segmented(ctl, { options: [{ value: 'x', label: '曲線と x 軸' }, { value: 'two', label: '2 曲線' }, { value: 'y', label: 'y 軸との面積' }], value: 'x', onChange: (v) => { st.mode = v; rebuild(); } });
+    const box = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    let sA, sB;
+    function rebuild() {
+      box.innerHTML = '';
+      const src = PRESETS[st.mode];
+      st.preset = Object.keys(src)[0];
+      UI.select(box, { label: '曲線', options: Object.entries(src).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; setup(); draw(); } });
+      const vn = st.mode === 'y' ? 'y' : 'x';
+      sA = UI.slider(box, { label: `区間の下端 $a$（${vn}）`, min: -1, max: 7, step: 0.05, value: 0, onInput: (v) => { st.a = Math.min(v, st.b - 0.1); sA.set(st.a); draw(); } });
+      sB = UI.slider(box, { label: `区間の上端 $b$（${vn}）`, min: -1, max: 7, step: 0.05, value: 1, onInput: (v) => { st.b = Math.max(v, st.a + 0.1); sB.set(st.b); draw(); } });
+      UI.buttonRow(box, [{ label: '区間を元に戻す', small: true, onClick: () => { setup(); draw(); } }]);
+      UI.texAll(box);
+      setup(); draw();
+    }
+    function setup() {
+      const p = cur();
+      st.a = p.a; st.b = p.b;
+      sA.setRange(p.lo, p.hi, 0.05); sB.setRange(p.lo, p.hi, 0.05); sA.set(st.a); sB.set(st.b);
+      plot.setView(...p.view);
+    }
+
+    const readout = $('#r-area');
+    function draw() {
+      const p = cur(), a = st.a, b = st.b;
+      const f = p.f, g = p.g, h = (v) => f(v) - g(v);
+      const zs = findZeros(h, a, b).filter((z) => z > a + 1e-6 && z < b - 1e-6);
+      const bounds = [a, ...zs, b];
+      const pieces = [];
+      for (let i = 0; i < bounds.length - 1; i++) {
+        const lo = bounds[i], hi = bounds[i + 1], mid = (lo + hi) / 2;
+        const val = integrate(h, lo, hi, 400);
+        pieces.push({ lo, hi, sign: h(mid) >= 0 ? 1 : -1, val });
+      }
+      const integral = pieces.reduce((s, q) => s + q.val, 0);
+      const area = pieces.reduce((s, q) => s + Math.abs(q.val), 0);
+      const isY = st.mode === 'y';
+      if (isY) { hA.x = 0; hA.y = a; hB.x = 0; hB.y = b; } else { hA.x = a; hA.y = 0; hB.x = b; hB.y = 0; }
+      plot.render((P) => {
+        for (const q of pieces) {
+          const col = q.sign > 0 ? C.sage : C.clay;
+          if (isY) {
+            const pts = [];
+            const m = 60;
+            for (let i = 0; i <= m; i++) { const y = q.lo + (q.hi - q.lo) * i / m; pts.push([f(y), y]); }
+            for (let i = m; i >= 0; i--) { const y = q.lo + (q.hi - q.lo) * i / m; pts.push([g(y), y]); }
+            P.polygon(pts, { color: 'none', fill: Plot.rgba(col, 0.3) });
+            for (let i = 1; i < 8; i++) { const y = q.lo + (q.hi - q.lo) * i / 8; P.segment(g(y), y, f(y), y, { color: col, width: 1, alpha: 0.6 }); }
+          } else {
+            P.fillBetween(f, g, q.lo, q.hi, { fill: Plot.rgba(col, 0.3), samples: 200 });
+            for (let i = 1; i < 8; i++) { const x = q.lo + (q.hi - q.lo) * i / 8; P.segment(x, g(x), x, f(x), { color: col, width: 1, alpha: 0.6 }); }
+          }
+          const mid = (q.lo + q.hi) / 2;
+          const cx = isY ? (f(mid) + g(mid)) / 2 : mid, cy = isY ? mid : (f(mid) + g(mid)) / 2;
+          if (P.px(q.hi - q.lo) > 40 || isY) P.text(cx, cy, (q.sign > 0 ? '+' : '−') + fmt(Math.abs(q.val), 3), { color: col, align: 'center', baseline: 'middle', bg: true, font: 'bold 13px "Noto Sans JP", sans-serif' });
+        }
+        if (isY) {
+          P.param(f, (y) => y, P.win.ymin, P.win.ymax, { color: C.ink, width: 2.6 });
+          if (p.gtex) P.param(g, (y) => y, P.win.ymin, P.win.ymax, { color: C.ink, width: 2, dash: [6, 4] });
+          P.hline(a, { color: C.ochre, width: 1, dash: [4, 4] }); P.hline(b, { color: C.ochre, width: 1, dash: [4, 4] });
+          P.text(P.win.xmax, P.win.ymax, `x = ${p.ftex.replace(/\\/g, '')}${p.gtex ? '（実線）, x = ' + p.gtex.replace(/\\/g, '') + '（破線）' : ''}`, { color: C.ink, align: 'right', dx: -8, dy: 18, bg: true, font: Plot.FONT_MATH });
+        } else {
+          P.fn(f, { color: C.ink, width: 2.6 });
+          if (p.gtex) P.fn(g, { color: C.ink, width: 2, dash: [6, 4] });
+          P.vline(a, { color: C.ochre, width: 1, dash: [4, 4] }); P.vline(b, { color: C.ochre, width: 1, dash: [4, 4] });
+          for (const z of zs) P.point(z, f(z), { color: C.clay, r: 5, hollow: true, label: `x=${fmt(z, 3)}`, dx: 8, dy: -8 });
+          P.legend([{ label: `y = ${p.ftex.replace(/\\/g, '')}`, color: C.ink }, ...(p.gtex ? [{ label: `y = ${p.gtex.replace(/\\/g, '')}`, color: C.ink, dash: [6, 4], width: 2 }] : [])], { left: 12, top: 34 });
+        }
+      });
+      const v = isY ? 'y' : 'x';
+      const integrand = p.gtex ? `\\{(${p.ftex})-(${p.gtex})\\}` : p.ftex;
+      const split = pieces.map((q) => `${q.sign > 0 ? '+' : '-'}\\int_{${fmt(q.lo, 3)}}^{${fmt(q.hi, 3)}}${integrand}\\,d${v}`).join('').replace(/^\+/, '');
+      readout.innerHTML = `
+        <div class="tex-block">$$\\int_{${fmt(a, 3)}}^{${fmt(b, 3)}}${integrand}\\,d${v}=${fmt(integral, 4)}\\qquad S=${zs.length ? split + '=' : ''}${fmt(area, 4)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ochre"><div class="k">区間</div><div class="v">${fmt(a, 3)} ≤ ${v} ≤ ${fmt(b, 3)}</div></div>
+          <div class="stat ink"><div class="k">定積分の値（緑 − 赤）</div><div class="v">${fmt(integral, 4)}</div></div>
+          <div class="stat sage"><div class="k">面積 S（緑 + 赤）</div><div class="v">${fmt(area, 4)}</div></div>
+          <div class="stat clay"><div class="k">符号が変わる ${v}</div><div class="v">${zs.length ? zs.map((z) => fmt(z, 3)).join(', ') : 'なし'}</div></div>
+        </div>
+        <p class="small">${pieces.map((q) => `[${fmt(q.lo, 2)}, ${fmt(q.hi, 2)}] では ${p.gtex ? (q.sign > 0 ? '実線が上' : '破線が上') : (q.sign > 0 ? '曲線が軸より上' : '曲線が軸より下')}（${q.sign > 0 ? '緑' : '赤'}、積分値 ${fmt(q.val, 3)}）`).join('。')}。</p>`;
+      UI.texAll(readout);
+    }
+    rebuild();
+  })();
+
+  /* ======================= 回転体の体積 ======================= */
+  (() => {
+    const ctl = $('#c-volume');
+    const st = { axis: 'x', preset: null, a: 0, b: 4, n: 12 };
+    const PRESETS = {
+      x: {
+        sqrt: { label: 'y = √x（0 ≤ x ≤ 4）', tex: '\\sqrt x', f: Math.sqrt, a: 0, b: 4, lo: 0, hi: 5, exactTex: '8\\pi' },
+        sin: { label: 'y = sin x（0 ≤ x ≤ π）', tex: '\\sin x', f: Math.sin, a: 0, b: Math.PI, lo: 0, hi: Math.PI, exactTex: '\\dfrac{\\pi^2}{2}' },
+        exp: { label: 'y = e^{−x}（0 ≤ x ≤ 2）', tex: 'e^{-x}', f: (x) => Math.exp(-x), a: 0, b: 2, lo: -0.5, hi: 3, exactTex: '\\dfrac{\\pi}{2}(1-e^{-4})' },
+        cone: { label: 'y = 1 + x/2（円錐台）', tex: '1+\\dfrac x2', f: (x) => 1 + x / 2, a: 0, b: 4, lo: -2, hi: 5, exactTex: '\\dfrac{52}{3}\\pi' },
+        sphere: { label: 'y = √(4−x²)（球）', tex: '\\sqrt{4-x^2}', f: (x) => Math.sqrt(Math.max(0, 4 - x * x)), a: -2, b: 2, lo: -2, hi: 2, exactTex: '\\dfrac{32}{3}\\pi' },
+      },
+      y: {
+        ysq: { label: 'x = y²（0 ≤ y ≤ 2）', tex: 'y^2', f: (y) => y * y, a: 0, b: 2, lo: 0, hi: 2.5, exactTex: '\\dfrac{32}{5}\\pi' },
+        ysqrt: { label: 'x = √y（0 ≤ y ≤ 4）', tex: '\\sqrt y', f: Math.sqrt, a: 0, b: 4, lo: 0, hi: 5, exactTex: '8\\pi' },
+        ycone: { label: 'x = 2 − y/2（円錐）', tex: '2-\\dfrac y2', f: (y) => 2 - y / 2, a: 0, b: 4, lo: 0, hi: 4, exactTex: '\\dfrac{16}{3}\\pi' },
+      },
+    };
+    const cur = () => PRESETS[st.axis][st.preset];
+    const plot = new Plot('#cv-volume', { xmin: -1, xmax: 5, ymin: -3, ymax: 3, equal: true, aspect: 0.6, grid: false, axes: false });
+    const hA = plot.addHandle({ x: 0, y: 0, color: C.ochre, label: 'a', onMove: (x, y) => { const p = cur(); const v = st.axis === 'y' ? y : x; st.a = Math.round(clamp(v, p.lo, st.b - 0.2) * 20) / 20; sA.set(st.a); draw(); } });
+    const hB = plot.addHandle({ x: 0, y: 0, color: C.ochre, label: 'b', onMove: (x, y) => { const p = cur(); const v = st.axis === 'y' ? y : x; st.b = Math.round(clamp(v, st.a + 0.2, p.hi) * 20) / 20; sB.set(st.b); draw(); } });
+
+    UI.heading(ctl, '回転軸と曲線');
+    UI.segmented(ctl, { options: [{ value: 'x', label: 'x 軸のまわり' }, { value: 'y', label: 'y 軸のまわり' }], value: 'x', onChange: (v) => { st.axis = v; rebuild(); } });
+    const box = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    let sA, sB;
+    function rebuild() {
+      box.innerHTML = '';
+      const src = PRESETS[st.axis];
+      st.preset = Object.keys(src)[0];
+      UI.select(box, { label: '曲線', options: Object.entries(src).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; setup(); draw(); } });
+      const vn = st.axis === 'y' ? 'y' : 'x';
+      sA = UI.slider(box, { label: `${vn} の下端 $a$`, min: 0, max: 4, step: 0.05, value: 0, onInput: (v) => { st.a = Math.min(v, st.b - 0.2); sA.set(st.a); draw(); } });
+      sB = UI.slider(box, { label: `${vn} の上端 $b$`, min: 0, max: 4, step: 0.05, value: 4, onInput: (v) => { st.b = Math.max(v, st.a + 0.2); sB.set(st.b); draw(); } });
+      UI.slider(box, { label: '円板の枚数 $n$', min: 3, max: 60, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+      UI.texAll(box);
+      setup(); draw();
+    }
+    function setup() {
+      const p = cur();
+      st.a = p.a; st.b = p.b;
+      sA.setRange(p.lo, p.hi, 0.05); sB.setRange(p.lo, p.hi, 0.05); sA.set(st.a); sB.set(st.b);
+    }
+
+    const readout = $('#r-volume');
+    function draw() {
+      const p = cur(), f = p.f, a = st.a, b = st.b, n = st.n, isY = st.axis === 'y';
+      let rmax = 0; for (let i = 0; i <= 100; i++) rmax = Math.max(rmax, Math.abs(f(p.lo + (p.hi - p.lo) * i / 100)));
+      const span = p.hi - p.lo;
+      if (isY) plot.setView(-rmax * 1.6, rmax * 1.6, p.lo - 0.8 - rmax * 0.3, p.hi + 0.8 + rmax * 0.3);
+      else plot.setView(p.lo - 0.6 - rmax * 0.3, p.hi + 0.8 + rmax * 0.3, -rmax * 1.35, rmax * 1.35);
+      if (isY) { hA.x = 0; hA.y = a; hB.x = 0; hB.y = b; } else { hA.x = a; hA.y = 0; hB.x = b; hB.y = 0; }
+      const dx = (b - a) / n;
+      let diskSum = 0;
+      plot.render((P) => {
+        const ctx = P.ctx, K = 0.25;
+        if (isY) {
+          P.arrow(0, P.win.ymin + 0.2, 0, P.win.ymax - 0.1, { color: C.borderStrong, width: 1.2 });
+          P.segment(P.win.xmin, 0, P.win.xmax, 0, { color: C.borderSubtle, width: 1 });
+          P.text(0, P.win.ymax - 0.1, 'y', { color: C.muted, dx: 8, dy: 10, font: Plot.FONT_MATH });
+          P.text(P.win.xmax, 0, 'x', { color: C.muted, align: 'right', dx: -6, dy: -6, font: Plot.FONT_MATH });
+        } else {
+          P.arrow(P.win.xmin + 0.2, 0, P.win.xmax - 0.1, 0, { color: C.borderStrong, width: 1.2 });
+          P.segment(0, P.win.ymin, 0, P.win.ymax, { color: C.borderSubtle, width: 1 });
+          P.text(P.win.xmax - 0.1, 0, 'x', { color: C.muted, align: 'right', dx: -4, dy: -8, font: Plot.FONT_MATH });
+          P.text(0, P.win.ymax, 'y', { color: C.muted, dx: 8, dy: 14, font: Plot.FONT_MATH });
+        }
+        for (let k = 0; k < n; k++) {
+          const u0 = a + k * dx, u1 = u0 + dx, um = (u0 + u1) / 2;
+          const r = Math.abs(f(um));
+          diskSum += Math.PI * r * r * dx;
+          const R = P.px(r), Rk = R * K;
+          ctx.lineWidth = 1; ctx.strokeStyle = Plot.rgba(C.ink, 0.7);
+          if (isY) {
+            const Y0 = P.Y(u0), Y1 = P.Y(u1), X = P.X(0);
+            ctx.fillStyle = Plot.rgba(C.ink, 0.14);
+            ctx.beginPath(); ctx.rect(X - R, Y1, 2 * R, Y0 - Y1); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(X - R, Y1); ctx.lineTo(X - R, Y0); ctx.moveTo(X + R, Y1); ctx.lineTo(X + R, Y0); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(X, Y0, R, Rk, 0, 0, Math.PI); ctx.stroke();
+            ctx.fillStyle = Plot.rgba(C.ink, 0.22);
+            ctx.beginPath(); ctx.ellipse(X, Y1, R, Rk, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          } else {
+            const X0 = P.X(u0), X1 = P.X(u1), Y = P.Y(0);
+            ctx.fillStyle = Plot.rgba(C.ink, 0.14);
+            ctx.beginPath(); ctx.rect(X0, Y - R, X1 - X0, 2 * R); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(X0, Y, Rk, R, 0, Math.PI / 2, Math.PI * 1.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(X0, Y - R); ctx.lineTo(X1, Y - R); ctx.moveTo(X0, Y + R); ctx.lineTo(X1, Y + R); ctx.stroke();
+            ctx.fillStyle = Plot.rgba(C.ink, 0.22);
+            ctx.beginPath(); ctx.ellipse(X1, Y, Rk, R, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          }
+        }
+        if (isY) {
+          P.param(f, (y) => y, p.lo, p.hi, { color: C.ink, width: 2.6 });
+          P.param((y) => -f(y), (y) => y, p.lo, p.hi, { color: C.ink, width: 1.4, dash: [5, 4], alpha: 0.6 });
+          P.segment(-f(a), a, f(a), a, { color: C.ochre, width: 1.2, dash: [4, 4] });
+          P.segment(-f(b), b, f(b), b, { color: C.ochre, width: 1.2, dash: [4, 4] });
+          P.text(P.win.xmax, P.win.ymax, `x = ${p.tex.replace(/\\dfrac/g, '').replace(/[{}\\]/g, '')}`, { color: C.ink, align: 'right', dx: -8, dy: 18, font: Plot.FONT_MATH, bg: true });
+        } else {
+          P.fn(f, { color: C.ink, width: 2.6, domain: [p.lo, p.hi] });
+          P.fn((x) => -f(x), { color: C.ink, width: 1.4, dash: [5, 4], alpha: 0.6, domain: [p.lo, p.hi] });
+          P.segment(a, -f(a), a, f(a), { color: C.ochre, width: 1.2, dash: [4, 4] });
+          P.segment(b, -f(b), b, f(b), { color: C.ochre, width: 1.2, dash: [4, 4] });
+          P.text(P.win.xmin, P.win.ymax, `y = ${p.tex.replace(/\\dfrac/g, '').replace(/[{}\\]/g, '')}`, { color: C.ink, dx: 8, dy: 40, font: Plot.FONT_MATH, bg: true });
+        }
+      });
+      const V = Math.PI * integrate((u) => f(u) ** 2, a, b);
+      const v = isY ? 'y' : 'x', fn = isY ? 'g' : 'f';
+      const full = Math.abs(a - p.a) < 1e-9 && Math.abs(b - p.b) < 1e-9;
+      readout.innerHTML = `
+        <div class="tex-block">$$V=\\pi\\int_{${fmt(a)}}^{${fmt(b)}}\\left(${p.tex}\\right)^2d${v}=${full ? p.exactTex + '=' : ''}${fmt(V, 4)}$$</div>
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">体積 V</div><div class="v">${fmt(V, 4)}${full ? `　(${fmt(V / Math.PI, 4)} π)` : ''}</div></div>
+          <div class="stat ink"><div class="k">円板の和 π Σ ${fn}(${v}ₖ)² Δ${v}（n=${n}）</div><div class="v">${fmt(diskSum, 4)}</div></div>
+          <div class="stat ochre"><div class="k">区間・厚さ Δ${v}</div><div class="v">[${fmt(a)}, ${fmt(b)}]　${fmt(dx, 4)}</div></div>
+          <div class="stat ${Math.abs(diskSum - V) / V < 0.01 ? 'sage' : 'clay'}"><div class="k">円板の和 − V</div><div class="v">${fmt(diskSum - V, 4)}</div></div>
+        </div>
+        <p class="small">各円板の半径は区間の中点での ${fn}(${v}) の値。断面積 π ${fn}(${v})² × 厚さ Δ${v} を n 枚分足している。</p>`;
+      UI.texAll(readout);
+    }
+    rebuild();
+  })();
+
+  /* ======================= 曲線の長さ ======================= */
+  (() => {
+    const ctl = $('#c-length');
+    const st = { preset: 'cycloid', n: 8, k: 2 };
+    const PRESETS = {
+      cycloid: { label: 'サイクロイド (t−sin t, 1−cos t), 0 ≤ t ≤ 2π', x: (t) => t - Math.sin(t), y: (t) => 1 - Math.cos(t), dx: (t) => 1 - Math.cos(t), dy: Math.sin, t0: 0, t1: 2 * Math.PI,
+        tex: 'L=\\int_0^{2\\pi}\\sqrt{(1-\\cos t)^2+\\sin^2t}\\,dt=\\int_0^{2\\pi}2\\sin\\frac t2\\,dt=8', exact: 8, view: [-0.7, 7, -0.6, 2.6] },
+      circle: { label: '円 (cos t, sin t), 0 ≤ t ≤ 2π', x: Math.cos, y: Math.sin, dx: (t) => -Math.sin(t), dy: Math.cos, t0: 0, t1: 2 * Math.PI,
+        tex: 'L=\\int_0^{2\\pi}\\sqrt{\\sin^2t+\\cos^2t}\\,dt=2\\pi', exact: 2 * Math.PI, view: [-1.6, 1.6, -1.4, 1.4] },
+      parabola: { label: '放物線 y = x², 0 ≤ x ≤ 2', x: (t) => t, y: (t) => t * t, dx: () => 1, dy: (t) => 2 * t, t0: 0, t1: 2,
+        tex: 'L=\\int_0^2\\sqrt{1+(2x)^2}\\,dx=\\sqrt{17}+\\frac14\\log(4+\\sqrt{17})', exact: Math.sqrt(17) + Math.asinh(4) / 4, view: [-0.5, 2.5, -0.5, 4.5], isFn: true },
+      catenary: { label: 'カテナリー y = cosh x, −1 ≤ x ≤ 1', x: (t) => t, y: Math.cosh, dx: () => 1, dy: Math.sinh, t0: -1, t1: 1,
+        tex: 'L=\\int_{-1}^{1}\\sqrt{1+\\sinh^2x}\\,dx=\\int_{-1}^1\\cosh x\\,dx=2\\sinh1', exact: 2 * Math.sinh(1), view: [-1.5, 1.5, -0.3, 2.2], isFn: true },
+      astroid: { label: 'アステロイド (cos³t, sin³t), 0 ≤ t ≤ 2π', x: (t) => Math.cos(t) ** 3, y: (t) => Math.sin(t) ** 3, dx: (t) => -3 * Math.cos(t) ** 2 * Math.sin(t), dy: (t) => 3 * Math.sin(t) ** 2 * Math.cos(t), t0: 0, t1: 2 * Math.PI,
+        tex: 'L=\\int_0^{2\\pi}3|\\sin t\\cos t|\\,dt=6', exact: 6, view: [-1.5, 1.5, -1.3, 1.3] },
+    };
+    const cur = () => PRESETS[st.preset];
+    const plot = new Plot('#cv-length', { xmin: -0.7, xmax: 7, ymin: -0.6, ymax: 2.6, equal: true, aspect: 0.6 });
+
+    UI.heading(ctl, '曲線と分割');
+    UI.select(ctl, { label: '曲線', options: Object.entries(PRESETS).map(([k, p]) => ({ value: k, label: p.label })), value: st.preset, onChange: (v) => { st.preset = v; draw(); } });
+    UI.slider(ctl, { label: '分割数 $n$', min: 2, max: 100, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; st.k = clamp(st.k, 0, v - 1); sK.setRange(1, v, 1); sK.set(st.k + 1); draw(); } });
+    const sK = UI.slider(ctl, { label: '注目する線分の番号', min: 1, max: st.n, step: 1, value: st.k + 1, digits: 0, onInput: (v) => { st.k = v - 1; draw(); } });
+    UI.texAll(ctl);
+    plot.onHover = (x, y) => {
+      if (x == null) return;
+      const p = cur(), n = st.n;
+      let best = -1, bd = 1e9;
+      for (let i = 0; i < n; i++) {
+        const t0 = p.t0 + (p.t1 - p.t0) * i / n, t1 = p.t0 + (p.t1 - p.t0) * (i + 1) / n;
+        const x0 = p.x(t0), y0 = p.y(t0), x1 = p.x(t1), y1 = p.y(t1);
+        const L2 = (x1 - x0) ** 2 + (y1 - y0) ** 2 || 1e-12;
+        const u = clamp(((x - x0) * (x1 - x0) + (y - y0) * (y1 - y0)) / L2, 0, 1);
+        const d = Math.hypot(x - (x0 + u * (x1 - x0)), y - (y0 + u * (y1 - y0)));
+        if (d < bd) { bd = d; best = i; }
+      }
+      if (best >= 0 && plot.px(bd) < 25 && best !== st.k) { st.k = best; sK.set(best + 1); draw(); }
+    };
+
+    const readout = $('#r-length');
+    function draw() {
+      const p = cur(), n = st.n;
+      plot.setView(...p.view);
+      const pts = [];
+      for (let i = 0; i <= n; i++) { const t = p.t0 + (p.t1 - p.t0) * i / n; pts.push([p.x(t), p.y(t)]); }
+      let poly = 0; const segs = [];
+      for (let i = 0; i < n; i++) { const L = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]); segs.push(L); poly += L; }
+      const exact = integrate((t) => Math.hypot(p.dx(t), p.dy(t)), p.t0, p.t1, 4000);
+      const k = st.k, [x0, y0] = pts[k], [x1, y1] = pts[k + 1];
+      const DX = x1 - x0, DY = y1 - y0;
+      plot.render((P) => {
+        P.param(p.x, p.y, p.t0, p.t1, { color: C.ink, width: 2.4, alpha: 0.9 });
+        P.polygon(pts, { color: C.ochre, width: 2, open: true });
+        for (const q of pts) P.point(q[0], q[1], { color: C.ochre, r: n > 40 ? 2 : 3.5 });
+        P.polygon([[x0, y0], [x1, y0], [x1, y1]], { color: C.clay, width: 1.2, dash: [4, 3], open: true });
+        P.segment(x0, y0, x1, y1, { color: C.clay, width: 3.5 });
+        P.point(x0, y0, { color: C.clay, r: 5 }); P.point(x1, y1, { color: C.clay, r: 5 });
+        if (P.px(Math.abs(DX)) > 30) P.text((x0 + x1) / 2, y0, `Δx=${fmt(DX, 3)}`, { color: C.clay, align: 'center', dy: DY >= 0 ? 16 : -8, bg: true, font: Plot.FONT_MATH });
+        if (P.px(Math.abs(DY)) > 24) P.text(x1, (y0 + y1) / 2, `Δy=${fmt(DY, 3)}`, { color: C.clay, dx: DX >= 0 ? 8 : -8, align: DX >= 0 ? 'left' : 'right', baseline: 'middle', bg: true, font: Plot.FONT_MATH });
+        P.legend([{ label: '曲線', color: C.ink }, { label: `折れ線 (n=${n})：${fmt(poly, 4)}`, color: C.ochre }, { label: `線分 ${k + 1}：${fmt(segs[k], 4)}`, color: C.clay, width: 3.5 }], { left: 12, top: 34 });
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$${p.tex}=${fmt(p.exact, 5)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ochre"><div class="k">折れ線の長さ（n=${n}）</div><div class="v">${fmt(poly, 5)}</div></div>
+          <div class="stat sage"><div class="k">曲線の長さ L（数値積分）</div><div class="v">${fmt(exact, 5)}</div></div>
+          <div class="stat ${exact - poly < 0.01 * exact ? 'sage' : 'clay'}"><div class="k">L − 折れ線</div><div class="v">${fmt(exact - poly, 5)}</div></div>
+          <div class="stat clay"><div class="k">線分 ${k + 1}：Δx, Δy</div><div class="v">${fmt(DX, 4)}, ${fmt(DY, 4)}</div></div>
+          <div class="stat clay"><div class="k">√(Δx² + Δy²)</div><div class="v">${fmt(segs[k], 5)}</div></div>
+        </div>
+        <div class="tex-block small">$$\\sqrt{(${fmt(DX, 3)})^2+(${fmt(DY, 3)})^2}=${fmt(segs[k], 4)}\\qquad ${p.isFn ? `L=\\int_a^b\\sqrt{1+f'(x)^2}\\,dx` : `L=\\int_\\alpha^\\beta\\sqrt{\\left(\\frac{dx}{dt}\\right)^2+\\left(\\frac{dy}{dt}\\right)^2}dt`}$$</div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'riemann', label: '区分求積法' },
+    { id: 'substitution', label: '置換積分の図解' },
+    { id: 'area', label: '面積' },
+    { id: 'volume', label: '回転体の体積' },
+    { id: 'length', label: '曲線の長さ' },
+  ]);
+});
+</script>
+</body>
+</html>
