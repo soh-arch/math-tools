@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>三角関数</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+<style>
+  .canvas-row.unwrap { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+  @media (max-width: 700px) { .canvas-row.unwrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>三角関数</h1>
+    <p class="lede">単位円上の点の動きが、そのままグラフの波になる。$y=A\sin(b(x-c))+d$ の変形、加法定理と合成、三角方程式・不等式の解を、円とグラフの両方で確かめます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <section class="tool-body" data-tab="unwrap">
+    <div class="layout">
+      <aside class="controls" id="c-unwrap"></aside>
+      <div class="stage">
+        <div class="canvas-row unwrap">
+          <div class="canvas-wrap"><canvas id="cv-unwrap-circle"></canvas><div class="caption">単位円（点をドラッグできます）</div></div>
+          <div class="canvas-wrap"><canvas id="cv-unwrap-graph"></canvas><div class="caption">グラフ</div></div>
+        </div>
+        <div class="readout" id="r-unwrap"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink"><div class="title">角 θ の「高さ」と「横の位置」</div>
+        単位円上の点 $\mathrm P(\cos\theta,\ \sin\theta)$ の $y$ 座標を、横軸に $\theta$ をとって並べたものが $y=\sin\theta$ のグラフ。$x$ 座標を並べると $y=\cos\theta$。$\tan\theta$ は直線 $x=1$ 上での高さ、つまり $\dfrac{\sin\theta}{\cos\theta}$ です。</div>
+      <ul>
+        <li>「動かす」を押して、点が円を 1 周する間にグラフが 1 周期分($2\pi$)伸びるのを見よう。</li>
+        <li>$\theta=\dfrac{\pi}{2}$ 付近で $\cos\theta\to0$ となり $\tan\theta$ が発散する。漸近線 $x=\dfrac{\pi}{2}+n\pi$ の理由が円で分かる。</li>
+        <li>$\sin\theta$ と $\cos\theta$ のグラフは $\dfrac{\pi}{2}$ ずれた同じ形。$\cos\theta=\sin\!\left(\theta+\dfrac{\pi}{2}\right)$。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tool-body" data-tab="transform">
+    <div class="layout">
+      <aside class="controls" id="c-transform"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-transform"></canvas></div>
+        <div class="readout" id="r-transform"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ochre"><div class="title">4 つのパラメータの役割</div>
+        $y=A\sin(b(x-c))+d$ で、$|A|$ は振幅（縦の伸び）、$b$ は周期を $\dfrac{2\pi}{b}$ に変える（横の縮み）、$c$ は $x$ 方向、$d$ は $y$ 方向の平行移動。$b$ で縮めるときは「$x$ 軸方向に $\dfrac1b$ 倍」です。</div>
+      <ul>
+        <li>$b$ だけを動かして、$x=0$ の位置は変わらず周期だけが変わることを確認しよう。</li>
+        <li>$y=\sin(2x-\pi)$ を $y=\sin\!\left(2\!\left(x-\dfrac{\pi}{2}\right)\right)$ と読み直すと、平行移動は $\dfrac{\pi}{2}$ だと分かる。$c$ の値と式の見え方を比べよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tool-body" data-tab="compose">
+    <div class="layout">
+      <aside class="controls" id="c-compose"></aside>
+      <div class="stage">
+        <div class="canvas-row unwrap">
+          <div class="canvas-wrap"><canvas id="cv-compose-vec"></canvas><div class="caption">点 (a, b) をドラッグ</div></div>
+          <div class="canvas-wrap"><canvas id="cv-compose-graph"></canvas></div>
+        </div>
+        <div class="readout" id="r-compose"></div>
+        <div class="readout" id="r-addition"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage"><div class="title">合成は加法定理の逆読み</div>
+        $r\sin(x+\alpha)=r\cos\alpha\,\sin x+r\sin\alpha\,\cos x$ なので、$a=r\cos\alpha,\ b=r\sin\alpha$ とおけば $a\sin x+b\cos x=r\sin(x+\alpha)$。点 $(a,b)$ の極座標がそのまま $r$ と $\alpha$ です。</div>
+      <ul>
+        <li>点 $(a,b)$ を原点を中心に回すと、$r$ が変わらず位相 $\alpha$ だけが動く。波の高さは同じで左右にずれる。</li>
+        <li>2 つの波（実線と破線）が常に重なることを確認しよう。$r$ が最大値、$-r$ が最小値。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tool-body" data-tab="solve">
+    <div class="layout">
+      <aside class="controls" id="c-solve"></aside>
+      <div class="stage">
+        <div class="canvas-row unwrap">
+          <div class="canvas-wrap"><canvas id="cv-solve-circle"></canvas><div class="caption">単位円</div></div>
+          <div class="canvas-wrap"><canvas id="cv-solve-graph"></canvas></div>
+        </div>
+        <div class="readout" id="r-solve"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink"><div class="title">方程式は「円と直線の交点」</div>
+        $\sin x=k$ は、単位円と直線 $y=k$ の交点の角を求めること。$\cos x=k$ なら直線 $x=k$、$\tan x=k$ なら原点と点 $(1,k)$ を通る直線と円の交点です。不等式は、直線の上側（下側）にある弧の角の範囲。</div>
+      <ul>
+        <li>$k$ を動かして、$|k|>1$ で $\sin x=k,\ \cos x=k$ の解がなくなる瞬間を見よう。$\tan x=k$ はどんな $k$ でも解が 2 つ。</li>
+        <li>不等式 $\sin x \lt k$ の解が、$0\le x<2\pi$ の範囲では 2 つに分かれることがある。円で見ると 1 つの弧。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$, PI = Math.PI;
+  UI.header({ unit: '数学II', title: '三角関数' });
+
+  /* π の倍数表記 (目盛・読み取り用) */
+  const piTick = (v) => {
+    const k = Math.round(v / (PI / 2));
+    if (Math.abs(v - k * PI / 2) > 1e-6) return fmt(v, 2);
+    if (k === 0) return '0';
+    const sign = k < 0 ? '-' : '', a = Math.abs(k);
+    if (a % 2 === 0) return sign + (a === 2 ? 'π' : (a / 2) + 'π');
+    return sign + (a === 1 ? 'π/2' : a + 'π/2');
+  };
+  const piTex = (x, maxDen = 12) => {
+    const f = UI.toFrac(x / PI, maxDen, 1e-6);
+    if (!f) return fmt(x, 3);
+    let [p, q] = f;
+    if (p === 0) return '0';
+    const sign = p < 0 ? '-' : ''; p = Math.abs(p);
+    const num = p === 1 ? '\\pi' : p + '\\pi';
+    return q === 1 ? sign + num : `${sign}\\dfrac{${num}}{${q}}`;
+  };
+  const piLabel = (x) => {
+    const f = UI.toFrac(x / PI, 12, 1e-6);
+    if (!f) return fmt(x, 2);
+    let [p, q] = f; if (p === 0) return '0';
+    const s = (p < 0 ? '-' : '') + (Math.abs(p) === 1 ? '' : Math.abs(p)) + 'π';
+    return q === 1 ? s : s + '/' + q;
+  };
+  const normalize = (x) => { x = x % (2 * PI); if (x < -1e-12) x += 2 * PI; if (Math.abs(x) < 1e-12 || Math.abs(x - 2 * PI) < 1e-12) x = 0; return x; };
+
+  /* ======================= 単位円とグラフ ======================= */
+  (() => {
+    const ctl = $('#c-unwrap');
+    const st = { t: PI / 3, track: 'sin', showTan: false };
+    const circle = new Plot('#cv-unwrap-circle', { xmin: -1.6, xmax: 1.6, ymin: -1.6, ymax: 1.6, aspect: 1 });
+    const graph = new Plot('#cv-unwrap-graph', { xmin: -0.3, xmax: 4 * PI + 0.3, ymin: -1.9, ymax: 1.9, equal: false, aspect: 0.62, xTick: PI / 2, xTickFormat: piTick, yTick: 1, xLabel: 'θ' });
+    const h = circle.addHandle({ x: Math.cos(st.t), y: Math.sin(st.t), color: C.clay, label: 'P', onMove: (x, y) => {
+      let a = Math.atan2(y, x); if (a < 0) a += 2 * PI;
+      // 前の値に近い巻き数を保つ
+      const turns = Math.floor(st.t / (2 * PI));
+      let cand = [a + (turns - 1) * 2 * PI, a + turns * 2 * PI, a + (turns + 1) * 2 * PI];
+      st.t = cand.reduce((b, v) => Math.abs(v - st.t) < Math.abs(b - st.t) ? v : b, cand[0]);
+      st.t = Math.max(0, Math.min(4 * PI, st.t));
+      sT.set(st.t); return [Math.cos(st.t), Math.sin(st.t)];
+    } });
+    UI.heading(ctl, '角');
+    const sT = UI.slider(ctl, { label: '$\\theta$', min: 0, max: 4 * PI, step: 0.005, value: st.t, format: (v) => piLabel(v) + ' (' + fmt(UI.deg(v), 0) + '°)', onInput: (v) => { st.t = v; draw(); } });
+    const anim = UI.animator((dt) => { st.t += dt * 0.8; if (st.t > 4 * PI) st.t = 0; sT.set(st.t); draw(); });
+    const playBtn = UI.button(ctl, { label: '▶ 動かす', primary: true, onClick: () => { playBtn.textContent = anim.toggle() ? '■ 止める' : '▶ 動かす'; } });
+    UI.divider(ctl);
+    UI.segmented(ctl, { label: '追いかける関数', options: [{ value: 'sin', label: 'sin' }, { value: 'cos', label: 'cos' }, { value: 'tan', label: 'tan' }], value: 'sin', onChange: (v) => { st.track = v; if (v === 'tan') { st.showTan = true; cbTan.set(true); } draw(); } });
+    const cbTan = UI.checkbox(ctl, { label: '$y=\\tan\\theta$ も表示', checked: false, onChange: (v) => { st.showTan = v; draw(); } });
+    const readout = $('#r-unwrap');
+
+    function draw() {
+      const t = st.t, s = Math.sin(t), c = Math.cos(t), tn = Math.tan(t);
+      h.x = c; h.y = s;
+      circle.render((P) => {
+        P.circle(0, 0, 1, { color: C.border, width: 1.5 });
+        P.arc(0, 0, 0.3, 0, t, { color: C.ochre, width: 1.5 });
+        P.segment(0, 0, c, s, { color: C.text, width: 1.5 });
+        P.segment(c, 0, c, s, { color: C.sage, width: 3 });
+        P.segment(0, 0, c, 0, { color: C.clay, width: 3 });
+        if (st.showTan) {
+          P.vline(1, { color: C.ochre, width: 1, dash: [4, 4] });
+          if (Math.abs(c) > 0.02 && Math.abs(tn) < 20) {
+            P.line(0, 0, c, s, { color: C.ochre, width: 1, dash: [3, 4], alpha: 0.7 });
+            P.segment(1, 0, 1, tn, { color: C.ochre, width: 3 });
+            P.point(1, tn, { color: C.ochre, r: 4 });
+          }
+        }
+        P.text(c / 2, 0, 'cos θ', { color: C.clay, dy: s >= 0 ? 16 : -6, align: 'center', bg: true });
+        P.text(c, s / 2, 'sin θ', { color: C.sage, dx: c >= 0 ? 6 : -6, align: c >= 0 ? 'left' : 'right', baseline: 'middle', bg: true });
+      });
+      graph.render((P) => {
+        if (st.showTan) {
+          for (let k = 0; k < 4; k++) P.vline(PI / 2 + k * PI, { color: C.ochreLine, width: 1, dash: [4, 4] });
+          P.fn(Math.tan, { color: C.ochre, width: 1.6 });
+        }
+        P.fn(Math.sin, { color: C.ink, width: 2.4 });
+        P.fn(Math.cos, { color: C.clay, width: 2 });
+        P.rect(0, -1, t, 2, { color: 'none', fill: Plot.rgba(C.ochre, 0.06) });
+        P.vline(t, { color: C.faint, width: 1, dash: [4, 4] });
+        const yv = st.track === 'sin' ? s : st.track === 'cos' ? c : tn;
+        const col = st.track === 'sin' ? C.ink : st.track === 'cos' ? C.clay : C.ochre;
+        if (isFinite(yv) && Math.abs(yv) < 1.9) {
+          P.hline(yv, { color: col, width: 1, dash: [3, 5], alpha: 0.6 });
+          P.point(t, yv, { color: col, r: 6, stroke: C.surface });
+        }
+        P.legend([{ label: 'y = sin θ', color: C.ink }, { label: 'y = cos θ', color: C.clay }].concat(st.showTan ? [{ label: 'y = tan θ', color: C.ochre }] : []), { left: 60 });
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$\\theta=${piTex(t)}\\ (=${fmt(UI.deg(t), 1)}^\\circ),\\qquad \\sin\\theta=${fmt(s, 3)},\\quad \\cos\\theta=${fmt(c, 3)},\\quad \\tan\\theta=${Math.abs(c) < 1e-9 ? '\\text{定義されない}' : fmt(tn, 3)}$$</div>
+        <p class="small">グラフの横軸は角 θ。単位円上の点の <span style="color:${C.sageText || C.sage}">高さ</span> が sin θ、<span style="color:${C.clay}">横の位置</span> が cos θ。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= グラフの変形 ======================= */
+  (() => {
+    const ctl = $('#c-transform');
+    const st = { A: 2, b: 1, c: 0, d: 0, fn: 'sin' };
+    const plot = new Plot('#cv-transform', { xmin: -2 * PI - 0.3, xmax: 2 * PI + 0.3, ymin: -4.5, ymax: 4.5, equal: false, aspect: 0.55, xTick: PI / 2, xTickFormat: piTick, yTick: 1 });
+    UI.heading(ctl, 'y = A sin(b(x − c)) + d');
+    UI.segmented(ctl, { options: [{ value: 'sin', label: 'sin' }, { value: 'cos', label: 'cos' }], value: 'sin', onChange: (v) => { st.fn = v; draw(); } });
+    UI.slider(ctl, { label: '$A$（振幅）', min: -3, max: 3, step: 0.25, value: st.A, onInput: (v) => { st.A = v; draw(); } });
+    UI.slider(ctl, { label: '$b$（周期 $2\\pi/b$）', min: 0.25, max: 4, step: 0.25, value: st.b, onInput: (v) => { st.b = v; draw(); } });
+    UI.slider(ctl, { label: '$c$（$x$ 方向の移動）', min: -PI, max: PI, step: PI / 12, value: st.c, format: piLabel, onInput: (v) => { st.c = v; draw(); } });
+    UI.slider(ctl, { label: '$d$（$y$ 方向の移動）', min: -3, max: 3, step: 0.5, value: st.d, onInput: (v) => { st.d = v; draw(); } });
+    const cbBase = UI.checkbox(ctl, { label: '$y=\\sin x$（元の形）を表示', checked: true, onChange: draw });
+    const readout = $('#r-transform');
+    function draw() {
+      const { A, b, c, d } = st;
+      const base = st.fn === 'sin' ? Math.sin : Math.cos;
+      const f = (x) => A * base(b * (x - c)) + d;
+      const T = 2 * PI / b;
+      plot.render((P) => {
+        if (cbBase.get()) P.fn(base, { color: C.ink, width: 1.4, dash: [5, 5], alpha: 0.5 });
+        P.hline(d, { color: C.faint, width: 1, dash: [3, 5] });
+        P.fn(f, { color: C.ink, width: 2.6 });
+        // 周期の目印
+        const x0 = c, x1 = c + T;
+        P.segment(x0, d, x1, d, { color: C.ochre, width: 2.5 });
+        P.segment(x0, d - 0.15, x0, d + 0.15, { color: C.ochre, width: 2.5 });
+        P.segment(x1, d - 0.15, x1, d + 0.15, { color: C.ochre, width: 2.5 });
+        P.text((x0 + x1) / 2, d, '周期 ' + piLabel(T), { color: C.ochre, align: 'center', dy: A >= 0 ? 18 : -8, bg: true });
+        // 振幅の目印
+        const xa = st.fn === 'sin' ? c + T / 4 : c;
+        P.arrow(xa, d, xa, d + A, { color: C.clay, width: 1.8 });
+        P.text(xa, d + A / 2, '振幅 ' + fmt(Math.abs(A)), { color: C.clay, dx: 8, baseline: 'middle', bg: true });
+        P.point(c, f(c), { color: C.ochre, r: 5, label: `(${piLabel(c)}, ${fmt(f(c))})`, dx: 8, dy: -8 });
+      });
+      const fnName = '\\' + st.fn;
+      const inner = `${fmt(b) === '1' ? '' : fmt(b)}${fmt(c) === '0' ? 'x' : `\\left(x${c < 0 ? '+' : '-'}${piTex(Math.abs(c))}\\right)`}`;
+      readout.innerHTML = `
+        <div class="tex-block">$$y=${fmt(Math.abs(A)) === '1' ? (A < 0 ? '-' : '') : fmt(A)}${fnName}${inner}${fmt(d) === '0' ? '' : (d < 0 ? '-' : '+') + fmt(Math.abs(d))}$$</div>
+        <div class="readout-grid">
+          <div class="stat clay"><div class="k">振幅 |A|</div><div class="v">${fmt(Math.abs(A))}</div></div>
+          <div class="stat ochre"><div class="k">周期 2π/b</div><div class="v">${piLabel(T)} ≈ ${fmt(T, 2)}</div></div>
+          <div class="stat"><div class="k">最大値・最小値</div><div class="v">${fmt(d + Math.abs(A))} , ${fmt(d - Math.abs(A))}</div></div>
+          <div class="stat"><div class="k">平行移動</div><div class="v">x 方向 ${piLabel(c)}, y 方向 ${fmt(d)}</div></div>
+        </div>
+        <p class="small">$y=${fnName} x$ を $y$ 方向に $${fmt(A)}$ 倍、$x$ 方向に $\\dfrac{1}{${fmt(b)}}$ 倍してから、$x$ 方向に $${piTex(c)}$、$y$ 方向に $${fmt(d)}$ 平行移動したグラフ。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 加法定理と合成 ======================= */
+  (() => {
+    const ctl = $('#c-compose');
+    const st = { a: 1, b: Math.sqrt(3), al: 30, be: 45 };
+    const vec = new Plot('#cv-compose-vec', { xmin: -3.5, xmax: 3.5, ymin: -3.5, ymax: 3.5, aspect: 1 });
+    const graph = new Plot('#cv-compose-graph', { xmin: -PI - 0.3, xmax: 2 * PI + 0.3, ymin: -3.6, ymax: 3.6, equal: false, aspect: 0.62, xTick: PI / 2, xTickFormat: piTick, yTick: 1 });
+    const hv = vec.addHandle({ x: st.a, y: st.b, color: C.ochre, label: '(a, b)', onMove: (x, y) => { st.a = Math.round(x * 4) / 4; st.b = Math.round(y * 4) / 4; sA.set(st.a); sB.set(st.b); return [st.a, st.b]; } });
+    UI.heading(ctl, 'a sin x + b cos x');
+    const sA = UI.slider(ctl, { label: '$a$', min: -3, max: 3, step: 0.25, value: st.a, onInput: (v) => { st.a = v; draw(); } });
+    const sB = UI.slider(ctl, { label: '$b$', min: -3, max: 3, step: 0.25, value: st.b, onInput: (v) => { st.b = v; draw(); } });
+    UI.buttonRow(ctl, [
+      { label: 'sin x + √3 cos x', small: true, onClick: () => { st.a = 1; st.b = Math.sqrt(3); sA.set(st.a); sB.set(st.b); draw(); } },
+      { label: 'sin x − cos x', small: true, onClick: () => { st.a = 1; st.b = -1; sA.set(st.a); sB.set(st.b); draw(); } },
+    ]);
+    UI.divider(ctl);
+    UI.heading(ctl, '加法定理の確認');
+    UI.slider(ctl, { label: '$\\alpha$', min: -180, max: 180, step: 5, value: st.al, unit: '°', digits: 0, onInput: (v) => { st.al = v; draw(); } });
+    UI.slider(ctl, { label: '$\\beta$', min: -180, max: 180, step: 5, value: st.be, unit: '°', digits: 0, onInput: (v) => { st.be = v; draw(); } });
+    const readout = $('#r-compose'), radd = $('#r-addition');
+    function draw() {
+      const { a, b } = st;
+      hv.x = a; hv.y = b;
+      const r = Math.hypot(a, b), al = Math.atan2(b, a);
+      vec.render((P) => {
+        P.circle(0, 0, r, { color: C.sageLine, width: 1, dash: [4, 4] });
+        P.arrow(0, 0, a, b, { color: C.ochre, width: 2.5 });
+        P.dropLines(a, b, { color: C.faint });
+        if (r > 0.1) P.angleMark(0, 0, 1, 0, a, b, { r: Math.min(0.9, r * 0.5), color: C.sage, label: 'α' });
+        P.text(a / 2, b / 2, 'r', { color: C.ochre, dx: b >= 0 ? -14 : 8, dy: b >= 0 ? -4 : 14, font: Plot.FONT_MATH, bg: true });
+      });
+      graph.render((P) => {
+        P.fn((x) => a * Math.sin(x), { color: C.ink, width: 1, alpha: 0.35 });
+        P.fn((x) => b * Math.cos(x), { color: C.clay, width: 1, alpha: 0.35 });
+        P.fn((x) => a * Math.sin(x) + b * Math.cos(x), { color: C.ink, width: 3 });
+        P.fn((x) => r * Math.sin(x + al), { color: C.sage, width: 2.5, dash: [8, 6] });
+        P.hline(r, { color: C.ochre, width: 1, dash: [3, 5] }); P.hline(-r, { color: C.ochre, width: 1, dash: [3, 5] });
+        P.legend([{ label: 'a sin x + b cos x', color: C.ink }, { label: 'r sin(x + α)', color: C.sage, dash: [8, 6] }, { label: 'a sin x, b cos x', color: C.faint, width: 1 }], { left: 60 });
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$${UI.texTerm(a, '\\sin x', 2, true) || '0'} ${UI.texTerm(b, '\\cos x', 2)} = ${fmt(r, 3)}\\,\\sin\\left(x+${piTex(al)}\\right)\\qquad r=\\sqrt{a^2+b^2}=${fmt(r, 3)},\\ \\alpha=${fmt(UI.deg(al), 1)}^\\circ$$</div>
+        <p class="small">$a=r\\cos\\alpha=${fmt(r * Math.cos(al), 2)}$、$b=r\\sin\\alpha=${fmt(r * Math.sin(al), 2)}$。最大値 $${fmt(r, 3)}$、最小値 $${fmt(-r, 3)}$。</p>`;
+      const A = UI.rad(st.al), B = UI.rad(st.be);
+      radd.innerHTML = `
+        <div class="tex-block">$$\\sin(${st.al}^\\circ+${st.be}^\\circ)=${fmt(Math.sin(A + B), 4)}\\quad\\text{一方}\\quad \\sin\\alpha\\cos\\beta+\\cos\\alpha\\sin\\beta=${fmt(Math.sin(A) * Math.cos(B), 4)}+${fmt(Math.cos(A) * Math.sin(B), 4)}=${fmt(Math.sin(A) * Math.cos(B) + Math.cos(A) * Math.sin(B), 4)}$$
+        $$\\cos(${st.al}^\\circ+${st.be}^\\circ)=${fmt(Math.cos(A + B), 4)}\\quad\\text{一方}\\quad \\cos\\alpha\\cos\\beta-\\sin\\alpha\\sin\\beta=${fmt(Math.cos(A) * Math.cos(B), 4)}-${fmt(Math.sin(A) * Math.sin(B), 4)}=${fmt(Math.cos(A) * Math.cos(B) - Math.sin(A) * Math.sin(B), 4)}$$</div>`;
+      UI.texAll(readout); UI.texAll(radd);
+    }
+    draw();
+  })();
+
+  /* ======================= 三角方程式・不等式 ======================= */
+  (() => {
+    const ctl = $('#c-solve');
+    const st = { fn: 'sin', k: 0.5, op: '=' };
+    const circle = new Plot('#cv-solve-circle', { xmin: -1.6, xmax: 1.6, ymin: -1.6, ymax: 1.6, aspect: 1 });
+    const graph = new Plot('#cv-solve-graph', { xmin: -0.3, xmax: 2 * PI + 0.3, ymin: -2.2, ymax: 2.2, equal: false, aspect: 0.62, xTick: PI / 2, xTickFormat: piTick, yTick: 1 });
+    UI.heading(ctl, '方程式・不等式');
+    UI.segmented(ctl, { label: '関数', options: [{ value: 'sin', label: 'sin x' }, { value: 'cos', label: 'cos x' }, { value: 'tan', label: 'tan x' }], value: 'sin', onChange: (v) => { st.fn = v; draw(); } });
+    UI.segmented(ctl, { label: '記号', options: [{ value: '=', label: '= k' }, { value: '<', label: '< k' }, { value: '>', label: '> k' }], value: '=', onChange: (v) => { st.op = v; draw(); } });
+    const sK = UI.slider(ctl, { label: '$k$', min: -2, max: 2, step: 0.01, value: st.k, onInput: (v) => { st.k = v; draw(); } });
+    UI.buttonRow(ctl, [
+      { label: '1/2', small: true, onClick: () => { st.k = 0.5; sK.set(0.5); draw(); } },
+      { label: '√2/2', small: true, onClick: () => { st.k = Math.SQRT1_2; sK.set(st.k); draw(); } },
+      { label: '√3/2', small: true, onClick: () => { st.k = Math.sqrt(3) / 2; sK.set(st.k); draw(); } },
+      { label: '−1/2', small: true, onClick: () => { st.k = -0.5; sK.set(-0.5); draw(); } },
+      { label: '1', small: true, onClick: () => { st.k = 1; sK.set(1); draw(); } },
+      { label: '√3', small: true, onClick: () => { st.k = Math.sqrt(3); sK.set(st.k); draw(); } },
+    ]);
+    const readout = $('#r-solve');
+    const F = { sin: Math.sin, cos: Math.cos, tan: Math.tan };
+
+    function solutions() {
+      const k = st.k;
+      if (st.fn === 'sin') { if (Math.abs(k) > 1) return []; const a = Math.asin(k); return [...new Set([normalize(a), normalize(PI - a)].map((v) => +v.toFixed(10)))].sort((x, y) => x - y); }
+      if (st.fn === 'cos') { if (Math.abs(k) > 1) return []; const a = Math.acos(k); return [...new Set([normalize(a), normalize(-a)].map((v) => +v.toFixed(10)))].sort((x, y) => x - y); }
+      const a = Math.atan(k); return [normalize(a), normalize(a + PI)].sort((x, y) => x - y);
+    }
+    function intervals(sols) {
+      // 0 ≤ x < 2π で f(x) op k を満たす区間 (tan の漸近線も境界)
+      const f = F[st.fn], k = st.k;
+      const bounds = [0, ...sols, 2 * PI];
+      if (st.fn === 'tan') bounds.push(PI / 2, 3 * PI / 2);
+      const bs = [...new Set(bounds.map((v) => +v.toFixed(10)))].sort((x, y) => x - y);
+      const out = [];
+      for (let i = 0; i < bs.length - 1; i++) {
+        const lo = bs[i], hi = bs[i + 1]; if (hi - lo < 1e-9) continue;
+        const m = f((lo + hi) / 2);
+        if (st.op === '<' ? m < k : m > k) out.push([lo, hi]);
+      }
+      return out;
+    }
+
+    function draw() {
+      const k = st.k, f = F[st.fn];
+      const sols = solutions();
+      const ivs = st.op === '=' ? [] : intervals(sols);
+      const noSol = st.fn !== 'tan' && Math.abs(k) > 1;
+      circle.render((P) => {
+        P.circle(0, 0, 1, { color: C.border, width: 1.5 });
+        if (st.fn === 'sin') P.hline(k, { color: C.clay, width: 1.5, dash: [5, 4] });
+        else if (st.fn === 'cos') P.vline(k, { color: C.clay, width: 1.5, dash: [5, 4] });
+        else { P.vline(1, { color: C.faint, width: 1, dash: [4, 4] }); P.point(1, k, { color: C.clay, r: 4 }); P.line(0, 0, 1, k, { color: C.clay, width: 1.5, dash: [5, 4] }); }
+        // 不等式の弧
+        for (const [lo, hi] of ivs) P.arc(0, 0, 1, lo, hi, { color: C.sage, width: 6, alpha: 0.7 });
+        for (const x of sols) {
+          P.segment(0, 0, Math.cos(x), Math.sin(x), { color: C.text, width: 1.2 });
+          P.point(Math.cos(x), Math.sin(x), { color: C.sage, r: 5.5, label: piLabel(x), dx: Math.cos(x) >= 0 ? 8 : -8, dy: Math.sin(x) >= 0 ? -8 : 16, align: Math.cos(x) >= 0 ? 'left' : 'right' });
+        }
+        if (sols.length) P.arc(0, 0, 0.35, 0, sols[0], { color: C.ochre, width: 1.5 });
+      });
+      graph.render((P) => {
+        if (st.fn === 'tan') { P.vline(PI / 2, { color: C.ochreLine, width: 1, dash: [4, 4] }); P.vline(3 * PI / 2, { color: C.ochreLine, width: 1, dash: [4, 4] }); }
+        for (const [lo, hi] of ivs) P.rect(lo, P.win.ymin, hi - lo, P.win.ymax - P.win.ymin, { color: 'none', fill: Plot.rgba(C.sage, 0.12) });
+        P.fn(f, { color: C.ink, width: 2.4, domain: [0, 2 * PI] });
+        P.fn(f, { color: C.ink, width: 1, alpha: 0.3 });
+        P.hline(k, { color: C.clay, width: 1.5, dash: [5, 4] });
+        P.text(P.win.xmax, k, 'y = k', { color: C.clay, align: 'right', dx: -6, dy: -6, font: Plot.FONT_MATH, bg: true });
+        for (const [lo, hi] of ivs) P.segment(lo, 0, hi, 0, { color: C.sage, width: 7, alpha: 0.75 });
+        for (const x of sols) P.point(x, k, { color: C.sage, r: 5.5, label: piLabel(x), dx: -6, dy: k >= 0 ? -10 : 18 });
+        P.vline(2 * PI, { color: C.faint, width: 1, dash: [2, 4] });
+      });
+      const fnTex = `\\${st.fn} x`;
+      const kTex = (() => { const f2 = UI.toFrac(k, 8, 1e-6); if (f2) return UI.texFrac(f2[0], f2[1]).replace('\\dfrac', '\\frac'); const s2 = UI.toFrac(k * k, 8, 1e-6); if (s2 && s2[1] <= 4) return (k < 0 ? '-' : '') + `\\frac{\\sqrt{${s2[0] * (s2[1] === 4 ? 1 : s2[1])}}}{${s2[1] === 4 ? 2 : s2[1]}}`.replace('\\frac{\\sqrt{3}}{1}', '\\sqrt{3}').replace('\\frac{\\sqrt{2}}{1}', '\\sqrt{2}'); return fmt(k, 2); })();
+      let ans;
+      if (st.op === '=') ans = noSol ? '\\text{解なし}' : sols.map((x) => `x=${piTex(x)}`).join(',\\ ');
+      else if (ivs.length === 0) ans = '\\text{解なし}';
+      else if (ivs.length === 1 && ivs[0][0] === 0 && Math.abs(ivs[0][1] - 2 * PI) < 1e-9) ans = '0\\le x<2\\pi\\ (\\text{すべて})';
+      else ans = ivs.map(([lo, hi]) => { const L = Math.abs(lo) < 1e-9 ? '0\\le' : `${piTex(lo)}<`; const R = Math.abs(hi - 2 * PI) < 1e-9 ? '<2\\pi' : `<${piTex(hi)}`; return `${L} x ${R}`; }).join(',\\ ');
+      readout.innerHTML = `
+        <div class="tex-block">$$${fnTex} ${st.op === '=' ? '=' : st.op} ${kTex}\\quad (0\\le x<2\\pi)\\qquad\\Longrightarrow\\qquad ${ans}$$</div>
+        <p class="small">${noSol ? `<span style="color:${C.clay}">|k| &gt; 1 なので、直線と単位円は交わらない。</span>` : st.fn === 'tan' ? '直線 x = 1 上の点 (1, k) と原点を結んだ直線が単位円と交わる 2 点が解。周期 π。' : `単位円と直線 ${st.fn === 'sin' ? 'y' : 'x'} = k の交点の角が解。${st.op !== '=' ? '不等式の解は、条件を満たす弧（緑）の角の範囲。' : ''}`}</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'unwrap', label: '単位円とグラフ' },
+    { id: 'transform', label: 'グラフの変形' },
+    { id: 'compose', label: '加法定理と合成' },
+    { id: 'solve', label: '三角方程式・不等式' },
+  ]);
+});
+</script>
+</body>
+</html>
