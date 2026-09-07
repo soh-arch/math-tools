@@ -184,8 +184,7 @@ small, .small { font-size: 0.86rem; color: var(--text-muted); }
 .controls h3 {
   font-size: 0.82rem;
   color: var(--text-faint);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.06em;
   margin-top: 0.4rem;
 }
 .controls h3:first-child { margin-top: 0; }

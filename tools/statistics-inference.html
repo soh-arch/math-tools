@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計的な推測</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script defer src="../assets/plot.js"></script>
+<script defer src="../assets/ui.js"></script>
+</head>
+<body>
+<main class="tool">
+  <div class="tool-head">
+    <h1>統計的な推測</h1>
+    <p class="lede">確率変数の期待値と分散から始めて、二項分布が正規分布に近づく様子、標本平均の分布（中心極限定理）、信頼区間のシミュレーション、仮説検定の考え方までを一つの流れで見ます。</p>
+  </div>
+  <nav id="tabs"></nav>
+
+  <section class="tool-body" data-tab="dist">
+    <div class="layout">
+      <aside class="controls" id="c-dist"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-dist"></canvas></div>
+        <div class="readout" id="r-dist"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink"><div class="title">期待値は「重心」、分散は「散らばり」</div>
+        $E[X]=\sum x_k p_k$ は確率を重みとした平均。$V[X]=\sum (x_k-m)^2p_k=E[X^2]-(E[X])^2$。$Y=aX+b$ とすると $E[Y]=aE[X]+b$、$V[Y]=a^2V[X]$、$\sigma(Y)=|a|\sigma(X)$ です。</div>
+      <ul>
+        <li>$b$ を動かすと分布が平行移動するだけで、分散は変わらない。</li>
+        <li>$a$ を 2 倍にすると標準偏差は 2 倍、分散は 4 倍になる。棒の間隔と幅の変化を見よう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tool-body" data-tab="binom">
+    <div class="layout">
+      <aside class="controls" id="c-binom"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-binom"></canvas></div>
+        <div class="readout" id="r-binom"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage"><div class="title">二項分布 B(n, p) の正規近似</div>
+        $X\sim B(n,p)$ のとき $E[X]=np,\ V[X]=np(1-p)$。$n$ が大きいと $X$ は近似的に正規分布 $N(np,\ np(1-p))$ に従います。棒グラフに曲線がぴったり重なっていくのを確かめよう。</div>
+      <ul>
+        <li>$p=0.1$ のように偏った分布でも、$n$ を大きくすると左右対称に近づく。</li>
+        <li>$n=1$ のとき $E[X]=p,\ V[X]=p(1-p)$。これを $n$ 個足したのが二項分布（独立な和の期待値・分散）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tool-body" data-tab="normal">
+    <div class="layout">
+      <aside class="controls" id="c-normal"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-normal"></canvas><div class="caption">a, b（x 軸上の点）をドラッグ</div></div>
+        <div class="readout" id="r-normal"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ink"><div class="title">標準化 z = (x − μ)/σ</div>
+        どんな正規分布 $N(\mu,\sigma^2)$ でも、$Z=\dfrac{X-\mu}{\sigma}$ は標準正規分布 $N(0,1)$ に従います。だから正規分布表は 1 枚で足りる。$P(\mu-\sigma\le X\le\mu+\sigma)\approx0.683$、$\pm2\sigma$ で $0.954$、$\pm3\sigma$ で $0.997$。</div>
+      <ul>
+        <li>$\sigma$ を変えても、$\mu\pm\sigma$ の範囲の確率は常に約 68.3% であることを確かめよう。</li>
+        <li>面積（確率）は曲線の高さではなく、区間の幅と高さの積の総和。$\sigma$ が大きいほど曲線は低く広い。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tool-body" data-tab="sampling">
+    <div class="layout">
+      <aside class="controls" id="c-sampling"></aside>
+      <div class="stage">
+        <div class="canvas-row">
+          <div class="canvas-wrap"><canvas id="cv-pop"></canvas><div class="caption">母集団の分布</div></div>
+          <div class="canvas-wrap"><canvas id="cv-means"></canvas><div class="caption">標本平均 x̄ のヒストグラム</div></div>
+        </div>
+        <div class="readout" id="r-sampling"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note sage"><div class="title">標本平均の分布（中心極限定理）</div>
+        母平均 $m$、母標準偏差 $\sigma$ の母集団から大きさ $n$ の標本をとると、標本平均 $\bar X$ は $E[\bar X]=m$、$\sigma(\bar X)=\dfrac{\sigma}{\sqrt n}$ で、$n$ が大きければ母集団の形に関係なく正規分布に近づきます。</div>
+      <ul>
+        <li>母集団が偏っていても、$n=30$ 程度で標本平均のヒストグラムは左右対称の山になる。</li>
+        <li>$n$ を 4 倍にすると散らばり（標準偏差）は半分。$\sqrt n$ で割る理由を実験で確かめよう。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tool-body" data-tab="estimate">
+    <div class="layout">
+      <aside class="controls" id="c-est"></aside>
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="cv-est"></canvas></div>
+        <div class="readout" id="r-est"></div>
+      </div>
+    </div>
+    <div class="explain">
+      <h2>見方</h2>
+      <div class="note ochre"><div class="title">「95%」は区間の当たる確率</div>
+        信頼度 95% の信頼区間 $\bar x\pm1.96\dfrac{\sigma}{\sqrt n}$ は、「同じ方法で区間を作ると 100 回のうち約 95 回は母平均を含む」という意味。1 本の区間が母平均を含む確率ではないことに注意。</div>
+      <div class="note clay"><div class="title">仮説検定は「帰無仮説のもとで珍しいか」</div>
+        コインが公正（$p=0.5$）だと仮定して、観測された表の回数が起こる確率（両側）を求める。それが有意水準（5%）より小さければ、仮定を疑って棄却します。棄却できなくても「公正だと証明された」わけではありません。</div>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const C = Plot.C, fmt = UI.fmt, $ = UI.$;
+  UI.header({ unit: '数学B', title: '統計的な推測' });
+
+  function erf(x) { const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x); const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return s * y; }
+  const Phi = (z) => 0.5 * (1 + erf(z / Math.SQRT2));
+  const pdf = (x, mu, sd) => Math.exp(-0.5 * ((x - mu) / sd) ** 2) / (sd * Math.sqrt(2 * Math.PI));
+  function binomPmf(n, p) {
+    const out = new Array(n + 1).fill(0);
+    if (p <= 0) { out[0] = 1; return out; } if (p >= 1) { out[n] = 1; return out; }
+    // 最頻値付近から計算して丸め誤差を避ける
+    let logs = new Array(n + 1);
+    let lc = 0; for (let k = 0; k <= n; k++) { if (k > 0) lc += Math.log((n - k + 1) / k); logs[k] = lc + k * Math.log(p) + (n - k) * Math.log(1 - p); }
+    for (let k = 0; k <= n; k++) out[k] = Math.exp(logs[k]);
+    return out;
+  }
+  function bars(P, xs, ps, w, color, alpha = 0.75, outline = false) {
+    for (let i = 0; i < xs.length; i++) {
+      if (ps[i] < 1e-9) continue;
+      P.rect(xs[i] - w / 2, 0, w, ps[i], outline ? { color, width: 1.5, fill: 'transparent' } : { color: 'none', fill: Plot.rgba(color, alpha) });
+      if (!outline) P.rect(xs[i] - w / 2, 0, w, ps[i], { color: C.surface, width: 1 });
+    }
+  }
+
+  /* ======================= 確率変数と期待値・分散 ======================= */
+  (() => {
+    const ctl = $('#c-dist');
+    const st = { a: 1, b: 0, text: '1 1/6\n2 1/6\n3 1/6\n4 1/6\n5 1/6\n6 1/6' };
+    const plot = new Plot('#cv-dist', { equal: false, aspect: 0.55, xmin: -1, xmax: 13, ymin: -0.05, ymax: 0.6, yLabel: 'P' });
+    UI.heading(ctl, '確率分布（値 確率）');
+    const ta = UI.el('textarea', { rows: 6, value: st.text });
+    ta.value = st.text;
+    ta.addEventListener('input', () => { st.text = ta.value; draw(); });
+    ctl.append(ta);
+    UI.buttonRow(ctl, [
+      { label: 'サイコロ', small: true, onClick: () => set('1 1/6\n2 1/6\n3 1/6\n4 1/6\n5 1/6\n6 1/6') },
+      { label: 'コイン 2 枚の表', small: true, onClick: () => set('0 1/4\n1 1/2\n2 1/4') },
+      { label: 'くじ（賞金）', small: true, onClick: () => set('0 0.85\n1 0.1\n5 0.04\n10 0.01') },
+    ]);
+    function set(t) { st.text = t; ta.value = t; draw(); }
+    UI.heading(ctl, 'Y = aX + b');
+    UI.slider(ctl, { label: '$a$', min: -2, max: 3, step: 0.5, value: 1, onInput: (v) => { st.a = v; draw(); } });
+    UI.slider(ctl, { label: '$b$', min: -4, max: 6, step: 1, value: 0, digits: 0, onInput: (v) => { st.b = v; draw(); } });
+    const readout = $('#r-dist');
+    function parse() {
+      const rows = [];
+      for (const line of st.text.split('\n')) {
+        const m = line.trim().split(/[\s,]+/); if (m.length < 2) continue;
+        const x = parseFloat(m[0]); let p;
+        if (m[1].includes('/')) { const [u, v] = m[1].split('/').map(Number); p = u / v; } else p = parseFloat(m[1]);
+        if (isFinite(x) && isFinite(p) && p >= 0) rows.push([x, p]);
+      }
+      return rows;
+    }
+    function draw() {
+      const rows = parse();
+      const total = rows.reduce((s, r) => s + r[1], 0);
+      const ok = Math.abs(total - 1) < 1e-6;
+      const E = rows.reduce((s, r) => s + r[0] * r[1], 0);
+      const E2 = rows.reduce((s, r) => s + r[0] * r[0] * r[1], 0);
+      const V = E2 - E * E, sd = Math.sqrt(Math.max(0, V));
+      const ys = rows.map(([x, p]) => [st.a * x + st.b, p]);
+      const allX = [...rows.map((r) => r[0]), ...ys.map((r) => r[0])];
+      const lo = Math.min(...allX, 0) - 1, hi = Math.max(...allX, 1) + 1;
+      const pmax = Math.max(...rows.map((r) => r[1]), 0.1);
+      plot.setView(lo, hi, -pmax * 0.08, pmax * 1.25);
+      const w = Math.min(0.8, Math.abs(st.a) * 0.8 || 0.8);
+      plot.render((P) => {
+        bars(P, rows.map((r) => r[0]), rows.map((r) => r[1]), 0.8, C.ink, 0.55);
+        const changed = st.a !== 1 || st.b !== 0;
+        if (changed) bars(P, ys.map((r) => r[0]), ys.map((r) => r[1]), w, C.sage, 0.45);
+        P.point(E, 0, { color: C.ink, r: 6, label: `E[X]=${fmt(E, 2)}`, dx: -10, dy: 22 });
+        P.segment(E - sd, -pmax * 0.04, E + sd, -pmax * 0.04, { color: C.ink, width: 3 });
+        if (changed) { const EY = st.a * E + st.b, sdY = Math.abs(st.a) * sd; P.point(EY, 0, { color: C.sage, r: 6, label: `E[Y]=${fmt(EY, 2)}`, dx: -10, dy: -14 }); P.segment(EY - sdY, -pmax * 0.065, EY + sdY, -pmax * 0.065, { color: C.sage, width: 3 }); }
+        P.legend([{ label: 'X', color: C.ink }, { label: 'Y = aX + b', color: C.sage }], { left: 60 });
+      });
+      readout.innerHTML = `
+        ${ok ? '' : `<div class="note clay"><div class="title">確率の合計が ${fmt(total, 3)} です</div>合計が 1 になるように直してください。</div>`}
+        <div class="tex-block">$$E[X]=\\sum x_kp_k=${fmt(E, 3)},\\quad V[X]=E[X^2]-(E[X])^2=${fmt(E2, 3)}-${fmt(E * E, 3)}=${fmt(V, 3)},\\quad \\sigma(X)=${fmt(sd, 3)}$$</div>
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">E[Y] = aE[X] + b</div><div class="v">${fmt(st.a)}·${fmt(E, 3)} + ${fmt(st.b)} = ${fmt(st.a * E + st.b, 3)}</div></div>
+          <div class="stat sage"><div class="k">V[Y] = a²V[X]</div><div class="v">${fmt(st.a * st.a)}·${fmt(V, 3)} = ${fmt(st.a * st.a * V, 3)}</div></div>
+          <div class="stat sage"><div class="k">σ(Y) = |a|σ(X)</div><div class="v">${fmt(Math.abs(st.a) * sd, 3)}</div></div>
+        </div>
+        <p class="small">軸の下の太い線は 期待値 ± 標準偏差 の範囲。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 二項分布と正規分布 ======================= */
+  (() => {
+    const ctl = $('#c-binom');
+    const st = { n: 20, p: 0.3, normal: true };
+    const plot = new Plot('#cv-binom', { equal: false, aspect: 0.55, xmin: -1, xmax: 21, ymin: 0, ymax: 0.3, yLabel: 'P' });
+    UI.heading(ctl, 'B(n, p)');
+    UI.slider(ctl, { label: '$n$（回数）', min: 1, max: 100, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; draw(); } });
+    UI.slider(ctl, { label: '$p$（確率）', min: 0.05, max: 0.95, step: 0.05, value: st.p, onInput: (v) => { st.p = v; draw(); } });
+    UI.checkbox(ctl, { label: '正規分布 $N(np,\\ np(1-p))$ を重ねる', checked: true, onChange: (v) => { st.normal = v; draw(); } });
+    const readout = $('#r-binom');
+    function draw() {
+      const { n, p } = st, mu = n * p, va = n * p * (1 - p), sd = Math.sqrt(va);
+      const pm = binomPmf(n, p);
+      const pmax = Math.max(...pm);
+      const lo = Math.max(-1, Math.floor(mu - 4.5 * sd) - 1), hi = Math.min(n + 1, Math.ceil(mu + 4.5 * sd) + 1);
+      plot.setView(lo, Math.max(hi, lo + 4), -pmax * 0.05, pmax * 1.2);
+      plot.render((P) => {
+        bars(P, pm.map((_, k) => k), pm, 1, C.ink, 0.55);
+        if (st.normal) P.fn((x) => pdf(x, mu, sd), { color: C.clay, width: 2.4 });
+        P.vline(mu, { color: C.clay, width: 1, dash: [4, 4] });
+        P.segment(mu - sd, pmax * 1.1, mu + sd, pmax * 1.1, { color: C.clay, width: 2 });
+        P.text(mu, pmax * 1.1, `np = ${fmt(mu, 2)},  σ = ${fmt(sd, 2)}`, { color: C.clay, align: 'center', dy: -8, bg: true });
+      });
+      const within = pm.reduce((s, v, k) => s + (Math.abs(k - mu) <= sd ? v : 0), 0);
+      readout.innerHTML = `
+        <div class="tex-block">$$P(X=k)={}_{${n}}\\mathrm C_k\\,(${fmt(p)})^k(${fmt(1 - p)})^{${n}-k}\\qquad E[X]=np=${fmt(mu, 2)},\\quad V[X]=np(1-p)=${fmt(va, 3)},\\quad \\sigma=${fmt(sd, 3)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">P(|X − np| ≤ σ)（二項分布の実際の値）</div><div class="v">${fmt(within, 4)}</div></div>
+          <div class="stat clay"><div class="k">正規分布なら</div><div class="v">${fmt(Phi(1) - Phi(-1), 4)}</div></div>
+          <div class="stat"><div class="k">最も起こりやすい k</div><div class="v">${pm.indexOf(pmax)}（P = ${fmt(pmax, 4)}）</div></div>
+        </div>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 正規分布 ======================= */
+  (() => {
+    const ctl = $('#c-normal');
+    const st = { mu: 50, sd: 10, a: 40, b: 60, z: 1.96 };
+    const plot = new Plot('#cv-normal', { equal: false, aspect: 0.55, xmin: 0, xmax: 100, ymin: -0.004, ymax: 0.045, yLabel: 'f(x)' });
+    const hA = plot.addHandle({ x: st.a, y: 0, color: C.ochre, label: 'a', onMove: (x) => { st.a = Math.min(Math.round(x * 2) / 2, st.b - 0.5); return [st.a, 0]; } });
+    const hB = plot.addHandle({ x: st.b, y: 0, color: C.ochre, label: 'b', onMove: (x) => { st.b = Math.max(Math.round(x * 2) / 2, st.a + 0.5); return [st.b, 0]; } });
+    plot.onChange = () => draw();
+    UI.heading(ctl, 'N(μ, σ²)');
+    UI.slider(ctl, { label: '$\\mu$', min: 20, max: 80, step: 1, value: st.mu, digits: 0, onInput: (v) => { st.mu = v; draw(); } });
+    UI.slider(ctl, { label: '$\\sigma$', min: 2, max: 20, step: 0.5, value: st.sd, onInput: (v) => { st.sd = v; draw(); } });
+    UI.heading(ctl, '区間 a ≤ X ≤ b');
+    UI.buttonRow(ctl, [
+      { label: 'μ ± σ', small: true, onClick: () => { st.a = st.mu - st.sd; st.b = st.mu + st.sd; draw(); } },
+      { label: 'μ ± 2σ', small: true, onClick: () => { st.a = st.mu - 2 * st.sd; st.b = st.mu + 2 * st.sd; draw(); } },
+      { label: 'μ ± 3σ', small: true, onClick: () => { st.a = st.mu - 3 * st.sd; st.b = st.mu + 3 * st.sd; draw(); } },
+      { label: 'μ ± 1.96σ', small: true, onClick: () => { st.a = st.mu - 1.96 * st.sd; st.b = st.mu + 1.96 * st.sd; draw(); } },
+    ]);
+    UI.heading(ctl, '正規分布表');
+    UI.number(ctl, { label: '$z$ =', value: st.z, min: 0, max: 4, step: 0.01, onInput: (v) => { st.z = v; draw(); } });
+    const readout = $('#r-normal');
+    function draw() {
+      const { mu, sd, a, b } = st;
+      hA.x = a; hB.x = b;
+      const f = (x) => pdf(x, mu, sd);
+      const top = pdf(mu, mu, sd);
+      plot.setView(mu - 4.2 * sd, mu + 4.2 * sd, -top * 0.08, top * 1.15);
+      const prob = Phi((b - mu) / sd) - Phi((a - mu) / sd);
+      plot.render((P) => {
+        P.fillBetween(f, 0, a, b, { fill: Plot.rgba(C.sage, 0.35) });
+        P.fn(f, { color: C.ink, width: 2.4 });
+        P.vline(mu, { color: C.faint, width: 1, dash: [4, 4] });
+        for (const k of [-3, -2, -1, 1, 2, 3]) { P.segment(mu + k * sd, 0, mu + k * sd, f(mu + k * sd), { color: C.borderSubtle, width: 1 }); P.text(mu + k * sd, 0, (k > 0 ? '+' : '−') + Math.abs(k) + 'σ', { color: C.faint, align: 'center', dy: 16, font: '11px "Noto Sans JP", sans-serif' }); }
+        P.text((a + b) / 2, f((a + b) / 2) / 2, `P = ${fmt(prob, 4)}`, { color: C.sageText || C.sage, align: 'center', baseline: 'middle', font: 'bold 14px "Noto Sans JP", sans-serif', bg: true });
+        P.text(mu, top, `μ = ${mu}`, { color: C.muted, align: 'center', dy: -8, bg: true });
+      });
+      const za = (a - mu) / sd, zb = (b - mu) / sd;
+      readout.innerHTML = `
+        <div class="tex-block">$$P(${fmt(a)}\\le X\\le${fmt(b)})=P\\left(\\frac{${fmt(a)}-${mu}}{${fmt(sd)}}\\le Z\\le\\frac{${fmt(b)}-${mu}}{${fmt(sd)}}\\right)=P(${fmt(za, 2)}\\le Z\\le${fmt(zb, 2)})=${fmt(prob, 4)}$$</div>
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">確率（緑の面積）</div><div class="v">${fmt(prob, 4)} = ${fmt(prob * 100, 2)}%</div></div>
+          <div class="stat"><div class="k">標準化した区間</div><div class="v">${fmt(za, 2)} ≤ z ≤ ${fmt(zb, 2)}</div></div>
+          <div class="stat ink"><div class="k">正規分布表 P(0 ≤ Z ≤ ${fmt(st.z, 2)})</div><div class="v">${fmt(Phi(st.z) - 0.5, 4)}</div></div>
+        </div>
+        <p class="small">表の値は $P(0\\le Z\\le z)$。$P(Z\\le z)=0.5+$表の値、$P(Z\\ge z)=0.5-$表の値。$z=1.96$ で 0.475（両側 95%）、$z=2.58$ で 0.495（両側 99%）。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 標本平均の分布 ======================= */
+  (() => {
+    const ctl = $('#c-sampling');
+    const POPS = {
+      dice: { label: 'サイコロ（1〜6 一様）', xs: [1, 2, 3, 4, 5, 6], ps: [1, 1, 1, 1, 1, 1].map((v) => v / 6) },
+      skew: { label: '偏った分布', xs: [1, 2, 3, 4, 5, 6], ps: [0.45, 0.25, 0.13, 0.08, 0.05, 0.04] },
+      bimodal: { label: '二峰性', xs: [1, 2, 3, 4, 5, 6], ps: [0.3, 0.15, 0.05, 0.05, 0.15, 0.3] },
+    };
+    const st = { pop: 'dice', n: 5, means: [] };
+    const rnd = UI.rng(20240907);
+    const popPlot = new Plot('#cv-pop', { equal: false, aspect: 0.7, xmin: 0, xmax: 7, ymin: -0.03, ymax: 0.55, yLabel: 'P' });
+    const meanPlot = new Plot('#cv-means', { equal: false, aspect: 0.7, xmin: 0.5, xmax: 6.5, ymin: 0, ymax: 1, yLabel: '' });
+    UI.heading(ctl, '母集団');
+    UI.select(ctl, { options: Object.entries(POPS).map(([v, o]) => ({ value: v, label: o.label })), value: 'dice', onChange: (v) => { st.pop = v; st.means = []; draw(); } });
+    UI.slider(ctl, { label: '標本の大きさ $n$', min: 1, max: 50, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; st.means = []; draw(); } });
+    UI.heading(ctl, '標本抽出');
+    UI.buttonRow(ctl, [
+      { label: '100 回抽出', primary: true, small: true, onClick: () => { sample(100); draw(); } },
+      { label: '1000 回抽出', small: true, onClick: () => { sample(1000); draw(); } },
+      { label: 'リセット', small: true, onClick: () => { st.means = []; draw(); } },
+    ]);
+    const cbNormal = UI.checkbox(ctl, { label: '$N\\!\\left(m,\\ \\dfrac{\\sigma^2}{n}\\right)$ を重ねる', checked: true, onChange: draw });
+    const readout = $('#r-sampling');
+    function drawOne() { const P = POPS[st.pop]; const u = rnd(); let acc = 0; for (let i = 0; i < P.xs.length; i++) { acc += P.ps[i]; if (u < acc) return P.xs[i]; } return P.xs[P.xs.length - 1]; }
+    function sample(times) { for (let t = 0; t < times; t++) { let s = 0; for (let i = 0; i < st.n; i++) s += drawOne(); st.means.push(s / st.n); } }
+    function draw() {
+      const Pp = POPS[st.pop];
+      const m = Pp.xs.reduce((s, x, i) => s + x * Pp.ps[i], 0);
+      const v = Pp.xs.reduce((s, x, i) => s + x * x * Pp.ps[i], 0) - m * m, sd = Math.sqrt(v);
+      popPlot.render((P) => { bars(P, Pp.xs, Pp.ps, 0.8, C.ink, 0.55); P.point(m, 0, { color: C.clay, r: 5, label: `m = ${fmt(m, 2)}`, dx: -12, dy: 20 }); });
+      const se = sd / Math.sqrt(st.n);
+      const bw = Math.max(0.02, Math.min(0.5, se / 2.5));
+      const lo = Math.max(1, m - 4.5 * se), hi = Math.min(6, m + 4.5 * se);
+      const nb = Math.max(1, Math.round((hi - lo) / bw));
+      const counts = new Array(nb).fill(0);
+      for (const x of st.means) { const k = Math.min(nb - 1, Math.max(0, Math.floor((x - lo) / bw))); counts[k]++; }
+      const N = st.means.length;
+      const dens = counts.map((c) => N ? c / (N * bw) : 0);
+      const top = Math.max(pdf(m, m, se), ...dens, 0.5);
+      meanPlot.setView(lo - bw, hi + bw, -top * 0.05, top * 1.15);
+      meanPlot.render((P) => {
+        for (let k = 0; k < nb; k++) if (dens[k] > 0) P.rect(lo + k * bw, 0, bw, dens[k], { color: C.surface, width: 1, fill: Plot.rgba(C.sage, 0.6) });
+        if (cbNormal.get()) P.fn((x) => pdf(x, m, se), { color: C.clay, width: 2.2 });
+        P.vline(m, { color: C.clay, width: 1, dash: [4, 4] });
+        P.screenText(P.W - 10, 8, `${N} 回`, { align: 'right', color: C.muted });
+      });
+      const obsMean = N ? st.means.reduce((s, x) => s + x, 0) / N : NaN;
+      const obsSd = N > 1 ? Math.sqrt(st.means.reduce((s, x) => s + (x - obsMean) ** 2, 0) / N) : NaN;
+      readout.innerHTML = `
+        <div class="readout-grid">
+          <div class="stat ink"><div class="k">母平均 m ／ 母標準偏差 σ</div><div class="v">${fmt(m, 3)} ／ ${fmt(sd, 3)}</div></div>
+          <div class="stat clay"><div class="k">理論値 σ/√n</div><div class="v">${fmt(sd, 3)} / √${st.n} = ${fmt(se, 3)}</div></div>
+          <div class="stat sage"><div class="k">標本平均の平均 ／ 標準偏差（${N} 回）</div><div class="v">${N ? fmt(obsMean, 3) + ' ／ ' + fmt(obsSd, 3) : '—'}</div></div>
+        </div>
+        <p class="small">右のヒストグラムは面積が 1 になるよう縮尺を合わせてある（曲線と比較できる）。</p>`;
+      UI.texAll(readout);
+    }
+    draw();
+  })();
+
+  /* ======================= 信頼区間と仮説検定 ======================= */
+  (() => {
+    const ctl = $('#c-est');
+    const st = { mode: 'ci', mu: 50, sd: 10, n: 25, conf: 95, cis: [], N: 100, k: 60, alpha: 5 };
+    const rnd = UI.rng(7);
+    const plot = new Plot('#cv-est', { equal: false, aspect: 0.6, grid: false, xmin: 30, xmax: 70, ymin: 0, ymax: 52 });
+    UI.segmented(ctl, { options: [{ value: 'ci', label: '信頼区間' }, { value: 'test', label: '仮説検定' }], value: 'ci', onChange: (v) => { st.mode = v; rebuild(); } });
+    const box = UI.el('div', { class: 'controls', style: 'padding:0;border:0;background:none' });
+    ctl.append(box);
+    const readout = $('#r-est');
+    function rebuild() {
+      box.innerHTML = '';
+      if (st.mode === 'ci') {
+        UI.heading(box, '母集団 N(μ, σ²)');
+        UI.slider(box, { label: '$\\mu$（母平均）', min: 40, max: 60, step: 1, value: st.mu, digits: 0, onInput: (v) => { st.mu = v; st.cis = []; draw(); } });
+        UI.slider(box, { label: '$\\sigma$', min: 2, max: 20, step: 1, value: st.sd, digits: 0, onInput: (v) => { st.sd = v; st.cis = []; draw(); } });
+        UI.slider(box, { label: '標本の大きさ $n$', min: 4, max: 100, step: 1, value: st.n, digits: 0, onInput: (v) => { st.n = v; st.cis = []; draw(); } });
+        UI.segmented(box, { label: '信頼度', options: [{ value: 95, label: '95%' }, { value: 99, label: '99%' }], value: st.conf, onChange: (v) => { st.conf = +v; draw(); } });
+        UI.buttonRow(box, [{ label: '50 個の標本をとる', primary: true, small: true, onClick: () => { st.cis = []; for (let i = 0; i < 50; i++) { let s = 0; for (let j = 0; j < st.n; j++) s += gauss(); st.cis.push(st.mu + st.sd * s / st.n); } draw(); } }, { label: 'クリア', small: true, onClick: () => { st.cis = []; draw(); } }]);
+      } else {
+        UI.heading(box, 'コインを N 回投げて表が k 回');
+        UI.slider(box, { label: '$N$（投げる回数）', min: 10, max: 200, step: 1, value: st.N, digits: 0, onInput: (v) => { st.N = v; st.k = Math.min(st.k, v); draw(); } });
+        UI.slider(box, { label: '$k$（表の回数）', min: 0, max: 200, step: 1, value: st.k, digits: 0, onInput: (v) => { st.k = Math.min(v, st.N); draw(); } });
+        UI.segmented(box, { label: '有意水準', options: [{ value: 5, label: '5%' }, { value: 1, label: '1%' }], value: st.alpha, onChange: (v) => { st.alpha = +v; draw(); } });
+      }
+      UI.texAll(box);
+      draw();
+    }
+    function gauss() { let u = 0, v = 0; while (u === 0) u = rnd(); while (v === 0) v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+    function draw() { st.mode === 'ci' ? drawCI() : drawTest(); }
+    function drawCI() {
+      const z = st.conf === 95 ? 1.96 : 2.58, half = z * st.sd / Math.sqrt(st.n);
+      plot.opts.yTickFormat = () => ''; plot.opts.yLabel = ''; plot.opts.xLabel = 'x';
+      plot.setView(st.mu - Math.max(half * 3, 6), st.mu + Math.max(half * 3, 6), -3, 53);
+      let miss = 0;
+      plot.render((P) => {
+        P.vline(st.mu, { color: C.clay, width: 1.5, dash: [5, 4] });
+        P.text(st.mu, 52, `μ = ${st.mu}`, { color: C.clay, align: 'center', dy: 12, bg: true });
+        st.cis.forEach((xb, i) => {
+          const y = 50 - i; const contains = Math.abs(xb - st.mu) <= half; if (!contains) miss++;
+          P.segment(xb - half, y, xb + half, y, { color: contains ? C.sage : C.clay, width: contains ? 1.6 : 2.4 });
+          P.point(xb, y, { color: contains ? C.sage : C.clay, r: 2.5 });
+        });
+        if (!st.cis.length) P.screenText(P.W / 2, P.H / 2, '「50 個の標本をとる」を押すと、各標本の信頼区間が横線で並びます', { align: 'center', color: C.faint });
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$\\bar x\\pm ${z}\\cdot\\frac{\\sigma}{\\sqrt n}=\\bar x\\pm ${z}\\cdot\\frac{${st.sd}}{\\sqrt{${st.n}}}=\\bar x\\pm ${fmt(half, 2)}\\qquad(\\text{信頼度 } ${st.conf}\\%,\\ \\text{幅 } ${fmt(2 * half, 2)})$$</div>
+        <div class="readout-grid">
+          <div class="stat sage"><div class="k">μ を含む区間</div><div class="v">${st.cis.length ? (st.cis.length - miss) + ' / ' + st.cis.length : '—'}</div></div>
+          <div class="stat clay"><div class="k">μ を外した区間</div><div class="v">${st.cis.length ? miss : '—'}</div></div>
+          <div class="stat"><div class="k">期待される外れの数</div><div class="v">50 × ${fmt((100 - st.conf) / 100, 2)} = ${fmt(50 * (100 - st.conf) / 100, 1)}</div></div>
+        </div>
+        <p class="small">$n$ を大きくすると区間は狭くなるが、μ を含む割合は約 ${st.conf}% のまま。信頼度を 99% にすると区間は広がり、外れは減る。</p>`;
+      UI.texAll(readout);
+    }
+    function drawTest() {
+      const N = st.N, k = st.k, p0 = 0.5, mu = N * p0, sd = Math.sqrt(N * p0 * (1 - p0));
+      const pm = binomPmf(N, p0);
+      const zc = st.alpha === 5 ? 1.96 : 2.58;
+      const z = (k - mu) / sd;
+      const pExact = pm.reduce((s, v, i) => s + (Math.abs(i - mu) >= Math.abs(k - mu) - 1e-9 ? v : 0), 0);
+      const pNormal = 2 * (1 - Phi(Math.abs(z)));
+      const reject = Math.abs(z) >= zc;
+      const pmax = Math.max(...pm);
+      plot.opts.yTickFormat = null; plot.opts.xLabel = 'k'; plot.opts.yLabel = 'P';
+      plot.setView(Math.max(-1, mu - 5 * sd), Math.min(N + 1, mu + 5 * sd), -pmax * 0.06, pmax * 1.2);
+      plot.render((P) => {
+        const loC = mu - zc * sd, hiC = mu + zc * sd;
+        P.rect(P.win.xmin, 0, loC - P.win.xmin, P.win.ymax, { color: 'none', fill: Plot.rgba(C.clay, 0.12) });
+        P.rect(hiC, 0, P.win.xmax - hiC, P.win.ymax, { color: 'none', fill: Plot.rgba(C.clay, 0.12) });
+        bars(P, pm.map((_, i) => i), pm, 1, C.ink, 0.5);
+        P.fn((x) => pdf(x, mu, sd), { color: C.ink, width: 1.5, alpha: 0.6 });
+        P.vline(loC, { color: C.clay, width: 1, dash: [4, 4] }); P.vline(hiC, { color: C.clay, width: 1, dash: [4, 4] });
+        P.text(loC, pmax * 1.1, `${fmt(loC, 1)}`, { color: C.clay, align: 'center', bg: true }); P.text(hiC, pmax * 1.1, `${fmt(hiC, 1)}`, { color: C.clay, align: 'center', bg: true });
+        P.text(P.win.xmax, pmax * 1.1, '棄却域', { color: C.clay, align: 'right', dx: -6, bg: true });
+        P.arrow(k, pmax * 0.9, k, pmax * 0.05, { color: reject ? C.clay : C.sage, width: 2.5 });
+        P.text(k, pmax * 0.9, `観測 k = ${k}`, { color: reject ? C.clay : C.sage, align: 'center', dy: -8, font: 'bold 13px "Noto Sans JP", sans-serif', bg: true });
+      });
+      readout.innerHTML = `
+        <div class="tex-block">$$H_0: p=0.5\\quad X\\sim B(${N},\\ 0.5)\\approx N(${fmt(mu, 1)},\\ ${fmt(sd, 2)}^2),\\qquad z=\\frac{${k}-${fmt(mu, 1)}}{${fmt(sd, 2)}}=${fmt(z, 2)}$$</div>
+        <div class="readout-grid">
+          <div class="stat ${reject ? 'clay' : 'sage'}"><div class="k">判定（有意水準 ${st.alpha}%、両側）</div><div class="v">${reject ? 'H₀ を棄却：偏っていると判断' : 'H₀ を棄却できない'}</div></div>
+          <div class="stat"><div class="k">棄却域</div><div class="v">|z| ≥ ${zc}　⇔　k ≤ ${fmt(mu - zc * sd, 1)} または k ≥ ${fmt(mu + zc * sd, 1)}</div></div>
+          <div class="stat ink"><div class="k">P 値（両側）二項分布 ／ 正規近似</div><div class="v">${fmt(pExact, 4)} ／ ${fmt(pNormal, 4)}</div></div>
+        </div>
+        <p class="small">公正なコインなら、表が ${k} 回以上（または同じだけ少なく）出る確率は約 ${fmt(pExact * 100, 2)}%。${reject ? `これは ${st.alpha}% より小さいので「珍しすぎる」と考え、公正という仮定を捨てる。` : `これは ${st.alpha}% 以上なので、公正なコインでも起こりうる範囲。`}</p>`;
+      UI.texAll(readout);
+    }
+    rebuild();
+  })();
+
+  UI.tabs('#tabs', [
+    { id: 'dist', label: '確率変数と期待値' },
+    { id: 'binom', label: '二項分布と正規分布' },
+    { id: 'normal', label: '正規分布' },
+    { id: 'sampling', label: '標本平均の分布' },
+    { id: 'estimate', label: '信頼区間と検定' },
+  ]);
+});
+</script>
+</body>
+</html>
